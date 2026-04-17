@@ -1,0 +1,15 @@
+# LLM 调用
+openai
+python-dotenv
+
+# 科学计算
+numpy
+scipy
+pandas
+
+# 数据可视化
+matplotlib
+seaborn
+
+# 测试
+pytest

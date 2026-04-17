@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# 虚拟环境
+.venv/
+venv/
+env/
+
+# 环境变量（含 API Key，绝对不能提交）
+.env
+
+# IDE
+.vscode/
+.idea/
+.cursor/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 实验输出
+outputs/
+*.png
+*.jpg
+!docs/*.png
+
+# Jupyter
+.ipynb_checkpoints/
+
+# 开题报告 PDF（太大，不需要版本控制）
+*.pdf
