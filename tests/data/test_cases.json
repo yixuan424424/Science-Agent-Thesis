@@ -1,0 +1,147 @@
+{
+  "_comment": "12 个评测用例。tolerance 为相对误差；checker 实现里会与一个最小绝对误差 0.01 取较大者，避免接近 0 的值过严。任务文本统一用英文，避免 B0 的中英文混合输出影响数值抽取。",
+  "cases": [
+    {
+      "id": "num_01",
+      "category": "numerical",
+      "difficulty": "easy",
+      "task": "Compute the determinant of the matrix [[2, 1], [1, 3]]. Reply with the numeric value.",
+      "expected_numeric": [
+        {"name": "determinant", "value": 5.0, "tolerance": 0.02}
+      ],
+      "expected_files": [],
+      "required_tools": ["matrix_operation"]
+    },
+    {
+      "id": "num_02",
+      "category": "numerical",
+      "difficulty": "easy",
+      "task": "Numerically integrate f(x) = x**2 over the interval [0, 1].",
+      "expected_numeric": [
+        {"name": "integral", "value": 0.3333333, "tolerance": 0.02}
+      ],
+      "expected_files": [],
+      "required_tools": ["numerical_integration"]
+    },
+    {
+      "id": "num_03",
+      "category": "numerical",
+      "difficulty": "medium",
+      "task": "Find the real root of the equation x**3 - x - 1 = 0 in the interval [1, 2].",
+      "expected_numeric": [
+        {"name": "root", "value": 1.32472, "tolerance": 0.02}
+      ],
+      "expected_files": [],
+      "required_tools": ["equation_solver"]
+    },
+    {
+      "id": "num_04",
+      "category": "numerical",
+      "difficulty": "easy",
+      "task": "Fit a linear model y = a*x + b to the data x=[0, 1, 2, 3, 4] and y=[1.0, 3.1, 5.0, 7.2, 9.1]. Report the slope and intercept.",
+      "expected_numeric": [
+        {"name": "slope", "value": 2.03, "tolerance": 0.02},
+        {"name": "intercept", "value": 1.02, "tolerance": 0.05}
+      ],
+      "expected_files": [],
+      "required_tools": ["curve_fitting"]
+    },
+    {
+      "id": "stats_01",
+      "category": "statistics",
+      "difficulty": "easy",
+      "task": "Compute the mean and median of the dataset [2.1, 3.5, 4.8, 5.2, 6.7, 7.9, 8.3].",
+      "expected_numeric": [
+        {"name": "mean", "value": 5.5, "tolerance": 0.02},
+        {"name": "median", "value": 5.2, "tolerance": 0.02}
+      ],
+      "expected_files": [],
+      "required_tools": ["descriptive_statistics"]
+    },
+    {
+      "id": "stats_02",
+      "category": "statistics",
+      "difficulty": "medium",
+      "task": "Perform a one-sample t-test on the data [102, 103, 104, 105, 106] to test whether its mean equals 100. Report the t statistic.",
+      "expected_numeric": [
+        {"name": "t_statistic", "value": 5.6569, "tolerance": 0.02}
+      ],
+      "expected_files": [],
+      "required_tools": ["hypothesis_test"]
+    },
+    {
+      "id": "stats_03",
+      "category": "statistics",
+      "difficulty": "easy",
+      "task": "Perform linear regression on x=[1, 2, 3, 4, 5] and y=[2.1, 3.9, 6.2, 8.1, 9.8]. Report the slope, intercept and R squared.",
+      "expected_numeric": [
+        {"name": "slope", "value": 1.96, "tolerance": 0.02},
+        {"name": "intercept", "value": 0.14, "tolerance": 0.10},
+        {"name": "r_squared", "value": 0.998, "tolerance": 0.005}
+      ],
+      "expected_files": [],
+      "required_tools": ["linear_regression"]
+    },
+    {
+      "id": "stats_04",
+      "category": "statistics",
+      "difficulty": "easy",
+      "task": "Compute the Pearson correlation coefficient between x=[1, 2, 3, 4, 5] and y=[2, 4, 6, 8, 10].",
+      "expected_numeric": [
+        {"name": "correlation", "value": 1.0, "tolerance": 0.005}
+      ],
+      "expected_files": [],
+      "required_tools": ["correlation_analysis"]
+    },
+    {
+      "id": "viz_01",
+      "category": "visualization",
+      "difficulty": "easy",
+      "task": "Plot a line chart for x=[1, 2, 3, 4, 5] and y=[1, 4, 9, 16, 25] with title 'Squares' and save the figure.",
+      "expected_numeric": [],
+      "expected_files": [
+        {"tool_name": "line_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": ["line_chart"]
+    },
+    {
+      "id": "viz_02",
+      "category": "visualization",
+      "difficulty": "easy",
+      "task": "Generate a heatmap for the 3x3 matrix [[1, 2, 3], [4, 5, 6], [7, 8, 9]] and save the figure.",
+      "expected_numeric": [],
+      "expected_files": [
+        {"tool_name": "heatmap", "min_size_bytes": 1024}
+      ],
+      "required_tools": ["heatmap"]
+    },
+    {
+      "id": "comp_01",
+      "category": "composite",
+      "difficulty": "medium",
+      "task": "For the dataset [2.1, 3.5, 4.8, 5.2, 6.7, 7.9, 8.3], first compute the mean and standard deviation, then plot a bar chart of these seven values.",
+      "expected_numeric": [
+        {"name": "mean", "value": 5.5, "tolerance": 0.02},
+        {"name": "std", "value": 2.28, "tolerance": 0.05}
+      ],
+      "expected_files": [
+        {"tool_name": "bar_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": ["descriptive_statistics", "bar_chart"]
+    },
+    {
+      "id": "comp_02",
+      "category": "composite",
+      "difficulty": "medium",
+      "task": "Given x=[1, 2, 3, 4, 5] and y=[2.1, 3.9, 6.2, 8.1, 9.8], perform a linear regression to obtain the slope and intercept, then draw a scatter plot with the fitted regression line overlaid.",
+      "expected_numeric": [
+        {"name": "slope", "value": 1.96, "tolerance": 0.02},
+        {"name": "intercept", "value": 0.14, "tolerance": 0.10}
+      ],
+      "expected_files": [
+        {"tool_name": "scatter_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": ["linear_regression", "scatter_chart"]
+    }
+  ]
+}

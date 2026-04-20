@@ -51,4 +51,14 @@ observation 的 data 中取值，不要凭空编造数字或路径。
 """
 
 
-__all__ = ["SYSTEM_PROMPT"]
+MINIMAL_PROMPT = """You are a scientific assistant. You have access to a set of tools \
+for numerical computation, statistics, and visualization. Use the tools when needed \
+to solve the user's task. Reply in the user's language."""
+"""B1 基线提示词。
+
+刻意保持简短：只告诉模型"你能用工具"，不做任何 Thought / 失败重试 / 数据传递规范的引导。
+用来对照 SYSTEM_PROMPT 中所有"针对科学场景的优化"是否真的带来了可量化的收益。
+"""
+
+
+__all__ = ["SYSTEM_PROMPT", "MINIMAL_PROMPT"]
