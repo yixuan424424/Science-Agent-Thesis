@@ -111,6 +111,7 @@ class CheckReport:
                     "name": d.expected.name,
                     "expected_value": d.expected.value,
                     "tolerance": d.expected.tolerance,
+                    "abs_tolerance": d.expected.abs_tolerance,
                     "matched": d.matched,
                     "matched_value": d.matched_value,
                 }
@@ -155,10 +156,13 @@ def extract_numbers(text: str) -> list[float]:
 def _is_match(expected: ExpectedNumeric, value: float) -> bool:
     """判定提取的数值是否与期望匹配。
 
-    使用 max(0.01 绝对误差, |expected| * tolerance) 双阈值，
+    使用 max(expected.abs_tolerance, |expected| * tolerance) 双阈值，
     避免接近 0 时相对误差过苛、绝对值很大时绝对误差过松。
+    abs_tolerance 可按题配置：
+    - 带噪题保持默认 0.01（历史行为）
+    - 闭式精确题可设为 1e-6 让小误差被判出来
     """
-    threshold = max(0.01, abs(expected.value) * expected.tolerance)
+    threshold = max(expected.abs_tolerance, abs(expected.value) * expected.tolerance)
     return abs(value - expected.value) <= threshold
 
 

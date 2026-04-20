@@ -1,5 +1,5 @@
 {
-  "_comment": "36 个评测用例（v1）。tolerance 为相对误差；checker 实现里会与一个最小绝对误差 0.01 取较大者，避免接近 0 的值过严。任务文本统一用英文，避免 B0 的中英文混合输出影响数值抽取。required_tools 支持两种写法：老格式 [\"tool_a\",\"tool_b\"]（AND 语义）和新格式 [[\"a\",\"b\"],[\"c\"]]（外层 AND、内层 OR）。",
+  "_comment": "评测用例（v2.1，36 道原题经 tolerance 分档严化 + 新增 6 道 5-8 步 hard 链式/规划题）。tolerance 为相对误差，abs_tolerance 为最小绝对误差兜底（默认 0.01，沿用历史行为）。checker 用 max(abs_tolerance, |value|*tolerance) 作为阈值。分档规则：极严 (tol=1e-9, abs_tol=1e-6) 用于闭式精确值（整数/简单分数）；中严 (tol=0.001, abs_tol=1e-4) 用于数值方法但理论值精确；宽松 (tol=0.02~0.05, abs_tol=0.01) 用于带噪拟合/采样统计。任务文本统一用英文。required_tools 支持两种写法：老格式 [\"tool_a\",\"tool_b\"]（AND 语义）和新格式 [[\"a\",\"b\"],[\"c\"]]（外层 AND、内层 OR）。",
   "cases": [
     {
       "id": "num_01",
@@ -7,7 +7,7 @@
       "difficulty": "easy",
       "task": "Compute the determinant of the matrix [[2, 1], [1, 3]]. Reply with the numeric value.",
       "expected_numeric": [
-        {"name": "determinant", "value": 5.0, "tolerance": 0.02}
+        {"name": "determinant", "value": 5.0, "tolerance": 1e-9, "abs_tolerance": 1e-6}
       ],
       "expected_files": [],
       "required_tools": ["matrix_operation"]
@@ -18,7 +18,7 @@
       "difficulty": "easy",
       "task": "Numerically integrate f(x) = x**2 over the interval [0, 1].",
       "expected_numeric": [
-        {"name": "integral", "value": 0.3333333, "tolerance": 0.02}
+        {"name": "integral", "value": 0.333333, "tolerance": 0.001, "abs_tolerance": 1e-4}
       ],
       "expected_files": [],
       "required_tools": ["numerical_integration"]
@@ -29,7 +29,7 @@
       "difficulty": "medium",
       "task": "Find the real root of the equation x**3 - x - 1 = 0 in the interval [1, 2].",
       "expected_numeric": [
-        {"name": "root", "value": 1.32472, "tolerance": 0.02}
+        {"name": "root", "value": 1.32472, "tolerance": 0.001, "abs_tolerance": 1e-4}
       ],
       "expected_files": [],
       "required_tools": ["equation_solver"]
@@ -52,8 +52,8 @@
       "difficulty": "easy",
       "task": "Compute the mean and median of the dataset [2.1, 3.5, 4.8, 5.2, 6.7, 7.9, 8.3].",
       "expected_numeric": [
-        {"name": "mean", "value": 5.5, "tolerance": 0.02},
-        {"name": "median", "value": 5.2, "tolerance": 0.02}
+        {"name": "mean", "value": 5.5, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "median", "value": 5.2, "tolerance": 1e-9, "abs_tolerance": 1e-6}
       ],
       "expected_files": [],
       "required_tools": ["descriptive_statistics"]
@@ -64,7 +64,7 @@
       "difficulty": "medium",
       "task": "Perform a one-sample t-test on the data [102, 103, 104, 105, 106] to test whether its mean equals 100. Report the t statistic.",
       "expected_numeric": [
-        {"name": "t_statistic", "value": 5.6569, "tolerance": 0.02}
+        {"name": "t_statistic", "value": 5.6569, "tolerance": 0.001, "abs_tolerance": 5e-4}
       ],
       "expected_files": [],
       "required_tools": ["hypothesis_test"]
@@ -75,9 +75,9 @@
       "difficulty": "easy",
       "task": "Perform linear regression on x=[1, 2, 3, 4, 5] and y=[2.1, 3.9, 6.2, 8.1, 9.8]. Report the slope, intercept and R squared.",
       "expected_numeric": [
-        {"name": "slope", "value": 1.96, "tolerance": 0.02},
-        {"name": "intercept", "value": 0.14, "tolerance": 0.10},
-        {"name": "r_squared", "value": 0.998, "tolerance": 0.005}
+        {"name": "slope", "value": 1.96, "tolerance": 0.005, "abs_tolerance": 0.005},
+        {"name": "intercept", "value": 0.14, "tolerance": 0.05, "abs_tolerance": 0.02},
+        {"name": "r_squared", "value": 0.9976, "tolerance": 0.001, "abs_tolerance": 5e-4}
       ],
       "expected_files": [],
       "required_tools": ["linear_regression"]
@@ -88,7 +88,7 @@
       "difficulty": "easy",
       "task": "Compute the Pearson correlation coefficient between x=[1, 2, 3, 4, 5] and y=[2, 4, 6, 8, 10].",
       "expected_numeric": [
-        {"name": "correlation", "value": 1.0, "tolerance": 0.005}
+        {"name": "correlation", "value": 1.0, "tolerance": 1e-9, "abs_tolerance": 1e-6}
       ],
       "expected_files": [],
       "required_tools": ["correlation_analysis"]
@@ -150,7 +150,7 @@
       "difficulty": "medium",
       "task": "For the matrix A = [[2, 1], [1, 3]], first compute its inverse, then compute the determinant of that inverse matrix. Report the determinant of the inverse.",
       "expected_numeric": [
-        {"name": "det_inverse", "value": 0.2, "tolerance": 0.02}
+        {"name": "det_inverse", "value": 0.2, "tolerance": 1e-9, "abs_tolerance": 1e-6}
       ],
       "expected_files": [],
       "required_tools": [["matrix_operation"]]
@@ -172,7 +172,7 @@
       "difficulty": "medium",
       "task": "Find the positive root of the equation x * exp(x) - 1 = 0 in the interval [0, 1], and report the root.",
       "expected_numeric": [
-        {"name": "root", "value": 0.5671, "tolerance": 0.02}
+        {"name": "root", "value": 0.5671, "tolerance": 0.001, "abs_tolerance": 5e-4}
       ],
       "expected_files": [],
       "required_tools": [["equation_solver"]]
@@ -183,9 +183,9 @@
       "difficulty": "hard",
       "task": "The polynomial x**3 - 6*x**2 + 11*x - 6 = 0 has three real roots, all between 0 and 4. Find all three roots by calling the equation solver on appropriate sub-intervals. Report the three roots in ascending order.",
       "expected_numeric": [
-        {"name": "root_1", "value": 1.0, "tolerance": 0.02},
-        {"name": "root_2", "value": 2.0, "tolerance": 0.02},
-        {"name": "root_3", "value": 3.0, "tolerance": 0.02}
+        {"name": "root_1", "value": 1.0, "tolerance": 0.001, "abs_tolerance": 1e-4},
+        {"name": "root_2", "value": 2.0, "tolerance": 0.001, "abs_tolerance": 1e-4},
+        {"name": "root_3", "value": 3.0, "tolerance": 0.001, "abs_tolerance": 1e-4}
       ],
       "expected_files": [],
       "required_tools": [["equation_solver"]]
@@ -197,9 +197,9 @@
       "difficulty": "medium",
       "task": "Given two independent samples A=[22.5, 23.1, 24.0, 22.8, 23.5] and B=[20.1, 21.2, 19.8, 20.5, 20.9], first compute the mean of each sample, then perform an independent two-sample t-test. Report mean_A, mean_B, and the t statistic.",
       "expected_numeric": [
-        {"name": "mean_A", "value": 23.18, "tolerance": 0.02},
-        {"name": "mean_B", "value": 20.5, "tolerance": 0.02},
-        {"name": "t_statistic", "value": 7.31, "tolerance": 0.03}
+        {"name": "mean_A", "value": 23.18, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "mean_B", "value": 20.5, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "t_statistic", "value": 7.31, "tolerance": 0.002, "abs_tolerance": 0.005}
       ],
       "expected_files": [],
       "required_tools": [["hypothesis_test"]]
@@ -210,8 +210,8 @@
       "difficulty": "medium",
       "task": "Sample data [5.2, 4.8, 5.5, 5.0, 4.9, 5.3, 5.1, 4.7, 5.4, 5.0]. Use the descriptive statistics tool to obtain the sample mean and standard deviation, then analytically compute the 95 percent confidence interval for the mean using CI = mean +/- 1.96 * std / sqrt(n). Report the lower and upper bounds.",
       "expected_numeric": [
-        {"name": "ci_lower", "value": 4.93, "tolerance": 0.03},
-        {"name": "ci_upper", "value": 5.25, "tolerance": 0.03}
+        {"name": "ci_lower", "value": 4.93, "tolerance": 0.005, "abs_tolerance": 0.01},
+        {"name": "ci_upper", "value": 5.25, "tolerance": 0.005, "abs_tolerance": 0.01}
       ],
       "expected_files": [],
       "required_tools": [["descriptive_statistics"]]
@@ -222,8 +222,8 @@
       "difficulty": "medium",
       "task": "For x=[1, 2, 3, 4, 5, 6, 7, 8] and y=[1, 1.5, 3, 5, 8, 13, 21, 34], compute both the Pearson and the Spearman correlation coefficients. Report both values.",
       "expected_numeric": [
-        {"name": "pearson", "value": 0.91, "tolerance": 0.05},
-        {"name": "spearman", "value": 1.0, "tolerance": 0.005}
+        {"name": "pearson", "value": 0.91, "tolerance": 0.02, "abs_tolerance": 0.005},
+        {"name": "spearman", "value": 1.0, "tolerance": 1e-9, "abs_tolerance": 1e-6}
       ],
       "expected_files": [],
       "required_tools": [["correlation_analysis"]]
@@ -234,9 +234,9 @@
       "difficulty": "hard",
       "task": "Given data = [2.1, 2.3, 2.4, 2.5, 2.6, 2.7, 15.0], first compute the descriptive statistics (mean, median, Q1, Q3). Then identify any values outside the range [Q1 - 1.5*IQR, Q3 + 1.5*IQR] as outliers. Remove the outlier and compute the mean of the cleaned data. Report original_mean, the outlier value, and cleaned_mean.",
       "expected_numeric": [
-        {"name": "original_mean", "value": 4.23, "tolerance": 0.02},
-        {"name": "outlier", "value": 15.0, "tolerance": 0.02},
-        {"name": "cleaned_mean", "value": 2.433, "tolerance": 0.02}
+        {"name": "original_mean", "value": 4.22857, "tolerance": 0.001, "abs_tolerance": 5e-4},
+        {"name": "outlier", "value": 15.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "cleaned_mean", "value": 2.43333, "tolerance": 0.001, "abs_tolerance": 5e-4}
       ],
       "expected_files": [],
       "required_tools": [["descriptive_statistics"]]
@@ -310,9 +310,9 @@
       "difficulty": "medium",
       "task": "Given group1=[23, 25, 27, 28, 30] and group2=[18, 20, 21, 22, 23], first compute the mean of each group, then perform an independent two-sample t-test, and finally plot a bar chart with categories 'group1','group2' and the two means as values. Report mean_1, mean_2, and the t statistic.",
       "expected_numeric": [
-        {"name": "mean_1", "value": 26.6, "tolerance": 0.02},
-        {"name": "mean_2", "value": 20.8, "tolerance": 0.02},
-        {"name": "t_statistic", "value": 3.91, "tolerance": 0.05}
+        {"name": "mean_1", "value": 26.6, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "mean_2", "value": 20.8, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "t_statistic", "value": 3.91, "tolerance": 0.005, "abs_tolerance": 0.005}
       ],
       "expected_files": [
         {"tool_name": "bar_chart", "min_size_bytes": 1024}
@@ -325,9 +325,9 @@
       "difficulty": "medium",
       "task": "Compute two integrals over [0, pi]: I1 = integral of sin(x) dx and I2 = integral of cos(x) dx. Report I1, I2, and their sum I1 + I2.",
       "expected_numeric": [
-        {"name": "I1", "value": 2.0, "tolerance": 0.02},
-        {"name": "I2", "value": 0.0, "tolerance": 0.02},
-        {"name": "sum", "value": 2.0, "tolerance": 0.02}
+        {"name": "I1", "value": 2.0, "tolerance": 0.001, "abs_tolerance": 1e-4},
+        {"name": "I2", "value": 0.0, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "sum", "value": 2.0, "tolerance": 0.001, "abs_tolerance": 1e-4}
       ],
       "expected_files": [],
       "required_tools": [["numerical_integration"]]
@@ -353,9 +353,9 @@
       "difficulty": "hard",
       "task": "Execute the following four-step chain on the matrix A = [[2, 1], [0, 3]]. (1) Find the eigenvalues of A. (2) Let b be the LARGER eigenvalue; compute I = integral of sin(x) dx over [0, b]. (3) Let c = I + 1; solve the equation x**2 - c = 0 for the positive root in [0, 5]. (4) Report b, I, and the positive root, clearly labelled.",
       "expected_numeric": [
-        {"name": "b", "value": 3.0, "tolerance": 0.02},
-        {"name": "I", "value": 1.99, "tolerance": 0.02},
-        {"name": "root", "value": 1.729, "tolerance": 0.03}
+        {"name": "b", "value": 3.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "I", "value": 1.99, "tolerance": 0.005, "abs_tolerance": 0.005},
+        {"name": "root", "value": 1.729, "tolerance": 0.005, "abs_tolerance": 0.002}
       ],
       "expected_files": [],
       "required_tools": [["matrix_operation"], ["numerical_integration"], ["equation_solver"]]
@@ -379,9 +379,9 @@
       "difficulty": "medium",
       "task": "For three datasets A=[1, 2, 3, 4, 5], B=[2, 4, 6, 8, 10], C=[1, 1, 2, 3, 5], compute the mean of each dataset, then plot a bar chart with categories ['A','B','C'] and the three means. Report mean_A, mean_B, mean_C.",
       "expected_numeric": [
-        {"name": "mean_A", "value": 3.0, "tolerance": 0.02},
-        {"name": "mean_B", "value": 6.0, "tolerance": 0.02},
-        {"name": "mean_C", "value": 2.4, "tolerance": 0.02}
+        {"name": "mean_A", "value": 3.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "mean_B", "value": 6.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "mean_C", "value": 2.4, "tolerance": 1e-9, "abs_tolerance": 1e-6}
       ],
       "expected_files": [
         {"tool_name": "bar_chart", "min_size_bytes": 1024}
@@ -394,9 +394,9 @@
       "difficulty": "medium",
       "task": "Solve the equation x**2 - 5 = 0 in the interval [0, 3] to find the positive root r. Then compute the integral of x**2 dx over [0, r]. Finally compute the ratio integral / (r**3). Report r, the integral, and the ratio.",
       "expected_numeric": [
-        {"name": "r", "value": 2.236, "tolerance": 0.02},
-        {"name": "integral", "value": 3.727, "tolerance": 0.02},
-        {"name": "ratio", "value": 0.333, "tolerance": 0.02}
+        {"name": "r", "value": 2.2361, "tolerance": 0.001, "abs_tolerance": 5e-4},
+        {"name": "integral", "value": 3.7268, "tolerance": 0.001, "abs_tolerance": 5e-4},
+        {"name": "ratio", "value": 0.33333, "tolerance": 0.001, "abs_tolerance": 5e-4}
       ],
       "expected_files": [],
       "required_tools": [["equation_solver"], ["numerical_integration"]]
@@ -408,7 +408,7 @@
       "difficulty": "medium",
       "task": "Find a root of f(x) = x**3 - 2*x - 5 = 0. Start by searching in the interval [0, 1]; if the solver reports that the endpoints have the same sign, progressively widen the interval (for example try [0, 3], [1, 3], [2, 3]) until a root is found. Report the root.",
       "expected_numeric": [
-        {"name": "root", "value": 2.0946, "tolerance": 0.02}
+        {"name": "root", "value": 2.0946, "tolerance": 0.001, "abs_tolerance": 5e-4}
       ],
       "expected_files": [],
       "required_tools": [["equation_solver"]]
@@ -419,7 +419,7 @@
       "difficulty": "medium",
       "task": "Try to compute the matrix product A @ B where A=[[1, 2, 3], [4, 5, 6]] and B=[[1, 2, 3], [4, 5, 6]]. If the multiplication fails because of incompatible dimensions, transpose B first and retry. Report the trace (sum of the diagonal entries) of the resulting 2x2 product matrix.",
       "expected_numeric": [
-        {"name": "trace", "value": 91.0, "tolerance": 0.02}
+        {"name": "trace", "value": 91.0, "tolerance": 1e-9, "abs_tolerance": 1e-6}
       ],
       "expected_files": [],
       "required_tools": [["matrix_operation"]]
@@ -446,6 +446,103 @@
       ],
       "expected_files": [],
       "required_tools": [["curve_fitting"]]
+    },
+
+    {
+      "id": "hard_01",
+      "category": "composite",
+      "difficulty": "hard",
+      "task": "For the symmetric matrix M = [[2, 1, 0], [1, 2, 1], [0, 1, 2]], execute the following five-step chain: (1) Compute the three eigenvalues of M and report them in ascending order as e1, e2, e3. (2) Let L = e3 (the largest eigenvalue). (3) Perform a linear regression on x=[1, 2, 3, 4, 5] and y=[3.46, 6.75, 10.34, 13.59, 17.09]; report slope_fit and r_squared. (4) Using the numerical integration tool, compute I = integral of (L * x) dx over the interval [0, 2]. (5) Report e1, e2, e3, slope_fit, r_squared, and I.",
+      "expected_numeric": [
+        {"name": "e1", "value": 0.58579, "tolerance": 0.001, "abs_tolerance": 5e-4},
+        {"name": "e2", "value": 2.0, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "e3", "value": 3.41421, "tolerance": 0.001, "abs_tolerance": 5e-4},
+        {"name": "slope_fit", "value": 3.41, "tolerance": 0.005, "abs_tolerance": 0.005},
+        {"name": "r_squared", "value": 0.9998, "tolerance": 0.001, "abs_tolerance": 5e-4},
+        {"name": "I", "value": 6.8284, "tolerance": 0.001, "abs_tolerance": 5e-4}
+      ],
+      "expected_files": [],
+      "required_tools": [["matrix_operation"], ["linear_regression", "curve_fitting"], ["numerical_integration"]]
+    },
+    {
+      "id": "hard_02",
+      "category": "composite",
+      "difficulty": "hard",
+      "task": "For the data x=[0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4] and y=[0.1, 0.9, 2.1, 4.2, 7.1, 11.3, 16.8, 23.7, 32.2], compare three polynomial models and pick the best. (1) Fit a polynomial of degree 1 (linear) and report r_sq_linear. (2) Fit a polynomial of degree 2 and report r_sq_quad. (3) Fit a polynomial of degree 3 and report r_sq_cubic. (4) Choose the SIMPLEST model whose R squared >= 0.999 (prefer degree 1 if it qualifies, otherwise 2, otherwise 3); report best_degree as 1, 2, or 3. (5) Using the best model, compute y_pred_at_5 = the chosen model's prediction at x = 5. (6) Report r_sq_linear, r_sq_quad, r_sq_cubic, best_degree, and y_pred_at_5.",
+      "expected_numeric": [
+        {"name": "r_sq_linear", "value": 0.9018, "tolerance": 0.005, "abs_tolerance": 0.005},
+        {"name": "r_sq_quad", "value": 0.9988, "tolerance": 0.001, "abs_tolerance": 5e-4},
+        {"name": "r_sq_cubic", "value": 0.99998, "tolerance": 0.001, "abs_tolerance": 1e-4},
+        {"name": "best_degree", "value": 3, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "y_pred_at_5", "value": 55.02, "tolerance": 0.005, "abs_tolerance": 0.05}
+      ],
+      "expected_files": [],
+      "required_tools": [["curve_fitting"]]
+    },
+    {
+      "id": "hard_03",
+      "category": "composite",
+      "difficulty": "hard",
+      "task": "Given control group C=[45.2, 47.1, 44.8, 46.5, 45.9, 47.3, 44.7, 46.1] and treatment group T=[48.5, 49.2, 50.1, 47.9, 49.7, 50.3, 48.2, 49.4], execute the following analysis: (1) Use the descriptive statistics tool to compute mean_C. (2) Use the descriptive statistics tool again to compute mean_T. (3) Compute diff = mean_T - mean_C. (4) Perform an independent two-sample t-test (treatment vs control, equal variance assumed) and report t_statistic. Because treatment > control, t_statistic MUST be positive; if your tool returns a negative value, report its absolute value. (5) Plot a bar chart with categories ['control','treatment'] and values [mean_C, mean_T]. (6) Report mean_C, mean_T, diff, and t_statistic.",
+      "expected_numeric": [
+        {"name": "mean_C", "value": 45.95, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "mean_T", "value": 49.1625, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "diff", "value": 3.2125, "tolerance": 0.001, "abs_tolerance": 1e-4},
+        {"name": "t_statistic", "value": 6.8273, "tolerance": 0.005, "abs_tolerance": 0.005}
+      ],
+      "expected_files": [
+        {"tool_name": "bar_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["descriptive_statistics"], ["hypothesis_test"], ["bar_chart"]]
+    },
+    {
+      "id": "hard_04",
+      "category": "composite",
+      "difficulty": "hard",
+      "task": "Execute the following dependent chain: (1) Solve the equation x**3 + x - 10 = 0 for the real root r in the interval [1, 3]. (2) Using numerical integration, compute I = integral of x * exp(-x) dx over [0, r]. (3) Let k = I rounded to 4 decimal places. Construct the sequence s = [k*1, k*2, k*3, k*4, k*5, k*6]. (4) Use the descriptive statistics tool on s to obtain mean_s and std_s (report whatever std the tool returns). (5) Plot a line chart of s versus its index 1..6. (6) Report r, I, mean_s, and std_s.",
+      "expected_numeric": [
+        {"name": "r", "value": 2.0, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "I", "value": 0.594, "tolerance": 0.005, "abs_tolerance": 0.001},
+        {"name": "mean_s", "value": 2.079, "tolerance": 0.005, "abs_tolerance": 0.005},
+        {"name": "std_s", "value": 1.1113, "tolerance": 0.01, "abs_tolerance": 0.01}
+      ],
+      "expected_files": [
+        {"tool_name": "line_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["equation_solver"], ["numerical_integration"], ["descriptive_statistics"], ["line_chart"]]
+    },
+    {
+      "id": "hard_05",
+      "category": "error_recovery",
+      "difficulty": "hard",
+      "task": "Given x=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10] and y=[2.1, 4.2, 5.9, 100.0, 10.3, 12.1, 14.0, 15.9, 18.2, 20.1] (the fourth value y[3]=100.0 is a gross outlier), execute: (1) Perform a linear regression on the full (x, y) and report r_sq_full. (2) If r_sq_full < 0.95, detect the outlier by finding the point whose y-value has the largest absolute deviation from the median of y, and report outlier_value. (3) Remove that outlier to obtain cleaned x_clean and y_clean. (4) Perform a new linear regression on (x_clean, y_clean); report slope_clean and r_sq_clean. (5) Plot a scatter chart of (x_clean, y_clean). (6) Report r_sq_full, outlier_value, slope_clean, and r_sq_clean.",
+      "expected_numeric": [
+        {"name": "r_sq_full", "value": 0.0012, "tolerance": 0.1, "abs_tolerance": 0.005},
+        {"name": "outlier_value", "value": 100.0, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "slope_clean", "value": 1.9971, "tolerance": 0.005, "abs_tolerance": 0.005},
+        {"name": "r_sq_clean", "value": 0.9995, "tolerance": 0.001, "abs_tolerance": 5e-4}
+      ],
+      "expected_files": [
+        {"tool_name": "scatter_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["linear_regression", "curve_fitting"], ["scatter_chart"]]
+    },
+    {
+      "id": "hard_06",
+      "category": "composite",
+      "difficulty": "hard",
+      "task": "For three datasets A=[1, 2, 3, 4, 5, 6], B=[3, 1, 4, 2, 5, 6], C=[6, 5, 7, 4, 8, 3], execute: (1) Compute the Pearson correlation coefficient for each of the three pairs and report r_AB, r_AC, r_BC. (2) Construct a 3x3 correlation matrix (with 1.0 on the diagonal) and visualize it as a heatmap with row and column labels ['A','B','C']. (3) Identify the pair with the SMALLEST ABSOLUTE value of correlation among (A,B), (A,C), (B,C); report that absolute value as min_abs_r. (4) Perform an independent two-sample t-test between the two datasets in that weakest pair; report abs_t_statistic (the absolute value of the t statistic). (5) Report r_AB, r_AC, r_BC, min_abs_r, and abs_t_statistic.",
+      "expected_numeric": [
+        {"name": "r_AB", "value": 0.7143, "tolerance": 0.005, "abs_tolerance": 0.005},
+        {"name": "r_AC", "value": -0.2571, "tolerance": 0.02, "abs_tolerance": 0.005},
+        {"name": "r_BC", "value": 0.0857, "tolerance": 0.05, "abs_tolerance": 0.005},
+        {"name": "min_abs_r", "value": 0.0857, "tolerance": 0.05, "abs_tolerance": 0.005},
+        {"name": "abs_t_statistic", "value": 1.8516, "tolerance": 0.005, "abs_tolerance": 0.005}
+      ],
+      "expected_files": [
+        {"tool_name": "heatmap", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["correlation_analysis"], ["heatmap"], ["hypothesis_test"]]
     }
   ]
 }

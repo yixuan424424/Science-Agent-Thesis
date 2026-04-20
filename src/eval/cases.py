@@ -21,12 +21,18 @@ class ExpectedNumeric:
     """单个数值期望。
 
     name 仅用于报告里指代某个具体指标（如 "mean"）。
-    匹配判定见 checker：使用 max(0.01 绝对误差, value*tolerance) 双阈值。
+    匹配判定见 checker：使用 max(abs_tolerance 绝对误差, |value|*tolerance) 双阈值。
+
+    - tolerance（相对误差）：默认 0.02 即 2%，适合带噪拟合 / 采样统计量
+    - abs_tolerance（绝对误差下限）：默认 0.01，避免接近 0 的期望被过严匹配；
+      对"闭式精确值"（如行列式 = 整数、相关系数 = 1.0）可以设成 1e-6 甚至更小，
+      让 LLM 的心算小误差被判出来。
     """
 
     name: str
     value: float
     tolerance: float = 0.02  # 默认 2% 相对误差
+    abs_tolerance: float = 0.01  # 最小绝对误差兜底，默认沿用历史行为
 
 
 @dataclass
@@ -51,6 +57,9 @@ class TestCase:
     - 空列表 [] 表示不强制任何工具，checker 此时的 tool_call_pass 直接视为 True。
     - JSON 中可以写成老格式 ["a", "b"]，加载时会自动归一化为 [["a"], ["b"]]（即 AND 语义）。
     """
+
+    # 防止 pytest 把我们这个数据类 TestCase 当 unittest 测试类收集
+    __test__ = False
 
     id: str
     category: str  # numerical / statistics / visualization / composite / error_recovery
@@ -106,6 +115,7 @@ def _parse_case(entry: dict) -> TestCase:
             name=item["name"],
             value=float(item["value"]),
             tolerance=float(item.get("tolerance", 0.02)),
+            abs_tolerance=float(item.get("abs_tolerance", 0.01)),
         )
         for item in entry.get("expected_numeric", [])
     ]
