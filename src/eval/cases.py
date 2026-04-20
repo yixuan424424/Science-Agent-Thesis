@@ -43,15 +43,22 @@ class ExpectedFile:
 
 @dataclass
 class TestCase:
-    """单条测试用例。"""
+    """单条测试用例。
+
+    required_tools 采用"组列表"结构：外层 AND、内层 OR。
+    - 例如 [["curve_fitting", "linear_regression"], ["scatter_chart"]] 表示
+      "curve_fitting 或 linear_regression 必须被调用一次，且 scatter_chart 必须被调用一次"。
+    - 空列表 [] 表示不强制任何工具，checker 此时的 tool_call_pass 直接视为 True。
+    - JSON 中可以写成老格式 ["a", "b"]，加载时会自动归一化为 [["a"], ["b"]]（即 AND 语义）。
+    """
 
     id: str
-    category: str  # numerical / statistics / visualization / composite
+    category: str  # numerical / statistics / visualization / composite / error_recovery
     difficulty: str  # easy / medium / hard
     task: str
     expected_numeric: list[ExpectedNumeric] = field(default_factory=list)
     expected_files: list[ExpectedFile] = field(default_factory=list)
-    required_tools: list[str] = field(default_factory=list)
+    required_tools: list[list[str]] = field(default_factory=list)
 
 
 def load_cases(
@@ -116,5 +123,29 @@ def _parse_case(entry: dict) -> TestCase:
         task=entry["task"],
         expected_numeric=expected_numeric,
         expected_files=expected_files,
-        required_tools=list(entry.get("required_tools", [])),
+        required_tools=_normalize_required_tools(entry.get("required_tools", [])),
     )
+
+
+def _normalize_required_tools(raw: list) -> list[list[str]]:
+    """把 JSON 里的 required_tools 统一归一化为 list[list[str]]。
+
+    允许两种写法：
+    - 老格式：["tool_a", "tool_b"]，解释为 [["tool_a"], ["tool_b"]]（AND 语义）
+    - 新格式：[["tool_a", "tool_b"], ["tool_c"]]，第一组 OR、组之间 AND
+    - 空列表 []：保持为 []，表示不强制任何工具
+
+    允许两种写法混用，便于老测试用例与新测试用例共存。
+    """
+    groups: list[list[str]] = []
+    for item in raw:
+        if isinstance(item, str):
+            groups.append([item])
+        elif isinstance(item, list):
+            cleaned = [str(t) for t in item if t]
+            if not cleaned:
+                raise ValueError(f"Empty group in required_tools: {item!r}")
+            groups.append(cleaned)
+        else:
+            raise ValueError(f"Invalid required_tools entry (expect str or list): {item!r}")
+    return groups

@@ -58,6 +58,100 @@ def _format_overall_table(records_by_config: dict[str, list[RunRecord]]) -> str:
     return "\n".join(lines)
 
 
+def _format_pass_only_efficiency_table(
+    records_by_config: dict[str, list[RunRecord]],
+) -> str:
+    """只统计 pass 用例的平均迭代数 / 工具调用数 / 耗时。
+
+    fail 用例会被"早退"或"崩溃"拉低，失去可比性。pass-only 才能公平衡量
+    "同样把题做对时谁更高效"，适合论文里衡量 prompt 优化的效率收益。
+    """
+    lines = [
+        "| Config | Pass cases | Avg iterations (pass) | Avg tool calls (pass) | Avg duration (s, pass) |",
+        "|---|---:|---:|---:|---:|",
+    ]
+    for config, records in records_by_config.items():
+        passed = [r for r in records if r.success]
+        if not passed:
+            lines.append(f"| {config} | 0 | - | - | - |")
+            continue
+        avg_iter = mean(r.iterations for r in passed)
+        avg_calls = mean(r.total_tool_calls for r in passed)
+        avg_dur = mean(r.duration_seconds for r in passed)
+        lines.append(
+            f"| {config} | {len(passed)} | "
+            f"{avg_iter:.2f} | {avg_calls:.2f} | {avg_dur:.2f} |"
+        )
+    return "\n".join(lines)
+
+
+def _format_delta_vs_b1_table(
+    records_by_config: dict[str, list[RunRecord]],
+    baseline: str = "b1",
+) -> str:
+    """展示每个 config 相对基线（默认 b1）的关键指标 delta。
+
+    成功率 delta 用"个数差"（+1 / -2）更直观；效率 delta 用相对百分比。
+    效率指标只在 pass 交集（两个 config 都 pass 的用例集合）上比较，
+    否则"本方多做对一题"和"那题顺带拖慢平均"会混淆。
+    """
+    if baseline not in records_by_config:
+        return f"_No '{baseline}' baseline available; delta table skipped._"
+
+    base_records = {r.case_id: r for r in records_by_config[baseline]}
+    base_pass_ids = {cid for cid, r in base_records.items() if r.success}
+
+    lines = [
+        f"Comparison is relative to **{baseline}**. "
+        f"Efficiency deltas are computed on cases that BOTH configs passed "
+        f"(to avoid mixing 'solved more' with 'spent more time').\n",
+        "| Config | Success delta | Shared-pass cases | Iter delta (pass) | Tool-call delta (pass) | Duration delta (pass) |",
+        "|---|---:|---:|---:|---:|---:|",
+    ]
+
+    for config, records in records_by_config.items():
+        if config == baseline:
+            lines.append(f"| {config} (baseline) | 0 | - | - | - | - |")
+            continue
+
+        this_by_id = {r.case_id: r for r in records}
+        this_pass = sum(1 for r in records if r.success)
+        base_pass = sum(1 for r in base_records.values() if r.success)
+        succ_delta = this_pass - base_pass
+        succ_sign = "+" if succ_delta > 0 else ""
+
+        shared_pass_ids = base_pass_ids & {cid for cid, r in this_by_id.items() if r.success}
+        if not shared_pass_ids:
+            lines.append(
+                f"| {config} | {succ_sign}{succ_delta} | 0 | - | - | - |"
+            )
+            continue
+
+        base_iter = mean(base_records[cid].iterations for cid in shared_pass_ids)
+        this_iter = mean(this_by_id[cid].iterations for cid in shared_pass_ids)
+        base_tc = mean(base_records[cid].total_tool_calls for cid in shared_pass_ids)
+        this_tc = mean(this_by_id[cid].total_tool_calls for cid in shared_pass_ids)
+        base_dur = mean(base_records[cid].duration_seconds for cid in shared_pass_ids)
+        this_dur = mean(this_by_id[cid].duration_seconds for cid in shared_pass_ids)
+
+        def _pct(now: float, base: float) -> str:
+            """形如 '+12.3%' / '-5.1%' / 'n/a'（base=0 无法计算）。"""
+            if base == 0:
+                return "n/a"
+            pct = (now - base) / base * 100
+            sign = "+" if pct >= 0 else ""
+            return f"{sign}{pct:.1f}%"
+
+        lines.append(
+            f"| {config} | {succ_sign}{succ_delta} | {len(shared_pass_ids)} | "
+            f"{_pct(this_iter, base_iter)} | "
+            f"{_pct(this_tc, base_tc)} | "
+            f"{_pct(this_dur, base_dur)} |"
+        )
+
+    return "\n".join(lines)
+
+
 def _format_category_table(
     records_by_config: dict[str, list[RunRecord]],
     cases: list[TestCase],
@@ -179,6 +273,14 @@ def write_report(
 
     parts.append("## Overall\n")
     parts.append(_format_overall_table(records_by_config))
+    parts.append("")
+
+    parts.append("## Efficiency on passed cases\n")
+    parts.append(_format_pass_only_efficiency_table(records_by_config))
+    parts.append("")
+
+    parts.append("## Delta vs baseline\n")
+    parts.append(_format_delta_vs_b1_table(records_by_config, baseline="b1"))
     parts.append("")
 
     parts.append("## By category (success / total)\n")

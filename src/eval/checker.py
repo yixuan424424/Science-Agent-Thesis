@@ -46,8 +46,24 @@ class FileMatchDetail:
 
 @dataclass
 class ToolMatchDetail:
-    tool_name: str
-    matched: bool  # 是否被成功调用过
+    """一个 required_tools 组的匹配详情。
+
+    tool_group：组内候选工具名（长度 >= 1）。组内任一工具被成功调用即视为该组 matched。
+    matched_tool：实际命中的工具名；未命中为 None。
+    """
+
+    tool_group: list[str]
+    matched: bool
+    matched_tool: str | None = None
+
+    def display(self) -> str:
+        """在诊断信息里展示本组的可读写法。
+
+        单工具直接返回工具名；多工具用花括号包起来，例如 {curve_fitting|linear_regression}。
+        """
+        if len(self.tool_group) == 1:
+            return self.tool_group[0]
+        return "{" + "|".join(self.tool_group) + "}"
 
 
 @dataclass
@@ -78,7 +94,7 @@ class CheckReport:
             if missed:
                 reasons.append(f"file miss: {','.join(missed)}")
         if not self.tool_call_pass:
-            missed = [d.tool_name for d in self.tool_details if not d.matched]
+            missed = [d.display() for d in self.tool_details if not d.matched]
             if missed:
                 reasons.append(f"tool miss: {','.join(missed)}")
         return "; ".join(reasons) if reasons else "fail"
@@ -112,7 +128,12 @@ class CheckReport:
                 for d in self.file_details
             ],
             "tool_details": [
-                {"tool_name": d.tool_name, "matched": d.matched} for d in self.tool_details
+                {
+                    "tool_group": d.tool_group,
+                    "matched": d.matched,
+                    "matched_tool": d.matched_tool,
+                }
+                for d in self.tool_details
             ],
         }
 
@@ -227,17 +248,43 @@ def _check_files(
 
 
 def _check_tool_calls(
-    required_tools: list[str], trajectory: list[Step]
+    required_groups: list[list[str]], trajectory: list[Step]
 ) -> tuple[bool, list[ToolMatchDetail]]:
+    """按组检查 required_tools。
+
+    required_groups 约定见 TestCase.required_tools 文档：
+    - 外层 AND：每一组都必须 matched
+    - 内层 OR：组内任一工具被成功调用过，该组即 matched
+    - 空列表（无任何组）视为"无强制要求"，直接返回 True
+
+    这里把成功调用过的工具集合一次性算好，避免在 N×M 上反复扫轨迹。
+    """
+    if not required_groups:
+        return True, []
+
+    successful_tools: set[str] = set()
+    for step in trajectory:
+        if step.tool_name is None:
+            continue
+        if (step.observation or {}).get("success"):
+            successful_tools.add(step.tool_name)
+
     details: list[ToolMatchDetail] = []
     all_matched = True
-    for tool_name in required_tools:
-        ok = any(
-            s.tool_name == tool_name and (s.observation or {}).get("success")
-            for s in trajectory
+    for group in required_groups:
+        hit: str | None = None
+        for tool_name in group:
+            if tool_name in successful_tools:
+                hit = tool_name
+                break
+        details.append(
+            ToolMatchDetail(
+                tool_group=list(group),
+                matched=hit is not None,
+                matched_tool=hit,
+            )
         )
-        details.append(ToolMatchDetail(tool_name=tool_name, matched=ok))
-        if not ok:
+        if hit is None:
             all_matched = False
     return all_matched, details
 
