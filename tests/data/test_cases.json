@@ -543,6 +543,173 @@
         {"tool_name": "heatmap", "min_size_bytes": 1024}
       ],
       "required_tools": [["correlation_analysis"], ["heatmap"], ["hypothesis_test"]]
+    },
+    {
+      "id": "vhard_01",
+      "category": "composite",
+      "difficulty": "hard",
+      "task": "A physicist measures the number of radioactive atoms remaining in a sample at times t (minutes): t=[0, 5, 10, 15, 20, 25, 30] and N=[1000, 779, 607, 472, 368, 287, 223]. Assuming first-order decay N(t) = N0 * exp(-lambda*t) where both N0 and lambda are unknown, determine the decay law from the data using numerical fitting and report the half-life of the sample. Provide, as numerical results, the fitted initial count N0, the decay constant lambda, and the half-life t_half = ln(2) / lambda in the same time units as t. Do not rely on symbolic reasoning alone; your answer must be backed by a numerical fit of the model to the data.",
+      "expected_numeric": [
+        {"name": "N0", "value": 1000.0903, "tolerance": 0.002, "abs_tolerance": 2.0},
+        {"name": "lambda", "value": 0.049988, "tolerance": 0.02, "abs_tolerance": 0.001},
+        {"name": "t_half", "value": 13.8664, "tolerance": 0.02, "abs_tolerance": 0.3}
+      ],
+      "expected_files": [],
+      "required_tools": [["curve_fitting"]]
+    },
+    {
+      "id": "vhard_02",
+      "category": "composite",
+      "difficulty": "hard",
+      "task": "A product team ran an A/B test on conversion rates and collected the following 10 samples per variant. Variant A: [0.12, 0.14, 0.11, 0.13, 0.15, 0.12, 0.14, 0.13, 0.11, 0.15]. Variant B: [0.18, 0.16, 0.19, 0.17, 0.20, 0.18, 0.17, 0.19, 0.16, 0.21]. Assess with statistical rigor whether variant B has a significantly higher mean than variant A, quantify the magnitude of the effect using Cohen's d, and produce a clearly labeled visual comparison of the two sample means that could be dropped into an executive summary. Report the following scalar numbers so the team can put them in a report: mean_A (arithmetic mean of A), mean_B (arithmetic mean of B), t_statistic (two-sample equal-variance t-test with the sign convention B vs A, so a positive value means B > A), and cohens_d = (mean_B - mean_A) / pooled_std, where pooled_std = sqrt(((n_A-1)*var_A + (n_B-1)*var_B) / (n_A + n_B - 2)) with var_A, var_B being sample variances (ddof=1).",
+      "expected_numeric": [
+        {"name": "mean_A", "value": 0.13, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "mean_B", "value": 0.181, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "t_statistic", "value": 7.2205, "tolerance": 0.01, "abs_tolerance": 0.05},
+        {"name": "cohens_d", "value": 3.2291, "tolerance": 0.02, "abs_tolerance": 0.1}
+      ],
+      "expected_files": [
+        {"tool_name": "bar_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["hypothesis_test"], ["bar_chart"]]
+    },
+    {
+      "id": "vhard_03",
+      "category": "error_recovery",
+      "difficulty": "hard",
+      "task": "Consider the equation x**4 - 2*x**2 - 3 = 0. Find its positive real root r using the equation solver tool, then use numerical integration to compute I = integral of x**2 * exp(-x) over the interval [0, r]. Report the positive root r and the integral I. Note that the equation solver requires the two endpoints of the search interval to have function values of opposite signs; you may need to adjust your choice of interval if the initial attempt fails. Use the tools; do not solve symbolically.",
+      "expected_numeric": [
+        {"name": "r", "value": 1.732051, "tolerance": 0.001, "abs_tolerance": 0.001},
+        {"name": "I", "value": 0.502521, "tolerance": 0.01, "abs_tolerance": 0.005}
+      ],
+      "expected_files": [],
+      "required_tools": [["equation_solver"], ["numerical_integration"]]
+    },
+    {
+      "id": "vhard_04",
+      "category": "composite",
+      "difficulty": "hard",
+      "task": "Let M be the 3x3 matrix M = [[2.5e1, -3.7e-1, 4.2e0], [1.1e-2, 8.9e0, -5.5e1], [-7.0e0, 2.3e-2, 1.4e1]] (entries are written in scientific notation and include negative values). Using the matrix tool for every linear-algebra step (do not compute by hand), determine: (a) the determinant det_M of M; (b) the matrix product P = (M transpose) multiplied by M; (c) the largest real eigenvalue lambda_max of P (report the maximum of the real parts of the eigenvalues of P). Report det_M, p_00 (the [0][0] entry of P), and lambda_max as numbers.",
+      "expected_numeric": [
+        {"name": "det_M", "value": 3265.893, "tolerance": 0.001, "abs_tolerance": 1.0},
+        {"name": "p_00", "value": 674.0001, "tolerance": 0.001, "abs_tolerance": 0.5},
+        {"name": "lambda_max", "value": 3313.1325, "tolerance": 0.001, "abs_tolerance": 1.0}
+      ],
+      "expected_files": [],
+      "required_tools": [["matrix_operation"]]
+    },
+
+    {
+      "_group_comment": "扩展用例 v3：8 道针对 RATS 和 DAGPlanner 的定向 hard 题（对应第六轮更新）",
+      "id": "ext_rs_01",
+      "category": "statistics",
+      "difficulty": "medium",
+      "task": "Compute the Pearson correlation coefficient between X=[1, 2, 3, 4, 5] and Y=[2, 4, 6, 8, 10]. Report only the correlation coefficient.",
+      "expected_numeric": [
+        {"name": "correlation", "value": 1.0, "tolerance": 1e-6, "abs_tolerance": 1e-6}
+      ],
+      "expected_files": [],
+      "required_tools": [["correlation_analysis"]]
+    },
+    {
+      "id": "ext_rs_02",
+      "category": "statistics",
+      "difficulty": "medium",
+      "task": "Perform a two-sided one-sample t-test on the dataset [4.8, 5.2, 5.0, 4.9, 5.1, 5.0, 4.9, 5.1] against the null hypothesis mean = 5.0 at significance level 0.05. Report the p-value.",
+      "expected_numeric": [
+        {"name": "p_value", "value": 1.0, "tolerance": 0.02, "abs_tolerance": 0.02}
+      ],
+      "expected_files": [],
+      "required_tools": [["hypothesis_test"]]
+    },
+    {
+      "id": "ext_rs_03",
+      "category": "numerical",
+      "difficulty": "medium",
+      "task": "Fit a quadratic polynomial y = a*x^2 + b*x + c to the data x=[-2, -1, 0, 1, 2] and y=[4.0, 1.0, 0.0, 1.0, 4.0]. Report the three coefficients a, b, c.",
+      "expected_numeric": [
+        {"name": "a", "value": 1.0, "tolerance": 1e-6, "abs_tolerance": 1e-5},
+        {"name": "b", "value": 0.0, "tolerance": 1e-6, "abs_tolerance": 1e-5},
+        {"name": "c", "value": 0.0, "tolerance": 1e-6, "abs_tolerance": 1e-5}
+      ],
+      "expected_files": [],
+      "required_tools": [["curve_fitting"]]
+    },
+    {
+      "id": "ext_rs_04",
+      "category": "visualization",
+      "difficulty": "medium",
+      "task": "Create a heatmap visualization of the 3x3 matrix [[1.0, 0.5, -0.3], [0.5, 1.0, 0.2], [-0.3, 0.2, 1.0]] with colors encoding values. Save the figure and report the file path.",
+      "expected_numeric": [],
+      "expected_files": [
+        {"tool_name": "heatmap", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["heatmap"]]
+    },
+    {
+      "id": "ext_dag_01",
+      "category": "composite",
+      "difficulty": "hard",
+      "task": "Execute this chain strictly in order: (1) Compute determinant D of [[4, 2], [1, 3]]. (2) Solve x^2 - D = 0 for its positive root R in [1, 5]. (3) Numerically integrate f(x) = x over [0, R]; call it I. (4) Construct s = [R*1, R*2, R*3, R*4] and compute its descriptive statistics (mean_s and sample std_s). (5) Plot s on a line chart versus index 1..4. Report D, R, I, mean_s, std_s.",
+      "expected_numeric": [
+        {"name": "D", "value": 10.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "R", "value": 3.16228, "tolerance": 0.001, "abs_tolerance": 0.001},
+        {"name": "I", "value": 5.0, "tolerance": 0.005, "abs_tolerance": 0.01},
+        {"name": "mean_s", "value": 7.9057, "tolerance": 0.005, "abs_tolerance": 0.01},
+        {"name": "std_s", "value": 4.0825, "tolerance": 0.01, "abs_tolerance": 0.05}
+      ],
+      "expected_files": [
+        {"tool_name": "line_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["matrix_operation"], ["equation_solver"], ["numerical_integration"], ["descriptive_statistics"], ["line_chart"]]
+    },
+    {
+      "id": "ext_dag_02",
+      "category": "composite",
+      "difficulty": "hard",
+      "task": "Given x=[1, 2, 3, 4, 5] and y=[3, 5, 7, 9, 11]: (1) compute descriptive statistics of x (report mean_x, std_x); (2) compute descriptive statistics of y (report mean_y); (3) compute the Pearson correlation coefficient between x and y; (4) fit a linear regression y = slope*x + intercept (report slope, intercept); (5) produce a scatter chart of (x, y). Report mean_x, std_x, mean_y, correlation, slope, intercept.",
+      "expected_numeric": [
+        {"name": "mean_x", "value": 3.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "std_x", "value": 1.5811, "tolerance": 0.001, "abs_tolerance": 0.001},
+        {"name": "mean_y", "value": 7.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "correlation", "value": 1.0, "tolerance": 1e-6, "abs_tolerance": 1e-6},
+        {"name": "slope", "value": 2.0, "tolerance": 1e-6, "abs_tolerance": 1e-6},
+        {"name": "intercept", "value": 1.0, "tolerance": 1e-6, "abs_tolerance": 1e-5}
+      ],
+      "expected_files": [
+        {"tool_name": "scatter_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["descriptive_statistics"], ["correlation_analysis"], ["linear_regression"], ["scatter_chart"]]
+    },
+    {
+      "id": "ext_dag_03",
+      "category": "composite",
+      "difficulty": "hard",
+      "task": "Let A = [[2, 1], [1, 2]]. (1) Compute the determinant D of A. (2) Compute the inverse matrix Ainv of A. (3) Compute the matrix product Ainv * [[3], [3]]; the result is the 2x1 solution vector x of the linear system A*x = [3, 3]. Report D and the two components x1, x2 of x.",
+      "expected_numeric": [
+        {"name": "D", "value": 3.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "x1", "value": 1.0, "tolerance": 1e-6, "abs_tolerance": 1e-5},
+        {"name": "x2", "value": 1.0, "tolerance": 1e-6, "abs_tolerance": 1e-5}
+      ],
+      "expected_files": [],
+      "required_tools": [["matrix_operation"]]
+    },
+    {
+      "id": "ext_dag_04",
+      "category": "composite",
+      "difficulty": "hard",
+      "task": "Execute: (1) Solve x^2 - 4 = 0 for its positive root r1 in [0, 3]. (2) Solve x^3 - 8 = 0 for its real root r2 in [0, 4]. (3) Solve x - 1 = 0 in [0, 2] for r3. (4) Form R = [r1, r2, r3] and compute descriptive statistics (mean_R, sample std_R). (5) Plot R as a bar chart. Report r1, r2, r3, mean_R, std_R.",
+      "expected_numeric": [
+        {"name": "r1", "value": 2.0, "tolerance": 1e-6, "abs_tolerance": 1e-5},
+        {"name": "r2", "value": 2.0, "tolerance": 1e-6, "abs_tolerance": 1e-5},
+        {"name": "r3", "value": 1.0, "tolerance": 1e-6, "abs_tolerance": 1e-5},
+        {"name": "mean_R", "value": 1.6667, "tolerance": 0.005, "abs_tolerance": 0.005},
+        {"name": "std_R", "value": 0.5774, "tolerance": 0.01, "abs_tolerance": 0.01}
+      ],
+      "expected_files": [
+        {"tool_name": "bar_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["equation_solver"], ["descriptive_statistics"], ["bar_chart"]]
     }
   ]
 }

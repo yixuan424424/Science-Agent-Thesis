@@ -36,23 +36,117 @@ for _name in ("stdout", "stderr"):
         except Exception:
             pass
 
-from src.agent import NoToolsAgent, ReActAgent  # noqa: E402
+from src.agent import (  # noqa: E402
+    CoTReActAgent,
+    DAGAgent,
+    NoToolsAgent,
+    PlanAndSolveAgent,
+    ReActAgent,
+    ReflexionAgent,
+)
+from src.agent.messages import AgentResult  # noqa: E402
 from src.eval import DEFAULT_CASES_PATH, RunRecord, load_cases, run_case, write_report  # noqa: E402
 from src.prompts import MINIMAL_PROMPT, SYSTEM_PROMPT  # noqa: E402
+from src.tool_selector import RATS  # noqa: E402
 from src.tools import build_all_tools  # noqa: E402
 
 
-CONFIG_NAMES = ["b0", "b1", "ours"]
+# 所有支持的配置名:
+# - b0/b1/ours 为原有（ours = v4 SYSTEM_PROMPT + ReAct）
+# - b2         : CoT + 工具
+# - b3         : Plan-and-Solve 两阶段（无 JSON 校验）
+# - b4         : Reflexion（失败即反思）
+# - ours_rats  : v4 Prompt + ReAct + RATS（只上工具选择）
+# - ours_dag   : v4 Prompt + DAGAgent（只上结构化规划，不筛工具）
+# - ours_full  : v4 Prompt + DAGAgent + RATS（主打配置）
+CONFIG_NAMES = [
+    "b0", "b1", "b2", "b3", "b4",
+    "ours", "ours_rats", "ours_dag", "ours_full",
+]
 
 
-def build_agent(config: str):
+class RATSReActAgent:
+    """每次 run(task) 前用 RATS 筛一遍工具，再委托给内置 ReActAgent。
+
+    用于 ``ours_rats`` 配置：v4 Prompt 和 ReAct 主循环保持不变，唯一差异是
+    工具集合变成"按任务精简后的子集"。
+    """
+
+    def __init__(
+        self,
+        tools: list,
+        selector: RATS,
+        system_prompt: str,
+        max_iterations: int = 10,
+    ) -> None:
+        self._tools = tools
+        self._selector = selector
+        self._system_prompt = system_prompt
+        self._max_iterations = max_iterations
+
+    def run(self, task: str) -> AgentResult:
+        selected = self._selector.select(task) or self._tools
+        inner = ReActAgent(
+            tools=selected,
+            system_prompt=self._system_prompt,
+            max_iterations=self._max_iterations,
+        )
+        return inner.run(task)
+
+
+def _build_rats(tools: list) -> RATS:
+    """构造并预热一个 RATS 实例（所有工具向量一次性算好）。"""
+    rats = RATS(tools=tools)
+    rats.build()
+    return rats
+
+
+def build_agent(config: str, *, max_iterations: int = 10):
     """根据配置名构造对应的 agent；返回 (agent, tools_available)。"""
     if config == "b0":
         return NoToolsAgent(), False
     if config == "b1":
-        return ReActAgent(tools=build_all_tools(), system_prompt=MINIMAL_PROMPT), True
+        return ReActAgent(
+            tools=build_all_tools(),
+            system_prompt=MINIMAL_PROMPT,
+            max_iterations=max_iterations,
+        ), True
     if config == "ours":
-        return ReActAgent(tools=build_all_tools(), system_prompt=SYSTEM_PROMPT), True
+        return ReActAgent(
+            tools=build_all_tools(),
+            system_prompt=SYSTEM_PROMPT,
+            max_iterations=max_iterations,
+        ), True
+    if config == "b2":
+        return CoTReActAgent(
+            tools=build_all_tools(),
+            max_iterations=max_iterations,
+        ), True
+    if config == "b3":
+        return PlanAndSolveAgent(
+            tools=build_all_tools(),
+            max_iterations=max_iterations,
+        ), True
+    if config == "b4":
+        return ReflexionAgent(
+            tools=build_all_tools(),
+            max_iterations=max_iterations,
+        ), True
+    if config == "ours_rats":
+        tools = build_all_tools()
+        rats = _build_rats(tools)
+        return RATSReActAgent(
+            tools=tools,
+            selector=rats,
+            system_prompt=SYSTEM_PROMPT,
+            max_iterations=max_iterations,
+        ), True
+    if config == "ours_dag":
+        return DAGAgent(tools=build_all_tools(), selector=None), True
+    if config == "ours_full":
+        tools = build_all_tools()
+        rats = _build_rats(tools)
+        return DAGAgent(tools=tools, selector=rats), True
     raise ValueError(f"Unknown config: {config}")
 
 
@@ -125,7 +219,7 @@ def main() -> None:
     total = len(cases) * len(configs)
     counter = 0
     for config in configs:
-        agent, tools_available = build_agent(config)
+        agent, tools_available = build_agent(config, max_iterations=args.max_iterations)
         for case in cases:
             counter += 1
             print(f"[{counter}/{total}] config={config} case={case.id} ... ", end="", flush=True)
