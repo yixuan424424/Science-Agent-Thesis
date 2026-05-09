@@ -1,0 +1,80 @@
+\cleardoublepage
+
+\section{相关工作}
+
+本章围绕本文方法所处的研究语境，分别从大语言模型智能体框架、任务规划、工具检索与选择、以及检索增强生成四个方向梳理与本文最相关的代表性工作，
+并在每一节末尾点明本文方法与其的差异点，作为后续算法章节展开的对照。
+
+\subsection{大语言模型智能体框架}
+
+大语言模型智能体的研究通常围绕“如何让模型在生成文本之外，进一步与外部环境交互、调用工具、执行任务”展开。
+\citeauthor{yao2023react}~\cite{yao2023react} 提出的 ReAct 范式将“推理”与“行动”交替进行，
+让模型在每一轮自由地写出思考（Thought）、产生行动（Action）、读入观测（Observation），并反复迭代直至完成任务。
+ReAct 的优势在于其极简且通用：仅依靠少样本提示即可在问答、事实校验、文本游戏与网页购物等迥异任务上取得有竞争力的效果，
+且整个交互轨迹对人类可读、便于诊断与编辑。
+工业界标准化的函数调用接口~\cite{openai2023functioncalling}进一步把“产生行动”这一步形式化为结构化的 \texttt{tool\_calls} 字段，
+让模型直接输出符合 \textsc{JSON} 模式的工具调用指令，并将工具返回作为下一轮的输入消息，
+从而把 ReAct 的“Thought-Action-Observation”循环映射到主流 SDK 的消息列表抽象上。
+
+为了进一步降低工程门槛，\citeauthor{schick2023toolformer}~\cite{schick2023toolformer} 提出的 Toolformer 通过自监督方式让模型在预训练语料中学会主动插入 API 调用，
+\citeauthor{qin2023toollearning}~\cite{qin2023toollearning} 系统地综述了基础模型时代的“工具学习”研究脉络，
+\textsc{LangChain}~\cite{langchain2023} 与 \textsc{LlamaIndex}~\cite{llamaindex2023} 则把工具封装、记忆管理、链式调度等组件抽象成可复用的开源框架。
+\citeauthor{shen2023hugginggpt}~\cite{shen2023hugginggpt} 进一步把 LLM 作为“控制器”串联起 \textsc{HuggingFace} 模型库中的多种专用模型，展示了 LLM 作为多模型路由器的可能性。
+
+\paragraph{与本文的差异}
+上述工作奠定了 LLM 智能体的范式与生态基础，本文也将 ReAct 主循环与函数调用接口作为底层执行机制。
+但这些工作大多聚焦在通用任务，对“工具库扩张后如何在不增加 token 成本的前提下保证选择精度”、
+“长依赖链任务如何避免参数错绑”等科学场景中的具体痛点，并没有给出结构化的算法解决方案。
+本文则在 ReAct 主循环之上额外叠加了两个轻量但形式化清晰的算法模块（RATS 与 DAGPlanner），并把它们与 4 条科学场景专用的提示工程规则一起，作为科学场景的整体优化方案。
+
+\subsection{任务规划与思维链}
+
+围绕“如何让模型在执行前先想好整体计划”，相关研究形成了一条从静态思维链到动态可观测规划的演进脉络。
+\citeauthor{wei2022cot}~\cite{wei2022cot} 首次发现，给少量带有“逐步推理”示例的提示，模型即可在算术、常识与符号推理任务上展现出涌现的多步推理能力，
+\citeauthor{wang2023selfconsistency}~\cite{wang2023selfconsistency} 在此基础上提出自洽性思维链，通过对多条推理轨迹采样并取多数答案进一步提升鲁棒性。
+然而思维链本质上是一个静态的“黑箱推理”过程，模型无法在推理中获取外部信息，也难以处理需要长程交互的任务。
+
+\citeauthor{wang2023plansolve}~\cite{wang2023plansolve} 提出的 Plan-and-Solve 把推理切分为“先生成自然语言计划、再按计划求解”两阶段，
+让模型在执行前显式地写出步骤列表，缓解了一次性长链推理中的步骤遗漏问题。
+\citeauthor{yao2023tot}~\cite{yao2023tot} 则提出 Tree-of-Thoughts，把推理空间组织成一棵搜索树并允许回溯与剪枝，更适合解空间不唯一的探索性任务。
+\citeauthor{shinn2023reflexion}~\cite{shinn2023reflexion} 提出的 Reflexion 在 ReAct 的基础上引入“失败后生成自我反思并追加到下一轮 system message”的机制，
+通过语言形式的强化学习让模型在多轮迭代中自我纠错，是当前在多种 Agent 评测基准上表现最强的轻量基线之一。
+
+\paragraph{与本文的差异}
+Plan-and-Solve 与 Reflexion 都是本文实验中的对照基线（分别对应配置 B3 与 B4）。
+两者的共同特征是把“计划”与“反思”仍然作为自由形式的自然语言文本，由 LLM 自主生成、自主消费，缺乏一种纯代码可校验的结构化模式。
+这导致它们在长依赖链科学任务上仍然会出现“计划写得头头是道、执行时参数错绑”的失败模式（详见第六章关键案例分析）。
+本文 DAGPlanner 与之的核心差异在于：明确定义带依赖占位符的 \textbf{Plan Schema}，并设计 \textbf{纯代码校验器} 在不调用 LLM 的前提下捕获 5 类典型失败模式，
+仅在校验失败时才以错误驱动的方式触发携带诊断信息的有限次重规划。
+Tree-of-Thoughts 适合解空间庞大的探索性任务，但科学计算任务的解通常唯一且步骤相对线性，故本文未采用树状搜索范式。
+
+\subsection{工具检索与选择}
+
+随着工具库规模的扩张，“先检索再调用”的工具选择思路逐渐受到关注。
+\citeauthor{patil2023gorilla}~\cite{patil2023gorilla} 提出的 Gorilla 在大量真实 API 上微调一个专用模型，并通过检索增强让模型能够动态适配 API 文档的更新；
+\citeauthor{qin2024toolllm}~\cite{qin2024toolllm} 提出的 ToolLLM 进一步把工具数量扩展到 16000+，并引入基于 DFS 的决策树搜索机制改善路径规划质量；
+\citeauthor{liu2024retool}~\cite{liu2024retool} 则尝试用强化学习训练模型的工具使用策略，把工具选择与组合作为一个可学习的策略问题。
+\textsc{Berkeley Function Calling Leaderboard}~\cite{bfcl2024} 等公开评测基准的出现，则为不同方法在统一口径下比较工具调用能力提供了基础设施。
+
+\paragraph{与本文的差异}
+上述工具检索类工作大多以“训练专用模型 + 大规模 API 库”为前提，工程门槛与计算成本较高，
+也在一定程度上限制了它们在中等规模、强调零样本可用性的科学场景中的直接落地。
+本文 RATS 走的是另一条更轻量的路线：完全免训练、零样本，仅依赖通用的句子嵌入模型与简单的规则化重排，
+在工具规模为 10 至 100 的中等量级上即可显著缓解上下文膨胀问题，
+特别契合科研工作者“快速基于现有 LLM API 拼出可用智能体”的现实诉求。
+RATS 同时保留了 \texttt{HashEmbedder} 离线 fallback 机制以及最低候选数兜底策略，使得算法在网络异常或 API 鉴权切换时仍可平稳运行。
+
+\subsection{检索增强生成}
+
+检索增强生成（Retrieval-Augmented Generation，RAG）由 \citeauthor{lewis2020rag}~\cite{lewis2020rag} 系统性提出，
+其核心思想是“先检索再生成”：在生成任务前先从外部知识库中检索若干相关文档，把它们与原始问题一同喂给生成模型。
+RAG 在知识密集型问答任务上显著缓解了大模型的事实幻觉问题，并在工业界催生了以 \textsc{LlamaIndex}~\cite{llamaindex2023} 为代表的成熟工程栈。
+\citeauthor{karpukhin2020dpr}~\cite{karpukhin2020dpr} 提出的稠密向量检索（Dense Passage Retrieval）则为 RAG 提供了高质量的检索骨干，
+使得“嵌入向量 + 余弦相似度”的检索范式成为检索增强生成中最常用的实现方式之一。
+
+\paragraph{与本文的差异}
+传统 RAG 把“文档”作为检索对象，目标是把外部知识注入到 LLM 的推理过程；
+本文 RATS 则把这一思想迁移到智能体场景，把“工具”作为新的检索对象，
+通过对工具描述与示例进行嵌入，在每一次任务到来时动态筛出最相关的候选工具子集，再交给 LLM 做最终的工具调用。
+从这个视角看，RATS 可以理解为“工具维度的轻量化 RAG”，
+两者在检索骨干（嵌入 + 余弦相似度）上同源，但在检索对象、重排特征、与 LLM 的协同方式上有本质差异。

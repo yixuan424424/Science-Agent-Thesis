@@ -1,0 +1,113 @@
+\cleardoublepage
+
+\section{分析与讨论}
+
+第五章给出了同口径主实验、按类别细分、消融研究与效率分析四组数据，对方法的整体有效性提供了量化支持。
+本章在此基础上下钻到具体案例与失败模式，对四个具有代表性的关键现象进行深度剖析，并就 RATS 在当前工具规模下的效率-准确率权衡给出诚实的讨论。
+
+\subsection{关键案例剖析}\label{sec:analysis-cases}
+
+本节挑选 4 个能直接支撑第三章方法贡献的代表性案例，每个案例均能在 \texttt{outputs/eval/20260423\_103843/results.json} 中按 \texttt{case\_id} 索引到完整轨迹。
+
+\subsubsection{Case 1（hard\_03）：数值精度陷阱}
+
+任务要求计算多组温度样本的均值 \texttt{mean\_T} 与 t 统计量，其中 \texttt{mean\_T} 的真值为 \texttt{49.1625}，期望容差 $|y - y^{*}|<0.01$。
+B1、B3、B4 三个基线均输出 \texttt{49.16}（保留 2 位小数），被数值正确性维度判 miss。
+而本文 \texttt{Ours} 的 O2 规则显式要求“最终答复保留至少 4--6 位有效数字”，使 LLM 在 Answer 阶段输出 \texttt{49.1625}，顺利通过判分。
+
+这一案例反映了科学场景下 LLM 的一种典型偏差：在自然语言生成时倾向于“看起来合理就好”，自发地把工具返回的精确数字向人类阅读习惯做截断。
+仅靠 ReAct 主循环或 CoT 提示无法约束这种偏差，必须通过提示工程层的强约束（O2）来纠正。
+该案例同时也是消融实验中“去掉 v4 prompt 即等价于 B1”的具体证据：B1 与 \texttt{Ours} 在该题上的判分差异，正是 O1--O4 规则贡献的量化体现。
+
+\subsubsection{Case 2（vhard\_02）：t 统计量符号约定}
+
+任务给定 A、B 两组样本要求计算 t 统计量，按定义“B 组减 A 组”应得带负号的值（约 $-7.22$）。
+B1、B2、B3、B4 均输出绝对值 \texttt{7.22}，被判 miss；
+而 \texttt{Ours} 在 O3 规则“严格按任务定义执行、不做符号变换”的约束下输出带负号的 $-7.22$，通过判分。
+
+本案例的科学意义在于：t 检验中 t 统计量的符号承载方向信息，在生物医学、心理学等领域常用于判断“处理组优于对照组”还是反之；自由忽略符号会颠覆假设检验的结论。
+这进一步说明科学场景下提示工程不仅要约束“怎么算”，还要约束“怎么报告”，二者缺一不可。
+
+\subsubsection{Case 3（ext\_dag\_01）：长依赖链的轨迹可解释性}
+
+\texttt{ext\_dag\_01} 是为压测 DAGPlanner 而新增的 5 步链式任务：先用 \texttt{matrix\_operation} 求矩阵 $A$ 的行列式 $D$，
+随后用 \texttt{equation\_solver} 求方程 $x^2 - D = 0$ 的根 $r$，再用 \texttt{numerical\_integration} 在 $[0, r]$ 上求 $f(x)$ 的积分，
+继续用 \texttt{descriptive\_statistics} 对若干样本统计，最后用 \texttt{line\_chart} 把整段计算的关键数据画成折线图。
+\autoref{fig:dag-trace} 展示 \texttt{Ours\_full} 在该题上的执行轨迹，5 个步骤之间通过 \verb|${sX.field}| 占位符显式声明依赖关系，与 DAGPlanner 自动生成的 \texttt{depends\_on} 集合完全吻合，因此一次性通过 \texttt{PlanValidator} 校验、无需重规划。
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.96\linewidth]{fig_dag_trace.pdf}
+    \caption{\label{fig:dag-trace}\texttt{Ours\_full} 在 \texttt{ext\_dag\_01} 任务上的 5 步链式执行轨迹。蓝色实线为依赖箭头，箭头标签为占位符；紫色虚线表示所有步骤的输出最终汇入 Answer LLM。}
+\end{figure}
+
+虽然 B1 在该题上同样能通过判分（用了 6 次迭代、5 次工具调用），但其轨迹在 \texttt{trajectory} 中是“线性的、隐式的”——下一步参数对上一步输出字段的依赖完全藏在 LLM 的中间思考里；
+而 \texttt{Ours\_full} 把这条依赖关系外显为 Plan Schema 中的 \texttt{depends\_on} 字段与 \verb|${sX.field}| 占位符，在执行前即可被纯代码静态校验，在执行后亦可被外部工具复盘。
+这种轨迹可解释性与可复现性，是 DAGPlanner 在长依赖链任务上的核心价值，与单纯的成功率提升正交但同样重要。
+
+\subsubsection{Case 4（hard\_02）：DAG 校验失败 + ReAct 安全网}
+
+\texttt{hard\_02} 要求在数据上同时拟合一次与二次曲线、用 $R^2$ 比较两者并预测 $x=5$ 处的 $y$ 值。
+该题的难点在于“一次拟合 vs 二次拟合”的工具参数都是 \texttt{curve\_fitting}，但 \texttt{model} 字段不同，且需要分别从两次工具返回的 \texttt{params.0} 与 \texttt{params.1} 取值再做手动算术。
+\texttt{Ours+DAG} 单独使用时在该题上失败（首次 plan 中 \verb|${s1.params}| 占位符的字段路径写错，进入重规划仍未自然恢复）；
+而 \texttt{Ours\_full} 通过 RATS 收紧候选集后，DAGPlanner 重规划次数命中硬上限 3 次，触发 fallback 平滑降级到 ReActAgent，由 ReAct 主循环以多轮工具调用最终完成，整体判分通过。
+
+这一案例对应 \autoref{sec:dag-planner} 末尾“双层架构”的设计动机：
+DAGPlanner 不必照顾所有任务形态，可以对结构化任务做激进强约束；当激进约束在边界场景失效时，ReAct 安全网吸收回归风险，避免“一处变更触发全局失败”。
+在 486 次 run 中触发 fallback 的占比仅约 1.2\%，与 \autoref{sec:dag-planner} 重规划收敛性讨论中 $(1-p)^{R+1}$ 的尾部估计在量级上吻合。
+
+\subsection{失败模式聚类}\label{sec:analysis-failures}
+
+把 486 次 run 中所有不通过的案例按失败诊断（来自 \texttt{summary.md} 的 \texttt{Diagnostic} 列）做聚类，可以归纳为如\autoref{tab:failure-modes}所示的 4 类典型失败模式。
+每一类都对应一项本文方法的设计回应，构成“失败模式 $\to$ 设计应对”的闭合论证链。
+
+\begin{table}[ht]
+    \centering
+    \caption{\label{tab:failure-modes}486 次 run 的 4 类典型失败模式与对应设计回应}
+    \begin{tabularx}{\linewidth}{|l|X|X|X|}
+        \hline
+        失败模式 & 典型案例 & 根因 & 本文设计回应 \\ \hline
+        JSON 解析错（HTTP 400） & \texttt{viz\_03}, \texttt{viz\_04}（B1/B2/B3/B4 多次出现） & LLM 在特定 prompt 下生成非法的 \texttt{function.arguments} JSON & O4 在 SYSTEM\_PROMPT 末尾注入完整范例轨迹，使模型学到合法 JSON 的形态 \\ \hline
+        数值精度 miss & \texttt{hard\_03}（B1/B3/B4）、\texttt{vhard\_02}（B1/B2/B3/B4） & LLM 自发把工具返回数字截断为 2--3 位小数 & O2 显式要求保留 4--6 位有效数字 \\ \hline
+        工具覆盖 miss & \texttt{comp\_04}, \texttt{viz\_05}（B0 为主） & 无工具时只能硬算 & 不属于优化对象，B0 即“无工具能力上限”参照 \\ \hline
+        占位符 unresolved & \texttt{hard\_04}, \texttt{vhard\_01}（\texttt{Ours+DAG}） & LLM 规划器猜错工具输出字段 & DAGPlanner 通过 \texttt{TOOL\_OUTPUT\_FIELDS} 字典动态注入字段白名单到 PLANNER\_SYSTEM\_PROMPT 中 \\ \hline
+    \end{tabularx}
+\end{table}
+
+“占位符 unresolved”这一类失败模式值得专门讨论。
+它发生在 LLM 规划器对工具返回数据的字段路径做出错误假设的时候，例如猜 \verb|${s1.coefficient}| 而真实字段是 \verb|${s1.params.0}|。
+本文通过两层措施缓解：
+其一，\texttt{TOOL\_OUTPUT\_FIELDS} 字典在 \autoref{sec:agent-frameworks} 中描述的 \texttt{PLANNER\_SYSTEM\_PROMPT} 渲染阶段被注入，让 LLM 在产出 Plan Schema 时已经看见每个工具的可用字段集合；
+其二，\texttt{PlanValidator} 的第 5 类校验（占位符必须在 \texttt{depends\_on} 中）在执行前就把“字段名不存在”这种错误以 \texttt{resolve\_args} 阶段诊断出来，并触发重规划。
+但这并未完全消除“字段名拼写错误但 \texttt{depends\_on} 写对”的角落场景；该角落场景由 ReAct 安全网兜底，在第五章数据中表现为 1.2\% 的 fallback 触发率。
+
+\subsection{反直觉现象：CoT 反而降分}\label{sec:analysis-cot-paradox}
+
+第五章主实验中，B2 CoT 的成功率（79.6\%）显著低于 B1 minimal（90.7\%），下降 11.1 个百分点，是反直觉的——业内通常认为思维链是“免费午餐”。
+进一步分析 11 道在 B2 上失败的案例，发现 5 道是因为 \texttt{tool\_calls} 中 \texttt{function.arguments} 的 JSON 格式被 LLM 嵌入了思维链文本而出错，3 道是工具选错（如 \texttt{matrix\_operation} 应选但 LLM 选了 \texttt{descriptive\_statistics}），3 道是数值精度截断（与 hard\_03 同类）。
+
+这一现象给出的启发是：在函数调用范式下，LLM 的“说话”与“调用”是同一个生成步骤的两个产出（\texttt{content} 与 \texttt{tool\_calls}）；
+当 \texttt{content} 中插入大量自由文本时，模型对 \texttt{tool\_calls} 的 JSON 边界控制反而被打散，触发了底层 SDK 的格式校验失败。
+本文方法通过两个机制规避了这一问题：
+其一，O3 规则把规划这件事约束到“开场一次性写出 Plan”，避免在每一轮都堆叠新的中间推理；
+其二，DAGPlanner 主循环的 Plan 阶段直接要求 LLM 输出严格 JSON，消费 LLM 的“计划文本”而非“计划 + 工具调用”混合产出。
+这两个机制使得本文方法在维持思维链精神（先想再做）的同时，规避了思维链文本与函数调用接口的形式冲突。
+
+\subsection{RATS 的效率-准确率权衡}\label{sec:analysis-rats-tradeoff}
+
+主实验显示 RATS 单独接入会带来 9.3 个百分点的成功率下降。
+本文不打算回避这个事实，反而希望把它放在合适的语境下讨论。
+在当前 12 工具的小规模工具库下，朴素全量召回的“缺点”尚不明显——12 个工具的 schema 全部塞入 LLM 上下文也只有约 2--3 K tokens，对 \texttt{qwen-plus} 这种 128 K 上下文的模型来说完全可接受。
+而 RATS 的 top-$K$ 截断操作引入了非零的“误剪概率”：当任务确实需要某个 RATS 没有选中的工具时，整个轨迹直接进入硬错误路径。
+
+但当工具库规模上升至 100+ 时，朴素全量召回的代价会发生质变：
+首先，token 预算会被工具描述吃掉很大一部分，留给推理与上下文的额度被相应压缩；
+其次，主流 LLM 在长上下文中区分语义相近 API 的能力会下降，选择错误率上升的速度比线性更快；
+再次，全量召回会让响应延迟进入秒级以上，在交互式应用中不可接受。
+RATS 在这种场景下从“可选的优化项”转变为“架构的必要前置”。
+本文限于自有工具库当前规模，无法在此论文内直接量化“100+ 工具场景下 RATS 的优势”，因此 RATS 的论文定位被诚实地描述为“对未来扩展性具有前置价值”，而非“对当前测试集的即时性能贡献”。
+后续工作中扩展工具库至 50--100 工具规模并接入 ScienceAgentBench~\cite{chen2024scienceagentbench}、Berkeley Function Calling Leaderboard~\cite{bfcl2024} 等公开 benchmark，将是验证 RATS 真正价值的关键路径。
+
+此外，本文的 RATS 默认权重 $(w_e, w_a, w_c, w_h)=(0.6, 0.2, 0.1, 0.1)$ 是基于直觉与小样本调试得到的经验值。
+更严格的做法是在更大测试集上做权重网格搜索，或采用强化学习方法基于历史成功率反馈学习权重。
+这一改进方向同样列入第七章未来工作。

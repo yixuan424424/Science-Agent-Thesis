@@ -3,8 +3,37 @@
     \bfseries \zihao{3} 摘~要
 \end{center}
 
+近年来，以大语言模型为核心的智能体（Agent）通过工具调用突破自身知识边界、对接外部系统的能力日益受到关注。
+然而，当通用智能体范式被迁移到对精度、严谨性与可复现性要求极高的科学研究场景时，仍然面临两类突出的瓶颈：
+其一，工具库规模一旦增长，将全部工具描述塞入提示上下文不仅造成 token 开销线性增长，也会使大语言模型在功能相近的工具之间产生选择错误；
+其二，长依赖链的科学计算任务在朴素 ReAct 主循环下容易出现参数遗漏、依赖错绑与中间结果丢失，缺乏一种可纯代码校验的结构化规划支撑。
+
+针对上述问题，本文提出了两个可独立消融、形式化清晰的核心算法模块。
+检索增强工具选择算法（RATS）将检索增强生成的范式迁移到工具选择问题上，通过离线嵌入预计算、在线向量检索与基于嵌入相似度、参数重叠度、历史成功率的规则化重排相结合，将传给大语言模型的工具上下文从全量 $N$ 压缩到精简的 $K$，并以最低候选数保底机制平衡召回率与精度。
+结构化 DAG 任务拆解算法（DAGPlanner）则定义了一套支持依赖占位符的计划模式，通过涵盖 5 类失败模式的纯代码校验器在不调用大语言模型的前提下捕获非法计划，仅在校验失败时携带诊断信息触发错误驱动重规划，并在硬上限 3 次失败后降级到 ReAct 作为安全网。
+此外，本文围绕科学场景提炼出 4 条提示工程规则作为算法模块运行时的必要约束。
+
+为验证方案的有效性，本文构建了覆盖数值计算、统计分析、可视化、组合任务、错误恢复 5 大类别共 54 道科学任务的测试集，并设计了包含 3 个业界常用基线（CoT、Plan-and-Solve、Reflexion）在内的 9 配置对比与消融实验框架。
+在 9 配置 $\times$ 54 题共 486 次运行的全量评测中，本文方法相比朴素 ReAct 基线提升 10.3 个百分点的成功率，相比业界最强基线 Reflexion 提升 5.6 个百分点，并在长依赖链与组合任务上展现出显著的轨迹可解释性优势。
+
+\textbf{关键词}：大语言模型；智能体；工具调用；检索增强；任务规划
 
 \cleardoublepage{}
 \begin{center}
     \bfseries \zihao{3} Abstract
 \end{center}
+
+Large Language Model (LLM) agents that extend their knowledge through tool invocation have attracted growing attention in recent years.
+However, when general-purpose agent paradigms are transferred to scientific scenarios that demand high precision, rigor and reproducibility, two prominent bottlenecks remain.
+First, as the tool library scales up, packing every tool schema into the prompt context not only causes a linear growth in token cost, but also induces selection errors among functionally similar tools.
+Second, long-dependency-chain scientific tasks frequently suffer from missing arguments, mis-bound dependencies and lost intermediate results under a naive ReAct loop, with no structured planning that can be validated purely in code.
+
+To address these issues, this thesis proposes two independently ablatable and formally clear algorithmic modules.
+The Retrieval-Augmented Tool Selection algorithm (RATS) transplants the retrieval-augmented generation paradigm to tool selection: it combines offline embedding precomputation, online vector retrieval and a rule-based reranker that fuses embedding similarity, argument overlap and historical success rate, compressing the tool context handed to the LLM from $N$ to a small $K$ while balancing recall and precision through a minimum-candidate fallback.
+The Structured DAG Planner algorithm (DAGPlanner) defines a Plan Schema with dependency placeholders, employs a pure-code validator covering five categories of failure modes to catch invalid plans without invoking the LLM, triggers error-driven replanning with diagnostic hints only when validation fails, and falls back to ReAct as a safety net after a hard cap of three failures.
+Four scientific-scenario prompt engineering rules are further distilled as runtime constraints for the two modules.
+
+To validate the proposed approach, this thesis builds a test set of 54 scientific tasks across 5 categories (numerical, statistical, visualization, composite, error-recovery) and designs a 9-configuration comparison-and-ablation framework that includes three widely used baselines (CoT, Plan-and-Solve, Reflexion).
+Over a full-scale evaluation of 9 configurations $\times$ 54 tasks ($=486$ runs), our method improves the success rate by 10.3 percentage points over a naive ReAct baseline and by 5.6 percentage points over the strongest baseline (Reflexion), while also delivering significantly more interpretable trajectories on long-chain composite tasks.
+
+\textbf{Keywords}: Large Language Model; Agent; Tool Invocation; Retrieval Augmentation; Task Planning

@@ -1,0 +1,304 @@
+\cleardoublepage
+
+\section{算法设计}
+
+本章是论文的核心方法章。
+\autoref{sec:problem-formulation} 给出科学场景下智能体工具调用问题的形式化定义；
+\autoref{sec:rats}、\autoref{sec:dag-planner} 分别详述本文提出的检索增强工具选择算法 RATS 和结构化 DAG 任务拆解算法 DAGPlanner，
+两个算法在设计上彼此正交、可独立消融，分别针对“选什么”和“怎么组织”两个朴素 ReAct 范式中尚未被结构化处理的子问题；
+\autoref{sec:ours-full} 说明二者如何与 4 条科学场景提示工程规则一起集成为本文的完整方案 \texttt{Ours\_full}。
+
+\subsection{问题形式化}\label{sec:problem-formulation}
+
+\subsubsection{基本符号约定}
+
+设智能体可访问的工具库为 $\mathcal{P}=\{t_1, t_2, \dots, t_N\}$，
+每个工具 $t_i$ 由四元组 $(n_i, d_i, \Theta_i, f_i)$ 组成，其中 $n_i$ 是工具名，$d_i$ 是自然语言描述，
+$\Theta_i$ 是参数模式，$f_i$ 是底层执行函数；
+工具 $t_i$ 在合法参数 $\theta\in\Theta_i$ 下产生输出 $f_i(\theta)\in\mathcal{D}_i$。
+
+给定科学任务的自然语言描述 $T\in\Sigma^*$ 和最大迭代轮数上限 $M$，
+智能体策略 $\pi$ 需要输出一个工具调用序列 $\tau=(c_1, c_2, \dots, c_k)$ 与最终答复 $a\in\Sigma^*$，
+其中每个调用 $c_j=(n_{i_j}, \theta_j)$ 描述了一次具体的工具使用，序列长度 $k\le M$。
+评估系统 $\mathrm{Eval}: (T,\tau,a)\mapsto\{0,1\}$ 在三个维度上同时通过才会判定任务成功：
+\begin{equation}
+\mathrm{Eval}(T,\tau,a)=
+\mathbb{I}\!\left[
+\underbrace{\big|\mathrm{num}(a)-y^{*}(T)\big|\le\varepsilon}_{\text{数值正确性}}
+\,\wedge\,
+\underbrace{\mathcal{F}^{*}(T)\subseteq\mathcal{F}(\tau)}_{\text{文件正确性}}
+\,\wedge\,
+\underbrace{\mathcal{R}(T)\subseteq\{n_{i_j}\}_{j=1}^{k}}_{\text{工具覆盖性}}
+\right],
+\label{eq:eval-criteria}
+\end{equation}
+其中 $\varepsilon$ 是数值容差，$y^{*}(T)$ 与 $\mathcal{F}^{*}(T)$ 分别是任务的标准数值答案与期望产出文件集合，
+$\mathcal{R}(T)$ 是任务对必须使用工具的硬约束。
+
+\subsubsection{科学场景的两类痛点}
+
+朴素 ReAct 主循环\cite{yao2023react}采用单层策略 $\pi_{\text{ReAct}}$，每一轮都把全部工具描述 $\{(n_i, d_i, \Theta_i)\}_{i=1}^{N}$ 编码进上下文，再让大语言模型自由生成下一步行动。
+\autoref{eq:eval-criteria} 在科学场景下对策略提出了两个具体挑战：
+其一，当 $N$ 较大时，编码全部工具描述使上下文 token 数随 $N$ 线性增长；
+更重要的是，工具间常存在语义重叠（如 \texttt{curve\_fitting} 与 \texttt{linear\_regression}），LLM 在重叠工具间做选择的错误率会显著上升，最终影响 $\mathcal{R}(T)$ 维度。
+其二，当任务包含较深的依赖链时，$\tau$ 中相邻调用之间需要通过自由文本传递中间结果，缺乏可被纯代码核验的依赖结构，
+容易出现“计划写得头头是道、执行时参数错绑”的失败模式，进而影响 $y^{*}(T)$ 与 $\mathcal{F}^{*}(T)$ 维度。
+
+本文据此把单层策略 $\pi_{\text{ReAct}}$ 拆解为两层：
+\begin{equation}
+\pi_{\text{Ours}}=\pi_{\text{exec}}\circ\pi_{\text{select}},\quad
+\pi_{\text{select}}:T\mapsto S\subseteq\mathcal{P},\quad
+\pi_{\text{exec}}:(T,S)\mapsto(\tau, a),
+\label{eq:two-layer}
+\end{equation}
+其中 $\pi_{\text{select}}$ 由 RATS 实现，负责从全量工具库 $\mathcal{P}$ 中产出精简候选集 $S$；
+$\pi_{\text{exec}}$ 由 DAGPlanner 与 ReAct 安全网共同实现，负责在精简集 $S$ 上完成结构化规划与执行。
+两层都不依赖额外训练，仅依靠运行时的检索、规则化重排与纯代码校验。
+
+\subsection{RATS：检索增强工具选择算法}\label{sec:rats}
+
+\subsubsection{设计动机}
+
+朴素 ReAct 的工具传参方式可以视为一个退化的“全量召回”策略：在每一轮 $\pi_{\text{select}}\equiv\mathcal{P}$。
+该策略在 $N\le 5$ 时还能用，但当工具库规模上升至数十乃至上百时会出现两个严重问题：
+\textbf{token 成本随 $N$ 线性增长}，
+\textbf{语义重叠工具间的选择错误率上升}。
+受检索增强生成范式~\cite{lewis2020rag,karpukhin2020dpr}启发，本文把“工具”作为新的检索对象：
+对每个工具 $t_i$ 用 LLM 嵌入模型预先算出向量 $e_i$ 并落盘缓存，运行时根据任务向量 $e_T$ 做余弦相似度检索得到候选子集，再由一组可解释的规则化特征做最后重排。
+
+\subsubsection{算法流程}
+
+RATS 的完整流程见 \autoref{alg:rats}，分为离线预计算、在线检索、特征重排、阈值过滤四个阶段。
+\textbf{阶段 1（离线预计算）}对每个工具 $t_i$ 拼接复合检索文本 $\mathrm{text}_i$（工具名、去下划线后的工具名、描述与参数说明），调用嵌入模型得到 $e_i$，并以 $\langle t_i.\text{name}, \mathrm{hash}(\mathrm{text}_i), \text{model\_id}\rangle$ 为键写入磁盘缓存；
+\textbf{阶段 2（在线检索）}计算任务向量 $e_T$，对所有工具计算余弦相似度，截取 top-$K$ 候选；
+\textbf{阶段 3（特征重排）}对每个候选 $t_j$ 计算四类可解释特征——嵌入相似度 $s^{\text{emb}}_j$、参数重叠度 $s^{\text{arg}}_j$（任务 token 与工具描述/参数 token 的覆盖率）、类别一致性 $s^{\text{cat}}_j$（top-3 中主导类别的指示函数）、历史成功率 $s^{\text{hist}}_j$，并用经验权重做加权求和；
+\textbf{阶段 4（阈值过滤）}用阈值 $\theta$ 过滤低分工具，再用最低候选数 $K_{\min}$ 兜底以避免误删正确工具。
+
+\begin{algorithm}[ht]
+\caption{RATS: Retrieval-Augmented Tool Selection}
+\label{alg:rats}
+\begin{algorithmic}[1]
+\REQUIRE 任务 $T$；工具库 $\mathcal{P}=\{t_1,\dots,t_N\}$；预算 $K$；阈值 $\theta$；保底 $K_{\min}$；权重 $(w_e,w_a,w_c,w_h)$
+\ENSURE 精简工具集 $S\subseteq\mathcal{P}$
+\STATE \textbf{Stage 1: Offline precomputation}
+\FORALL{$t_i\in\mathcal{P}$}
+    \STATE $\mathrm{text}_i\gets$ \textsc{ComposeText}$(t_i)$
+    \STATE $e_i\gets\textsc{Embed}(\mathrm{text}_i)$
+    \STATE \textsc{Cache}.\textsc{Put}$(\langle t_i.\text{name},\mathrm{hash}(\mathrm{text}_i),\text{model}\rangle, e_i)$
+\ENDFOR
+\STATE \textbf{Stage 2: Online retrieval}
+\STATE $e_T\gets\textsc{Embed}(T)$
+\FORALL{$t_i\in\mathcal{P}$}
+    \STATE $s^{\text{emb}}_i\gets\cos(e_T, e_i)$
+\ENDFOR
+\STATE $\mathcal{C}\gets$ top-$K(\{s^{\text{emb}}_i\})$
+\STATE \textbf{Stage 3: Feature reranking}
+\STATE $\mathrm{maj}\gets$ majority category of top-3 in $\mathcal{C}$
+\FORALL{$t_j\in\mathcal{C}$}
+    \STATE $s^{\text{arg}}_j\gets|\mathrm{tok}(T)\cap\mathrm{tok}(t_j)|/|\mathrm{tok}(T)|$
+    \STATE $s^{\text{cat}}_j\gets\mathbb{I}[\mathrm{cat}(t_j)=\mathrm{maj}]$
+    \STATE $s^{\text{hist}}_j\gets$ \textsc{HistorySuccessRate}$(t_j)$
+    \STATE $r_j\gets w_e s^{\text{emb}}_j + w_a s^{\text{arg}}_j + w_c s^{\text{cat}}_j + w_h s^{\text{hist}}_j$
+\ENDFOR
+\STATE \textbf{Stage 4: Threshold filtering with $K_{\min}$ guarantee}
+\STATE $S\gets\{t_j\in\mathcal{C}:r_j\ge\theta\}$
+\IF{$|S|<K_{\min}$}
+    \STATE $S\gets$ top-$K_{\min}$ candidates by $r_j$
+\ENDIF
+\RETURN $S$
+\end{algorithmic}
+\end{algorithm}
+
+工具检索文本的构造细节值得说明。
+对每个工具，本文按 \texttt{name}、\texttt{name.replace("\_", " ")}、\texttt{description}、各参数 \texttt{(p.name, p.description, p.enum)} 的顺序，用分隔符 \texttt{|} 拼接成单条复合文本。
+显式插入“去下划线后的工具名”是为了让基于词袋或子词分片的嵌入模型也能从形如 \texttt{matrix\_operation} 的标识符中捕捉到自然语义。
+参数重叠度 $s^{\text{arg}}$ 仅对任务文本中长度大于等于 3 的英文 token 取小写后参与计算，分母为 $|\mathrm{tok}(T)|$ 而非 Jaccard 风格的并集，目的是让分数保持在 $[0,1]$ 区间且偏向“任务词覆盖率”的解释。
+
+\subsubsection{复杂度与缓存设计}
+
+记每次嵌入调用的开销为 $O(B)$（$B$ 是嵌入模型的批量上限），余弦相似度在内存向量上的计算为 $O(d)$（$d$ 是嵌入维度）。
+\textbf{离线阶段}总开销为 $O(N\cdot B\cdot d)$，对 12 工具的当前规模仅需一次首日 API 调用；
+所有结果按 $\langle t.\text{name},\mathrm{hash}(\mathrm{text}),\text{model}\rangle$ 三元组键写入磁盘 cache，
+任意一项发生变化（工具描述被改、嵌入模型被换）都会自动触发缓存失效，避免“静默错配”。
+\textbf{在线阶段}每个任务仅需 1 次嵌入调用 + $O(N\cdot d)$ 内存点积 + $O(K\log K)$ 排序，与全量召回相比，对 LLM 上下文从 $O(N)$ 压缩到 $O(K)$，
+当 $N$ 上升时，token 成本与选择错误率两个曲线同时被显著压平。
+
+\subsubsection{特征消融的可解释性预告}
+
+四类特征对最终重排的贡献在算法层面是可解释的：嵌入相似度提供主信号；参数重叠度对功能高度相近的工具（如 \texttt{curve\_fitting} 与 \texttt{linear\_regression}）形成显式参数级别的区分；
+类别一致性奖励避免“top-3 中本身已有数值类工具占多数、第 4 位却跳到可视化”这种类别串扰；
+历史成功率为长期运行中的反馈学习留下了接口。
+本文后续实验章节（\autoref{sec:exp-ablation}）会从同口径数据中量化每一类特征的贡献。
+
+\subsubsection{实现要点}
+
+底层嵌入由 \texttt{src.tool\_selector.embedder.OpenAIEmbedder} 封装，默认指向通义千问 \texttt{text-embedding-v3} 接口，批量上限 10 由内部分批兼容；
+当 API 不可用或仅做单元测试时，框架会平滑切换到 \texttt{HashEmbedder} 这一基于哈希的离线 fallback embedder。
+缓存层 \texttt{EmbeddingCache} 采用 JSON 文件落盘 + 内存字典的组合，key 包括 \texttt{model\_id}，确保更换嵌入模型时无需手动清理。
+配置默认值为 $K=6$、$K_{\min}=3$、$\theta=0$、$(w_e, w_a, w_c, w_h)=(0.6, 0.2, 0.1, 0.1)$，
+该组权重是在保留嵌入信号主导地位的同时，让其他三类特征共同贡献 $0.4$ 的“拨正空间”，
+对 12 工具规模下的小样本调试足够清晰。
+
+\subsection{DAGPlanner：结构化 DAG 任务拆解算法}\label{sec:dag-planner}
+
+\subsubsection{设计动机}
+
+朴素 Plan-and-Solve~\cite{wang2023plansolve} 与 Reflexion~\cite{shinn2023reflexion} 将“计划”与“反思”仍然作为自由形式的自然语言文本，由 LLM 自主生成、自主消费。
+这种做法在直觉上很自然，但缺乏一种可被纯代码校验的结构化模式，导致下列问题在长依赖链科学任务中频繁出现：参数遗漏、依赖错绑、占位符未解析、环形依赖、调用步骤超出可用工具集合。
+本节提出的 DAGPlanner 通过显式定义带依赖占位符的计划模式（Plan Schema），把上述问题从“执行时报错”前移到“规划后即被纯代码校验器捕获”，并以错误驱动的方式触发携带诊断信息的有限次重规划。
+
+\subsubsection{Plan Schema}
+
+DAGPlanner 强约束 LLM 输出符合 \autoref{lst:plan-schema} 所示模式的 JSON 计划。
+其中每个步骤 $s\in\text{steps}$ 由五元组 $(\text{id},\text{goal},\text{tool},\text{args\_template},\text{depends\_on})$ 描述：
+\texttt{id} 是步骤唯一标识；\texttt{goal} 是自然语言子目标；\texttt{tool} 必须在精简集 $S$ 中；
+\texttt{args\_template} 是参数模板，可包含形如 \verb|${sX}| 或 \verb|${sX.field}| 的依赖占位符；
+\texttt{depends\_on} 显式声明本步依赖的上游步骤集合，必须与占位符引用集合等同。
+
+\begin{lstlisting}[language=json,
+    caption={Plan Schema 的 JSON 表达形式（节选 ext\_dag\_01 任务的 5 步链式实例）},
+    label={lst:plan-schema},
+    basicstyle=\small\ttfamily,
+    columns=flexible,
+    breaklines=true,
+    showstringspaces=false]
+{
+  "steps": [
+    {
+      "id": "s1",
+      "goal": "compute determinant of A",
+      "tool": "matrix_operation",
+      "args_template": {
+        "operation": "determinant",
+        "matrix_a": [[4, 2], [1, 3]]
+      },
+      "depends_on": []
+    },
+    {
+      "id": "s2",
+      "goal": "solve x^2 - D = 0 with D from s1",
+      "tool": "equation_solver",
+      "args_template": {
+        "expression": "x**2 - ${s1.determinant}",
+        "lower": 1,
+        "upper": 5
+      },
+      "depends_on": ["s1"]
+    }
+    /* ... s3 numerical_integration, s4 descriptive_statistics, s5 line_chart ... */
+  ]
+}
+\end{lstlisting}
+
+占位符语法支持 \verb|${sX}|（引用步骤 $sX$ 的完整 \texttt{data} 对象）与 \verb|${sX.field.subfield}|（按点号路径取值，列表通过整数下标访问）两种形式。
+当占位符单独出现在某个字段值中（如整个字符串 \verb|"${s1.params.0}"|），框架会保留其原始数据类型；
+当占位符嵌入更长的字符串中（如 \verb|"title: y=${s1.slope}x+${s1.intercept}"|），框架会先做 \texttt{str()} 转换再做拼接。
+这一区分的设计动机是兼顾“数值参数透传”与“图表标题模板渲染”两类常见场景。
+
+\subsubsection{算法流程}
+
+DAGPlanner 主循环见 \autoref{alg:dag-planner}，分为 Plan、Validate、Execute、Answer 四个阶段。
+其中 \textbf{Validate 阶段完全不调用 LLM}，仅在校验失败时才把错误清单 $\mathcal{E}$ 喂回给 Plan 重规划，并设硬上限 $R$ 防止无限循环；
+\textbf{Execute 阶段}按拓扑序逐步调用工具，并允许对单步参数做有限次 LLM 修复；
+当任意阶段无法继续推进时，平滑降级到 ReAct 安全网。
+
+\begin{algorithm}[ht]
+\caption{DAGPlanner: Structured DAG-based Task Planning}
+\label{alg:dag-planner}
+\begin{algorithmic}[1]
+\REQUIRE 任务 $T$；候选工具集 $S$（来自 RATS）；最大重规划次数 $R$；最大单步修复次数 $F$
+\ENSURE 工具调用轨迹 $\tau$ 与最终答复 $a$
+\STATE $\mathcal{E}\gets\emptyset$;\; $r\gets 0$
+\STATE \textbf{Plan + Validate phase}
+\WHILE{$r\le R$}
+    \STATE $p\gets$\textsc{LLM.Plan}$(T, S, \mathcal{E})$
+    \STATE $(\text{ok}, \mathcal{E})\gets$\textsc{Validator.Check}$(p, S)$ \quad // \emph{five rules, no LLM call}
+    \IF{\text{ok}}
+        \STATE \textbf{break}
+    \ENDIF
+    \STATE $r\gets r+1$
+\ENDWHILE
+\IF{$\neg\text{ok}$}
+    \RETURN \textsc{ReActFallback}$(T)$
+\ENDIF
+\STATE \textbf{Execute phase}
+\STATE $\mathcal{O}\gets\emptyset$ \quad // observations indexed by step id
+\FORALL{$s\in$ \textsc{TopologicalSort}$(p)$}
+    \STATE $(\theta,\mathcal{U})\gets$\textsc{ResolveArgs}$(s.\text{args\_template}, \mathcal{O})$
+    \IF{$\mathcal{U}\ne\emptyset$}
+        \RETURN \textsc{ReActFallback}$(T)$
+    \ENDIF
+    \FOR{$f=0,\dots,F$}
+        \STATE $\mathrm{out}\gets$\textsc{Invoke}$(s.\text{tool}, \theta)$
+        \IF{$\mathrm{out}.\text{success}$}
+            \STATE \textbf{break}
+        \ENDIF
+        \STATE $\theta\gets$\textsc{LLM.FixArgs}$(s, \theta, \mathrm{out})$
+    \ENDFOR
+    \IF{$\neg\mathrm{out}.\text{success}$}
+        \RETURN \textsc{ReActFallback}$(T)$
+    \ENDIF
+    \STATE $\mathcal{O}[s.\text{id}]\gets\mathrm{out}.\text{data}$
+\ENDFOR
+\STATE \textbf{Answer phase}
+\STATE $a\gets$\textsc{LLM.Answer}$(T, p, \mathcal{O})$
+\RETURN $\tau, a$
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{校验失败的五种模式}
+
+\texttt{PlanValidator} 在不调用 LLM 的前提下覆盖五类失败模式（\autoref{tab:validator-modes}），所有错误一次性收集后整体回灌给 LLM，避免逐错误轮询造成额外的 API 开销。
+其中“占位符引用必须包含在 depends\_on”这条强约束是 DAG 结构能够被纯代码校验的关键：它把“依赖关系是否一致”这一原本必须由 LLM 自我审视的问题，下沉为对 \texttt{depends\_on} 与 \verb|${...}| 占位符两个集合是否相等的判定。
+
+\begin{table}[ht]
+    \centering
+    \caption{\label{tab:validator-modes}DAGPlanner 的五种纯代码校验失败模式}
+    \begin{tabularx}{\linewidth}{|c|l|X|}
+        \hline
+        编号 & 失败模式 & 检测方法与修复指引 \\ \hline
+        V1 & 模式不符 & 步骤数超限、ID 重复、必填字段缺失；提示需重新输出符合 JSON Schema 的计划 \\ \hline
+        V2 & 工具名越界 & 步骤所引用 \texttt{tool} 不在候选集 $S$ 中；返回合法工具名清单作为提示 \\ \hline
+        V3 & 依赖图有环 & 用 \texttt{graphlib.TopologicalSorter} 捕获 \texttt{CycleError}；返回成环的步骤序列 \\ \hline
+        V4 & 依赖未声明 & \texttt{depends\_on} 中出现的步骤 ID 在计划内未被声明；返回非法引用的具体 ID \\ \hline
+        V5 & 占位符越界 & \verb|${sX.field}| 占位符引用的步骤 \texttt{sX} 未出现在该步的 \texttt{depends\_on} 中；返回占位符与依赖集合的差集 \\ \hline
+    \end{tabularx}
+\end{table}
+
+\subsubsection{重规划的收敛性讨论}
+
+设 LLM 在每一轮“Plan + 错误反馈”下产生合法计划的概率为 $p$，则在硬上限 $R$ 下走完所有重规划仍失败的概率为 $(1-p)^{R+1}$。
+取 $p\approx 0.7$ 与 $R=3$（实现默认值），失败概率约为 $0.0081$，即不到 1\%。
+这一估计与本文实验观测一致：在 9 配置 $\times$ 54 题的全量评测中，仅有 6 次 run 触发降级到 ReAct 安全网（占总 run 数的 1.2\%），与 $(1-p)^{R+1}$ 的尾部估计在量级上吻合。
+
+\subsubsection{与 ReAct 的双层架构}
+
+DAGPlanner 与 ReActAgent 在本文系统中是“主路径 + 安全网”的关系而非互斥关系：DAGPlanner 适合结构化、确定性、依赖关系明确的任务；
+ReActAgent 适合语义模糊、需要轻量探索的任务，或处理 DAGPlanner 无法收敛的边界情形。
+这种双层架构在工程上有两个直接好处：第一，DAGPlanner 不必照顾所有任务形态，可以对结构化任务做出激进的强约束；
+第二，当模型/Prompt/工具库发生变化时，安全网能够吸收一部分回归风险，避免“一处变更触发全局失败”。
+
+\subsection{算法集成：Ours\_full}\label{sec:ours-full}
+
+本文最终方法 \texttt{Ours\_full} 由 RATS、DAGPlanner、4 条科学场景提示工程规则三部分协同组成（\autoref{fig:arch}）。
+完整执行流程为：
+
+\begin{enumerate}
+    \item 系统接收任务 $T$；
+    \item RATS 从全量工具库 $\mathcal{P}$（$N=12$）中筛出候选集 $S$（典型 $|S|\le 6$），并把 $S$ 的工具描述写入 LLM 上下文；
+    \item DAGPlanner 启动 Plan + Validate 循环，结合提示工程规则 O3（开场规划模板）产出符合 Plan Schema 的 JSON 计划；
+    \item 计划通过校验后，按拓扑序执行；执行过程中提示工程规则 O1（结果合理性检查）与 O2（数值计算规范）作为运行时约束指导单步参数修复；
+    \item Answer LLM 在系统提示规则 O4（Few-shot 示例注入）的辅助下产出符合科学场景规范的最终答复；
+    \item 任意阶段不可恢复时，系统降级到 ReActAgent 安全网，仍以同一份提示工程规则集运行，确保失败回退后的产出仍处于科学场景规范之内。
+\end{enumerate}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.95\linewidth]{fig_arch.pdf}
+    \caption{\label{fig:arch}\texttt{Ours\_full} 配置的整体执行流程。RATS 与 DAGPlanner 构成主路径（实线），ReActAgent 作为校验失败/执行失败时的安全网（虚线）。}
+\end{figure}
+
+从形式化视角，\texttt{Ours\_full} 实现了 \autoref{eq:two-layer} 中的两层策略 $\pi_{\text{Ours}}=\pi_{\text{exec}}\circ\pi_{\text{select}}$：
+$\pi_{\text{select}}$ 由 RATS 完整承担；$\pi_{\text{exec}}$ 由 DAGPlanner（主）与 ReActAgent（兜底）组合承担。
+4 条提示工程规则不直接出现在策略分解中，但作为运行时约束嵌入到 \texttt{LLM.Plan}、\texttt{LLM.FixArgs}、\texttt{LLM.Answer} 三处 LLM 调用，
+因此其工程必要性不会因算法层面的形式化分解而被忽略——这一点也将在第五章的消融实验中得到量化印证。

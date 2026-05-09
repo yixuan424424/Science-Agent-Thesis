@@ -1,0 +1,187 @@
+\cleardoublepage
+
+\section{系统实现}
+
+本章介绍支撑第三章算法落地的工程实现。
+\autoref{sec:tool-library} 介绍 12 工具的标准化科学计算工具库；
+\autoref{sec:agent-frameworks} 介绍 6 种 Agent 策略的代码组织；
+\autoref{sec:prompt-system} 介绍 4 条科学场景提示工程规则及 DAGPlanner 专用提示；
+\autoref{sec:eval-framework} 介绍三维判分评估框架。
+全部代码基于 Python 3.14、NumPy 2.4、SciPy 1.17、Matplotlib 3.10 实现，底层 LLM 接入 \texttt{qwen-plus-latest} 与 \texttt{text-embedding-v3} 两个 OpenAI 兼容接口。
+
+\subsection{标准化科学计算工具库}\label{sec:tool-library}
+
+\subsubsection{统一抽象基类}
+
+所有工具都继承自抽象基类 \texttt{BaseTool}，实现规范化的元信息属性 \texttt{name}/\texttt{description}/\texttt{parameters} 与执行方法 \texttt{execute()}。
+\autoref{lst:base-tool} 给出 \texttt{BaseTool} 的核心接口签名：
+框架在外部通过 \texttt{run()} 入口调用工具，自动完成默认值填充、参数类型与范围校验、异常捕获，最终返回统一封装的 \texttt{ToolResult(success, data, error, message)}。
+\texttt{to\_openai\_schema()} 方法负责将 Python 端的 \texttt{ToolParameter} 列表自动转译为 OpenAI Function Calling 协议要求的 JSON Schema，
+使每个工具都能直接对接 \texttt{tool\_calls} 接口而无需手写 schema。
+
+\begin{lstlisting}[language=Python,
+    caption={\texttt{BaseTool} 抽象基类的核心接口签名（节选）},
+    label={lst:base-tool},
+    basicstyle=\small\ttfamily,
+    columns=flexible,
+    breaklines=true,
+    showstringspaces=false]
+class BaseTool(ABC):
+    @property
+    @abstractmethod
+    def name(self) -> str: ...
+
+    @property
+    @abstractmethod
+    def description(self) -> str: ...
+
+    @property
+    @abstractmethod
+    def parameters(self) -> list[ToolParameter]: ...
+
+    @abstractmethod
+    def execute(self, **kwargs) -> ToolResult: ...
+
+    def run(self, **kwargs) -> ToolResult:
+        # default-fill -> validate -> execute -> exception capture
+
+    def to_openai_schema(self) -> dict:
+        # ToolParameter[] -> OpenAI Function Calling JSON schema
+\end{lstlisting}
+
+这一抽象有三个工程价值：
+其一，所有工具的接口形态统一，DAGPlanner 在校验阶段无需为每个工具单独写适配器；
+其二，\texttt{ToolResult} 的 \texttt{data} 字段在第三章 DAG 占位符 \verb|${sX.field}| 解析中作为统一的依赖数据来源；
+其三，\texttt{validate\_params} 把参数类型、范围、枚举三类常见错误前移到工具调用前，避免 LLM 输出非法参数时把错误带入工具内部，便于错误根因的诊断。
+
+\subsubsection{12 个工具的功能分布}
+
+工具库按照科学计算场景划分为数值计算、统计分析、数据可视化三大类别，共 12 个工具，如\autoref{tab:tool-list}所示。
+四类数值工具基于 NumPy~\cite{harris2020numpy}、SciPy~\cite{virtanen2020scipy} 实现，
+四类统计工具基于 SciPy 与 Pandas~\cite{mckinney2010pandas}，
+四类可视化工具基于 Matplotlib~\cite{hunter2007matplotlib}。
+每个工具的关键输出字段（如线性回归的 \texttt{slope}、\texttt{intercept}、\texttt{r\_squared}）也在 \texttt{TOOL\_OUTPUT\_FIELDS} 字典中显式登记，供 DAGPlanner 在生成 Plan Schema 时按字段名而非自由想象的方式构造占位符 \verb|${sX.field}|。
+
+\begin{table}[ht]
+    \centering
+    \caption{\label{tab:tool-list}12 个标准化科学计算工具一览}
+    \begin{tabularx}{\linewidth}{|c|l|X|l|}
+        \hline
+        类别 & 工具名 & 功能简述 & 关键输出字段 \\ \hline
+        \multirow{4}{*}{数值计算} & \texttt{matrix\_operation} & 矩阵基本运算与行列式 & \texttt{result, determinant, shape} \\ \cline{2-4}
+                            & \texttt{numerical\_integration} & 自适应数值积分 & \texttt{integral, absolute\_error} \\ \cline{2-4}
+                            & \texttt{curve\_fitting} & 多模型曲线拟合（线性/多项式/指数/幂） & \texttt{params, r\_squared, formula} \\ \cline{2-4}
+                            & \texttt{equation\_solver} & 区间内方程求根 & \texttt{root, residual} \\ \hline
+        \multirow{4}{*}{统计分析} & \texttt{descriptive\_statistics} & 描述性统计量 & \texttt{mean, median, std, q1, q3} \\ \cline{2-4}
+                            & \texttt{hypothesis\_test} & 单/双样本 t 检验等 & \texttt{t\_statistic, p\_value, reject\_null} \\ \cline{2-4}
+                            & \texttt{linear\_regression} & 一元线性回归 & \texttt{slope, intercept, r\_squared, p\_value} \\ \cline{2-4}
+                            & \texttt{correlation\_analysis} & Pearson/Spearman 相关 & \texttt{correlation, p\_value, strength} \\ \hline
+        \multirow{4}{*}{可视化} & \texttt{line\_chart} & 折线图 & \texttt{file\_path, width\_pixels} \\ \cline{2-4}
+                            & \texttt{scatter\_chart} & 散点图 & \texttt{file\_path, width\_pixels} \\ \cline{2-4}
+                            & \texttt{bar\_chart} & 条形图 & \texttt{file\_path, width\_pixels} \\ \cline{2-4}
+                            & \texttt{heatmap} & 热力图 & \texttt{file\_path, width\_pixels} \\ \hline
+    \end{tabularx}
+\end{table}
+
+\subsubsection{安全表达式求值}
+
+数值积分与方程求解需要接受形如 \texttt{x**2 + sin(x)} 的字符串数学表达式。
+为避免直接 \texttt{eval} 带来的代码注入风险，本文实现了 \texttt{src/tools/\_expr.py} 模块，基于 Python AST 白名单的方式只允许常量、单变量名、四则运算、幂运算与一组安全数学函数（\texttt{sin}、\texttt{cos}、\texttt{exp}、\texttt{log} 等），其余 AST 节点一律拒绝。
+该模块同时承担 LLM 输出表达式的轻量规范化，使 DAGPlanner 中形如 \verb|"x**2 - ${s1.determinant}"| 的依赖占位符可以在替换后被安全地编译为可调用对象。
+
+\subsection{Agent 策略框架}\label{sec:agent-frameworks}
+
+\subsubsection{六种 Agent 的代码组织}
+
+为支持后续多基线对比与消融，框架同时实现了 6 种 Agent 策略，其继承与职责关系见\autoref{tab:agent-frameworks}。
+\texttt{ReActAgent} 是所有 Agent 的功能基底：负责消息拼接、与 LLM 的多轮对话、工具调用分发、迭代上限保护与异常退避。
+其余基线 Agent（B2/B3/B4）通过继承或组合 \texttt{ReActAgent} 实现各自的策略差异；
+RATS 与 DAG 相关 Agent 则在工具传参方式与主循环结构上做了更深的改造。
+
+\begin{table}[ht]
+    \centering
+    \caption{\label{tab:agent-frameworks}六种 Agent 策略的职责对比}
+    \begin{tabularx}{\linewidth}{|l|l|X|}
+        \hline
+        策略类 & 对应配置 & 关键差异 \\ \hline
+        \texttt{ReActAgent} & B1, Ours & 经典 ReAct~\cite{yao2023react} 主循环 + Function Calling \\ \hline
+        \texttt{CoTReActAgent} & B2 & ReActAgent + CoT 后缀提示\cite{wei2022cot} \\ \hline
+        \texttt{PlanAndSolveAgent} & B3 & 两阶段：先生成自然语言计划，再 ReAct 执行\cite{wang2023plansolve} \\ \hline
+        \texttt{ReflexionAgent} & B4 & ReAct + 失败后追加自我反思\cite{shinn2023reflexion} \\ \hline
+        \texttt{RATSReActAgent} & Ours+RATS & 在 ReActAgent 前插入 RATS 工具筛选 \\ \hline
+        \texttt{DAGAgent} & Ours+DAG, Ours\_full & 主循环替换为 Plan-Validate-Execute-Answer 四阶段（\autoref{alg:dag-planner}） \\ \hline
+    \end{tabularx}
+\end{table}
+
+\subsubsection{消息层抽象}
+
+\texttt{src/agent/messages.py} 定义了三个核心数据类：
+\texttt{Step}（一轮迭代的产出，含 \texttt{thought}、\texttt{tool\_name}、\texttt{tool\_arguments}、\texttt{observation}），
+\texttt{AgentResult}（一次 \texttt{run()} 的最终结果，含 \texttt{final\_answer}、\texttt{trajectory}、\texttt{iterations\_used}、\texttt{stopped\_reason}），
+以及 OpenAI 兼容消息格式的轻量序列化。
+所有 Agent 都向上统一返回 \texttt{AgentResult}，使评测框架可以无差别地对各种策略做轨迹分析与三维判分。
+
+\subsubsection{LLM 客户端的健壮性}
+
+\texttt{src/llm/client.py} 负责把上述消息格式转换为底层 SDK 调用，并加入两项重要的健壮性保护：
+其一是按指数退避的有限次重试，应对偶发的网络抖动与限流；
+其二是统一的超时控制，避免单次 LLM 调用阻塞整个评测流程。
+对 RATS 而言，嵌入接口 \texttt{OpenAIEmbedder.embed()} 还实现了批量上限 10 的内部分批，并在 API 不可用时静默切换到 \texttt{HashEmbedder}，让单元测试不依赖外网。
+
+\subsection{提示工程体系}\label{sec:prompt-system}
+
+\subsubsection{O1--O4 科学场景规则}
+
+针对 ReAct 在科学场景下的典型失败模式，本文在 \texttt{src/prompts/system\_prompts.py} 中提炼出 4 条提示工程规则，作为 RATS 与 DAGPlanner 在运行时的必要约束（\autoref{tab:o1-o4}）。
+
+\begin{table}[ht]
+    \centering
+    \caption{\label{tab:o1-o4}科学场景的 4 条提示工程规则（O1--O4）}
+    \begin{tabularx}{\linewidth}{|c|l|X|}
+        \hline
+        编号 & 规则名 & 关键内容 \\ \hline
+        O1 & 结果合理性检查 & 拟合 $R^2$ 须在 $[0,1]$ 之间；返回 NaN/Inf 视为异常；参数与输入数据主导量级偏差超过 2 个数量级视为异常；异常时下一轮 \emph{必须} 切换方法或工具 \\ \hline
+        O2 & 数值计算规范 & 涉及 3 个及以上样本的统计量必须通过 \texttt{descriptive\_statistics} 计算；线性代数运算必须通过 \texttt{matrix\_operation}；最终答复保留至少 4--6 位有效数字 \\ \hline
+        O3 & 开场规划模板 & 3 步以上任务的第一轮 \emph{必须} 在 content 中以 \texttt{Plan:} 模板列出步骤；后续每轮简要引用当前进展；执行中允许显式修正 Plan \\ \hline
+        O4 & Few-shot 示例注入 & 在 SYSTEM\_PROMPT 末尾追加一条与本题集无关的完整范例轨迹（异常切换 + 最终答复格式），让模型在零样本前已学到本系统期望的行为风格 \\ \hline
+    \end{tabularx}
+\end{table}
+
+四条规则在叙事上分工明确：O1 负责防止“看起来合理”的工具输出蒙混过关，O2 负责防止 LLM 在标量心算与工具调用之间偷懒，
+O3 负责把规划这件事从可有可无变成强制开场，O4 则用一条与目标域同构的 Few-shot 范例统一行为风格。
+四条规则共同构成本文方法相对最简基线 B1 的“可解释优势来源”，并在第五章消融实验中得到量化印证。
+
+\subsubsection{DAGPlanner 专用提示}
+
+\texttt{src/prompts/planner\_prompts.py} 定义了 DAGPlanner 专用的三段提示：
+\texttt{PLANNER\_SYSTEM\_PROMPT} 指导 LLM 输出严格符合 Plan Schema 的 JSON，并通过 \texttt{TOOL\_OUTPUT\_FIELDS} 动态注入每个工具的输出字段白名单，从根源减少占位符 \verb|${sX.field}| 的字段名书写错误；
+\texttt{REPLAN\_HINT\_TEMPLATE} 定义了校验失败后的重规划提示模板，把 \texttt{PlanValidator} 的诊断信息以编号列表形式回灌给 LLM；
+\texttt{ANSWER\_SYSTEM\_PROMPT} 则负责让 Answer 阶段的 LLM 在保留 O1--O4 数值精度规范的前提下，给出符合科学场景规范的最终答复。
+该三段提示与 O1--O4 在格式上保持完全一致的组织风格（中文为主、术语与字段名为英文），降低了 LLM 在不同提示间切换时的语义抖动。
+
+\subsection{评估框架}\label{sec:eval-framework}
+
+\subsubsection{用例 JSON Schema}
+
+测试用例集中存放于 \texttt{tests/data/test\_cases.json}，单条用例由 \texttt{TestCase} 数据类承载，其字段包括：
+任务标识 \texttt{id}、类别 \texttt{category}、难度 \texttt{difficulty}、自然语言任务描述 \texttt{task}，以及三类期望——
+\texttt{expected\_numeric}（每条数值的名称、期望值、相对容差与绝对容差兜底）、
+\texttt{expected\_files}（图表期望的工具名与最小字节数）、
+\texttt{required\_tools}（采用“外层 AND、内层 OR”的组列表语义）。
+该 schema 同时容纳了科学任务的两类数值要求（“有噪声拟合”需 2\% 相对误差，“闭式精确值”可设 $10^{-6}$ 绝对误差）以及“等价工具替代”这一现实场景（如 \texttt{curve\_fitting} 与 \texttt{linear\_regression} 互为可接受替代）。
+
+\subsubsection{三维判分}
+
+\texttt{src/eval/checker.py} 实现 \autoref{eq:eval-criteria} 中的三维判分：
+\textbf{数值正确性}通过正则抽取最终答复中的所有数字，对每个 \texttt{ExpectedNumeric} 用 $\max(\varepsilon_{\text{abs}}, |y^{*}|\cdot\varepsilon_{\text{rel}})$ 双阈值匹配；
+\textbf{文件正确性}通过遍历轨迹寻找指定工具的输出 \texttt{file\_path}，并核验文件存在与最小字节数；
+\textbf{工具覆盖性}按组列表的 AND/OR 语义判断每组工具是否被成功调用至少一次。
+对无工具的 B0 配置，框架仅以数值正确性作为唯一判据，避免由判分维度差异带来的不公比较。
+
+\subsubsection{实验入口与可复现性}
+
+\texttt{scripts/run\_eval.py} 是评测的命令行入口，支持按配置（\texttt{--configs}）与按用例（\texttt{--cases}）的任意组合运行。
+每一次评测会在 \texttt{outputs/eval/<timestamp>/} 下落盘 \texttt{results.json} 与 \texttt{summary.md} 两份产物：
+前者完整保留每个配置 $\times$ 每条用例的 \texttt{AgentResult}（包含 trajectory、最终答复、迭代次数、停止原因），
+后者按论文友好的 markdown 表格形式给出聚合统计。
+配合 Git 全过程版本管理，本文 9 配置 $\times$ 54 题共 486 次 run 的全量评测可一键复现，所有实验数字都能追溯到落盘文件。
