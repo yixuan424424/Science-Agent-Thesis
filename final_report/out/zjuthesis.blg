@@ -1,0 +1,35 @@
+[0] Config.pm:328> INFO - This is Biber 2.21
+[0] Config.pm:331> INFO - Logfile is 'out/zjuthesis.blg'
+[161] biber-MSWIN64:342> INFO - === 
+[222] Biber.pm:421> INFO - Reading 'out/zjuthesis.bcf'
+[452] Biber.pm:1002> INFO - Found 0 citekeys in bib section 0
+[456] Biber.pm:1002> INFO - Found 28 citekeys in bib section 1
+[456] Biber.pm:1002> INFO - Found 0 citekeys in bib section 0
+[456] Biber.pm:1002> INFO - Found 0 citekeys in bib section 2
+[456] Biber.pm:1002> INFO - Found 0 citekeys in bib section 0
+[456] Biber.pm:1002> INFO - Found 1 citekeys in bib section 3
+[456] Biber.pm:1002> INFO - Found 0 citekeys in bib section 0
+[457] Biber.pm:1002> INFO - Found 2 citekeys in bib section 4
+[457] Biber.pm:1002> INFO - Found 0 citekeys in bib section 0
+[504] Biber.pm:4487> INFO - Processing section 1
+[518] Biber.pm:4678> INFO - Looking for bibtex file 'body/ref.bib' for section 1
+[587] bibtex.pm:1713> INFO - LaTeX decoding ...
+[625] bibtex.pm:1519> INFO - Found BibTeX data source 'body/ref.bib'
+[1396] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[1396] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[1396] Biber.pm:4307> INFO - Sorting list 'none/global//global/global/global' of type 'entry' with template 'none' and locale 'en-US'
+[1396] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
+[1442] Biber.pm:4487> INFO - Processing section 3
+[1442] Biber.pm:4678> INFO - Looking for bibtex file 'body/ref.bib' for section 3
+[1503] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[1503] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[1503] Biber.pm:4307> INFO - Sorting list 'none/global//global/global/global' of type 'entry' with template 'none' and locale 'en-US'
+[1503] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
+[1504] Biber.pm:4487> INFO - Processing section 4
+[1504] Biber.pm:4678> INFO - Looking for bibtex file 'body/ref.bib' for section 4
+[1569] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[1569] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[1569] Biber.pm:4307> INFO - Sorting list 'none/global//global/global/global' of type 'entry' with template 'none' and locale 'en-US'
+[1569] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
+[1571] bbl.pm:676> INFO - Writing 'out/zjuthesis.bbl' with encoding 'UTF-8'
+[1661] bbl.pm:779> INFO - Output to out/zjuthesis.bbl

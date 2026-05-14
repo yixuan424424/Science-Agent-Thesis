@@ -1,0 +1,32 @@
+# Final_Project 环境配置
+
+## Python 虚拟环境
+- 管理工具: venv (内置)
+- 虚拟环境路径: .venv/
+- 激活命令 (Windows): .venv\Scripts\Activate.ps1
+- Python 解释器: .venv\Scripts\python.exe
+
+## LaTeX 编译环境
+- LaTeX 发行版: MiKTeX 25.12
+- 编译引擎: xelatex (xelatex.exe)
+- 参考文献工具: biber (biber.exe)
+- 主文件: final_report/zjuthesis.tex
+- 输出目录: final_report/out/
+- 注意: latexmk 需要 Perl，本机未安装，改用手动编译流程
+
+## LaTeX 手动编译流程（完整编译，含参考文献）
+# 在 final_report/ 目录下执行:
+# 1. xelatex -synctex=1 -interaction=nonstopmode -output-directory=out zjuthesis.tex
+# 2. biber out/zjuthesis
+# 3. xelatex -synctex=1 -interaction=nonstopmode -output-directory=out zjuthesis.tex
+# 4. xelatex -synctex=1 -interaction=nonstopmode -output-directory=out zjuthesis.tex
+# 输出: final_report/out/zjuthesis.pdf
+
+## 图表生成脚本
+- 路径: scripts/figs/
+- 运行方式: .venv\Scripts\python.exe scripts\figs\gen_*.py  (在项目根目录下执行)
+- 输出目录: final_report/figure/
+
+## Git
+- Repo: C:/Users/EDY/Desktop/Final_Project
+- 未配置 upstream，请用户确认分支信息后再操作
