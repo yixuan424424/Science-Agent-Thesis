@@ -710,6 +710,536 @@
         {"tool_name": "bar_chart", "min_size_bytes": 1024}
       ],
       "required_tools": [["equation_solver"], ["descriptive_statistics"], ["bar_chart"]]
+    },
+
+    {
+      "_group_comment": "扩展用例 v4：35 道新增题（6 numerical + 6 statistics + 5 visualization + 14 composite + 4 error_recovery），重点补充 hard/vhard 难度，分布与原集合一致",
+      "id": "num_09",
+      "category": "numerical",
+      "difficulty": "easy",
+      "task": "Numerically integrate f(x) = exp(x) over the interval [0, 1]. Report the integral value.",
+      "expected_numeric": [
+        {"name": "integral", "value": 1.71828, "tolerance": 0.001, "abs_tolerance": 1e-4}
+      ],
+      "expected_files": [],
+      "required_tools": [["numerical_integration"]]
+    },
+    {
+      "id": "num_10",
+      "category": "numerical",
+      "difficulty": "medium",
+      "task": "Compute the eigenvalues of the matrix [[4, 2], [2, 4]]. Report them in ascending order as e1 and e2.",
+      "expected_numeric": [
+        {"name": "e1", "value": 2.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "e2", "value": 6.0, "tolerance": 1e-9, "abs_tolerance": 1e-6}
+      ],
+      "expected_files": [],
+      "required_tools": [["matrix_operation"]]
+    },
+    {
+      "id": "num_11",
+      "category": "numerical",
+      "difficulty": "hard",
+      "task": "Execute a two-step chain: (1) Find the two roots of x^2 - 7*x + 10 = 0 by calling the equation solver separately on [1, 3] and [3, 6]. Call the smaller root r1 and the larger root r2. (2) Numerically integrate f(x) = x^2 over [r1, r2]. Report r1, r2, and the integral I.",
+      "expected_numeric": [
+        {"name": "r1", "value": 2.0, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "r2", "value": 5.0, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "I", "value": 39.0, "tolerance": 0.001, "abs_tolerance": 1e-4}
+      ],
+      "expected_files": [],
+      "required_tools": [["equation_solver"], ["numerical_integration"]]
+    },
+    {
+      "id": "num_12",
+      "category": "numerical",
+      "difficulty": "hard",
+      "task": "The polynomial p(x) = x^4 - 5*x^2 + 4 factors as (x^2 - 1)*(x^2 - 4) = 0, giving four real roots. Find all four roots by calling the equation solver on four separate intervals: [-3, -1.5], [-1.5, -0.5], [0.5, 1.5], and [1.5, 3]. Report the four roots in ascending order as r1, r2, r3, r4.",
+      "expected_numeric": [
+        {"name": "r1", "value": -2.0, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "r2", "value": -1.0, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "r3", "value": 1.0, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "r4", "value": 2.0, "tolerance": 1e-9, "abs_tolerance": 1e-4}
+      ],
+      "expected_files": [],
+      "required_tools": [["equation_solver"]]
+    },
+    {
+      "id": "num_13",
+      "category": "numerical",
+      "difficulty": "hard",
+      "task": "Given x=[0, 1, 2, 3, 4] and y=[1.0, 2.72, 7.39, 20.09, 54.60] (approximating y=exp(x)), fit an exponential model y = a * exp(b * x). Then numerically integrate the fitted model g(x) = a * exp(b * x) over [0, 2]. Report the fitted coefficients a and b, and the integral I.",
+      "expected_numeric": [
+        {"name": "a", "value": 1.0, "tolerance": 0.02, "abs_tolerance": 0.05},
+        {"name": "b", "value": 1.0, "tolerance": 0.02, "abs_tolerance": 0.05},
+        {"name": "I", "value": 6.389, "tolerance": 0.05, "abs_tolerance": 0.1}
+      ],
+      "expected_files": [],
+      "required_tools": [["curve_fitting"], ["numerical_integration"]]
+    },
+    {
+      "id": "num_14",
+      "category": "numerical",
+      "difficulty": "vhard",
+      "task": "Let A be the upper triangular matrix [[1, 2, 3], [0, 4, 5], [0, 0, 6]]. Execute the following chain: (1) Compute det_A (for a triangular matrix, the determinant equals the product of the diagonal entries). (2) Obtain all three eigenvalues of A (for an upper triangular matrix, eigenvalues are the diagonal entries); report them in ascending order as e1, e2, e3. (3) Numerically integrate f(x) = x over [e1, e3]. (4) Find the positive root r of x^2 - e3 = 0 in [0, 5] using the equation solver. Report det_A, e1, e2, e3, I, and r.",
+      "expected_numeric": [
+        {"name": "det_A", "value": 24.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "e1", "value": 1.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "e2", "value": 4.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "e3", "value": 6.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "I", "value": 17.5, "tolerance": 0.001, "abs_tolerance": 1e-4},
+        {"name": "r", "value": 2.44949, "tolerance": 0.001, "abs_tolerance": 1e-4}
+      ],
+      "expected_files": [],
+      "required_tools": [["matrix_operation"], ["numerical_integration"], ["equation_solver"]]
+    },
+
+    {
+      "id": "stats_09",
+      "category": "statistics",
+      "difficulty": "easy",
+      "task": "Compute the mean and median of the dataset [5, 10, 15, 20, 25, 30]. Report mean and median.",
+      "expected_numeric": [
+        {"name": "mean", "value": 17.5, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "median", "value": 17.5, "tolerance": 1e-9, "abs_tolerance": 1e-6}
+      ],
+      "expected_files": [],
+      "required_tools": [["descriptive_statistics"]]
+    },
+    {
+      "id": "stats_10",
+      "category": "statistics",
+      "difficulty": "medium",
+      "task": "For x=[1, 2, 3, 4, 5] and y=[1, 4, 9, 16, 25] (y = x^2), compute both the Pearson and Spearman correlation coefficients. Report pearson_r and spearman_r.",
+      "expected_numeric": [
+        {"name": "pearson_r", "value": 0.9811, "tolerance": 0.01, "abs_tolerance": 0.005},
+        {"name": "spearman_r", "value": 1.0, "tolerance": 1e-9, "abs_tolerance": 1e-6}
+      ],
+      "expected_files": [],
+      "required_tools": [["correlation_analysis"]]
+    },
+    {
+      "id": "stats_11",
+      "category": "statistics",
+      "difficulty": "hard",
+      "task": "Given control=[8.0, 9.0, 8.5, 7.5, 9.5] and treatment=[11.0, 12.0, 10.5, 11.5, 10.0]: (1) Compute descriptive statistics for each group and report mean_c and mean_t. (2) Perform an independent two-sample t-test (treatment vs control) and report t_statistic. (3) Compute Cohen's d = (mean_t - mean_c) / pooled_std, where pooled_std = sqrt(((n-1)*var_c + (n-1)*var_t) / (2*n-2)) using sample variances (ddof=1). (4) Plot a bar chart with categories ['control', 'treatment'] and the two means as values. Report mean_c, mean_t, t_statistic, and cohens_d.",
+      "expected_numeric": [
+        {"name": "mean_c", "value": 8.5, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "mean_t", "value": 11.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "t_statistic", "value": 5.0, "tolerance": 0.01, "abs_tolerance": 0.01},
+        {"name": "cohens_d", "value": 3.1623, "tolerance": 0.01, "abs_tolerance": 0.01}
+      ],
+      "expected_files": [
+        {"tool_name": "bar_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["descriptive_statistics"], ["hypothesis_test"], ["bar_chart"]]
+    },
+    {
+      "id": "stats_12",
+      "category": "statistics",
+      "difficulty": "hard",
+      "task": "Given data=[10, 12, 11, 13, 9, 100, 11, 12], use the descriptive statistics tool to obtain Q1, Q3, and IQR. Identify any value outside [Q1 - 1.5*IQR, Q3 + 1.5*IQR] as an outlier. Remove the outlier and compute the mean of the cleaned data. Report original_mean, outlier_value, and cleaned_mean.",
+      "expected_numeric": [
+        {"name": "original_mean", "value": 22.25, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "outlier_value", "value": 100.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "cleaned_mean", "value": 11.1429, "tolerance": 0.001, "abs_tolerance": 5e-4}
+      ],
+      "expected_files": [],
+      "required_tools": [["descriptive_statistics"]]
+    },
+    {
+      "id": "stats_13",
+      "category": "statistics",
+      "difficulty": "hard",
+      "task": "For three variables x=[1, 2, 3, 4, 5], y=[2, 4, 6, 8, 10], z=[1, 3, 2, 5, 4], compute the Pearson correlation coefficient for each pair (r_xy, r_xz, r_yz). Construct a 3x3 correlation matrix and visualize it as a heatmap with row and column labels ['x', 'y', 'z']. Identify which pair has the HIGHEST absolute correlation value and report it as max_abs_r. Report r_xy, r_xz, r_yz, and max_abs_r.",
+      "expected_numeric": [
+        {"name": "r_xy", "value": 1.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "r_xz", "value": 0.8, "tolerance": 0.01, "abs_tolerance": 0.005},
+        {"name": "r_yz", "value": 0.8, "tolerance": 0.01, "abs_tolerance": 0.005},
+        {"name": "max_abs_r", "value": 1.0, "tolerance": 1e-9, "abs_tolerance": 1e-6}
+      ],
+      "expected_files": [
+        {"tool_name": "heatmap", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["correlation_analysis"], ["heatmap"]]
+    },
+    {
+      "id": "stats_14",
+      "category": "statistics",
+      "difficulty": "vhard",
+      "task": "A researcher measures a physiological marker before and after a treatment. before=[10.5, 11.0, 9.8, 10.2, 10.8], after=[12.3, 12.8, 11.5, 12.0, 12.5]. Execute the following analysis: (1) Compute descriptive statistics for both groups and report mean_before, mean_after. (2) Compute the Pearson correlation between before and after. (3) Perform an independent two-sample t-test (after vs before) and report t_statistic. (4) Compute Cohen's d = (mean_after - mean_before) / pooled_std using sample variances. (5) Plot a line chart showing both 'before' and 'after' series vs index [1, 2, 3, 4, 5]. Report mean_before, mean_after, correlation, t_statistic, and cohens_d.",
+      "expected_numeric": [
+        {"name": "mean_before", "value": 10.46, "tolerance": 0.001, "abs_tolerance": 5e-4},
+        {"name": "mean_after", "value": 12.22, "tolerance": 0.001, "abs_tolerance": 5e-4},
+        {"name": "correlation", "value": 0.9944, "tolerance": 0.01, "abs_tolerance": 0.01},
+        {"name": "t_statistic", "value": 5.711, "tolerance": 0.02, "abs_tolerance": 0.02},
+        {"name": "cohens_d", "value": 3.611, "tolerance": 0.02, "abs_tolerance": 0.05}
+      ],
+      "expected_files": [
+        {"tool_name": "line_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["descriptive_statistics"], ["correlation_analysis"], ["hypothesis_test"], ["line_chart"]]
+    },
+
+    {
+      "id": "viz_07",
+      "category": "visualization",
+      "difficulty": "easy",
+      "task": "Generate a scatter chart for x=[2, 4, 1, 5, 3] and y=[4, 7, 2, 8, 5] with title 'Sample Scatter' and save the figure.",
+      "expected_numeric": [],
+      "expected_files": [
+        {"tool_name": "scatter_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["scatter_chart"]]
+    },
+    {
+      "id": "viz_08",
+      "category": "visualization",
+      "difficulty": "medium",
+      "task": "Plot a line chart with two series over x=[0, 1, 2, 3, 4, 5]: series1=[0, 1, 4, 9, 16, 25] labeled 'quadratic' and series2=[0, 2, 4, 6, 8, 10] labeled 'linear'. Report the difference between the last value of series1 and the last value of series2 (i.e., 25 - 10).",
+      "expected_numeric": [
+        {"name": "diff_at_x5", "value": 15.0, "tolerance": 1e-9, "abs_tolerance": 1e-6}
+      ],
+      "expected_files": [
+        {"tool_name": "line_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["line_chart"]]
+    },
+    {
+      "id": "viz_09",
+      "category": "visualization",
+      "difficulty": "hard",
+      "task": "For four variables x1=[1, 2, 3, 4, 5], x2=[5, 4, 3, 2, 1], x3=[1, 3, 2, 5, 4], x4=[2, 4, 6, 8, 10], compute all pairwise Pearson correlation coefficients and visualize the 4x4 correlation matrix as a heatmap with row and column labels ['x1', 'x2', 'x3', 'x4']. Report the Pearson correlation between x2 and x3 (r_x2_x3).",
+      "expected_numeric": [
+        {"name": "r_x2_x3", "value": -0.9, "tolerance": 0.01, "abs_tolerance": 0.005}
+      ],
+      "expected_files": [
+        {"tool_name": "heatmap", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["correlation_analysis"], ["heatmap"]]
+    },
+    {
+      "id": "viz_10",
+      "category": "visualization",
+      "difficulty": "hard",
+      "task": "Given x=[0, 1, 2, 3, 4, 5] and y_obs=[0.1, 1.05, 4.0, 9.1, 16.2, 25.05] (approximately y=x^2), fit a polynomial of degree 2 to obtain y_pred. Plot y_obs and y_pred as two lines on the same line chart with labels 'observed' and 'fitted'. Report the R squared of the fit.",
+      "expected_numeric": [
+        {"name": "r_squared", "value": 0.9999, "tolerance": 0.001, "abs_tolerance": 5e-4}
+      ],
+      "expected_files": [
+        {"tool_name": "line_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["curve_fitting"], ["line_chart"]]
+    },
+    {
+      "id": "viz_11",
+      "category": "visualization",
+      "difficulty": "hard",
+      "task": "For three groups A=[5, 7, 6, 8, 9], B=[3, 4, 4, 5, 3], C=[8, 9, 10, 11, 12], compute the mean and sample standard deviation for each group using the descriptive statistics tool. Plot a bar chart with categories ['A', 'B', 'C'] and the three means as values. Report mean_A, mean_B, mean_C, std_A, std_B, std_C.",
+      "expected_numeric": [
+        {"name": "mean_A", "value": 7.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "mean_B", "value": 3.8, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "mean_C", "value": 10.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "std_A", "value": 1.5811, "tolerance": 0.001, "abs_tolerance": 5e-4},
+        {"name": "std_B", "value": 0.8367, "tolerance": 0.001, "abs_tolerance": 5e-4},
+        {"name": "std_C", "value": 1.5811, "tolerance": 0.001, "abs_tolerance": 5e-4}
+      ],
+      "expected_files": [
+        {"tool_name": "bar_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["descriptive_statistics"], ["bar_chart"]]
+    },
+
+    {
+      "id": "comp_11",
+      "category": "composite",
+      "difficulty": "medium",
+      "task": "Let A=[[3, 0], [0, 4]] be a diagonal matrix. (1) Compute the determinant det_A. (2) Solve x^2 - det_A = 0 for the positive root r in [3, 4] using the equation solver. (3) Numerically integrate f(x) = x over [0, r]. Report det_A, r, and I.",
+      "expected_numeric": [
+        {"name": "det_A", "value": 12.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "r", "value": 3.46410, "tolerance": 0.001, "abs_tolerance": 5e-4},
+        {"name": "I", "value": 6.0, "tolerance": 0.001, "abs_tolerance": 1e-4}
+      ],
+      "expected_files": [],
+      "required_tools": [["matrix_operation"], ["equation_solver"], ["numerical_integration"]]
+    },
+    {
+      "id": "comp_12",
+      "category": "composite",
+      "difficulty": "medium",
+      "task": "Given x=[0, 1, 2, 3, 4, 5] and y=[1, 3, 5, 7, 9, 11] (a perfect linear relationship y=2x+1), perform a linear regression to obtain slope, intercept, and R squared. Then predict y at x=8. Plot a scatter chart of (x, y) with the regression line overlaid. Report slope, intercept, r_squared, and pred_at_8.",
+      "expected_numeric": [
+        {"name": "slope", "value": 2.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "intercept", "value": 1.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "r_squared", "value": 1.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "pred_at_8", "value": 17.0, "tolerance": 0.001, "abs_tolerance": 1e-4}
+      ],
+      "expected_files": [
+        {"tool_name": "scatter_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["linear_regression", "curve_fitting"], ["scatter_chart"]]
+    },
+    {
+      "id": "comp_13",
+      "category": "composite",
+      "difficulty": "medium",
+      "task": "Given group1=[1, 2, 3, 4, 5] and group2=[3, 4, 5, 6, 7], compute the Pearson correlation between them, compute the mean of each group, perform an independent two-sample t-test (group2 vs group1), and plot a bar chart with categories ['group1', 'group2'] and the two means as values. Report correlation, mean1, mean2, and t_statistic.",
+      "expected_numeric": [
+        {"name": "correlation", "value": 1.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "mean1", "value": 3.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "mean2", "value": 5.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "t_statistic", "value": 2.0, "tolerance": 0.005, "abs_tolerance": 0.005}
+      ],
+      "expected_files": [
+        {"tool_name": "bar_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["correlation_analysis"], ["descriptive_statistics"], ["hypothesis_test"], ["bar_chart"]]
+    },
+    {
+      "id": "comp_14",
+      "category": "composite",
+      "difficulty": "medium",
+      "task": "Compute three definite integrals: I1 = integral of x dx over [0, 3], I2 = integral of x^2 dx over [0, 3], and I3 = integral of x^3 dx over [0, 3]. Then use the descriptive statistics tool on the array [I1, I2, I3] to compute their mean and sample standard deviation. Report I1, I2, I3, mean_integrals, and std_integrals.",
+      "expected_numeric": [
+        {"name": "I1", "value": 4.5, "tolerance": 0.001, "abs_tolerance": 1e-4},
+        {"name": "I2", "value": 9.0, "tolerance": 0.001, "abs_tolerance": 1e-4},
+        {"name": "I3", "value": 20.25, "tolerance": 0.001, "abs_tolerance": 1e-4},
+        {"name": "mean_integrals", "value": 11.25, "tolerance": 0.001, "abs_tolerance": 1e-4},
+        {"name": "std_integrals", "value": 8.1124, "tolerance": 0.01, "abs_tolerance": 0.01}
+      ],
+      "expected_files": [],
+      "required_tools": [["numerical_integration"], ["descriptive_statistics"]]
+    },
+    {
+      "id": "comp_15",
+      "category": "composite",
+      "difficulty": "hard",
+      "task": "The polynomial x^3 - 6*x^2 + 11*x - 6 = 0 factors as (x-1)*(x-2)*(x-3) = 0. (1) Find all three roots by calling equation_solver on [0.5, 1.5], [1.5, 2.5], and [2.5, 3.5] separately. (2) Numerically integrate f(x) = x over [r1, r3]. (3) Compute descriptive statistics (mean, sample std) of [r1, r2, r3]. (4) Plot a bar chart of the three roots. Report r1, r2, r3, I, mean_roots, and std_roots.",
+      "expected_numeric": [
+        {"name": "r1", "value": 1.0, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "r2", "value": 2.0, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "r3", "value": 3.0, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "I", "value": 4.0, "tolerance": 0.001, "abs_tolerance": 1e-4},
+        {"name": "mean_roots", "value": 2.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "std_roots", "value": 1.0, "tolerance": 0.001, "abs_tolerance": 1e-4}
+      ],
+      "expected_files": [
+        {"tool_name": "bar_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["equation_solver"], ["numerical_integration"], ["descriptive_statistics"], ["bar_chart"]]
+    },
+    {
+      "id": "comp_16",
+      "category": "composite",
+      "difficulty": "hard",
+      "task": "Let M=[[6, 2], [2, 3]]. (1) Compute the eigenvalues of M; report the smaller as e1 and the larger as e2. (2) Form x=[e1, e2] and y=[e1^2, e2^2] (squares of the eigenvalues). Fit a polynomial of degree 1 to the two points (e1, e1^2) and (e2, e2^2). Report slope and intercept. (3) Using the fitted linear model, predict y at x = e2 + 1. (4) Plot a line chart of [e1, e2] vs [e1^2, e2^2]. Report e1, e2, slope, intercept, and pred.",
+      "expected_numeric": [
+        {"name": "e1", "value": 2.0, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "e2", "value": 7.0, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "slope", "value": 9.0, "tolerance": 0.001, "abs_tolerance": 1e-4},
+        {"name": "intercept", "value": -14.0, "tolerance": 0.001, "abs_tolerance": 1e-4},
+        {"name": "pred", "value": 58.0, "tolerance": 0.005, "abs_tolerance": 0.01}
+      ],
+      "expected_files": [
+        {"tool_name": "line_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["matrix_operation"], ["curve_fitting", "linear_regression"], ["line_chart"]]
+    },
+    {
+      "id": "comp_17",
+      "category": "composite",
+      "difficulty": "hard",
+      "task": "Let A=[[3, 1], [1, 3]]. Execute this four-step chain: (1) Compute the eigenvalues of A; report e1 (smaller) and e2 (larger). (2) Numerically integrate f(x) = sin(x) over [0, e1]; call this I1. (3) Numerically integrate f(x) = sin(x) over [0, e2]; call this I2. (4) Compute descriptive statistics (mean, sample std) of [I1, I2]. Plot a line chart of [e1, e2] vs [I1, I2]. Report e1, e2, I1, I2, mean_I, and std_I.",
+      "expected_numeric": [
+        {"name": "e1", "value": 2.0, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "e2", "value": 4.0, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "I1", "value": 1.4161, "tolerance": 0.005, "abs_tolerance": 0.005},
+        {"name": "I2", "value": 1.6536, "tolerance": 0.005, "abs_tolerance": 0.005},
+        {"name": "mean_I", "value": 1.5349, "tolerance": 0.005, "abs_tolerance": 0.005},
+        {"name": "std_I", "value": 0.1680, "tolerance": 0.005, "abs_tolerance": 0.005}
+      ],
+      "expected_files": [
+        {"tool_name": "line_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["matrix_operation"], ["numerical_integration"], ["descriptive_statistics"], ["line_chart"]]
+    },
+    {
+      "id": "comp_18",
+      "category": "composite",
+      "difficulty": "hard",
+      "task": "Given x=[1, 2, 3, 4, 5] and y=[2, 5, 8, 11, 14] (y = 3x - 1): (1) Perform a linear regression to get slope, intercept, and r_squared. (2) Predict y at x=10. (3) Compute descriptive statistics of y: mean_y and std_y. (4) Compute Pearson correlation between x and y. (5) Plot a scatter chart of (x, y) with the regression line overlaid. Report slope, intercept, r_squared, pred_at_10, mean_y, std_y, and correlation.",
+      "expected_numeric": [
+        {"name": "slope", "value": 3.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "intercept", "value": -1.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "r_squared", "value": 1.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "pred_at_10", "value": 29.0, "tolerance": 0.001, "abs_tolerance": 1e-4},
+        {"name": "mean_y", "value": 8.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "std_y", "value": 4.7434, "tolerance": 0.005, "abs_tolerance": 0.005},
+        {"name": "correlation", "value": 1.0, "tolerance": 1e-9, "abs_tolerance": 1e-6}
+      ],
+      "expected_files": [
+        {"tool_name": "scatter_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["linear_regression", "curve_fitting"], ["descriptive_statistics"], ["correlation_analysis"], ["scatter_chart"]]
+    },
+    {
+      "id": "comp_19",
+      "category": "composite",
+      "difficulty": "hard",
+      "task": "For x=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] and y=[0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20] (y = 2x): (1) Compute Pearson correlation. (2) Perform linear regression; obtain slope, intercept, and r_squared. (3) Predict y at x=15. (4) Compute descriptive statistics of y: mean_y and sample std_y. (5) Plot a scatter chart with the regression line overlaid. Report correlation, slope, intercept, r_squared, pred_at_15, mean_y, and std_y.",
+      "expected_numeric": [
+        {"name": "correlation", "value": 1.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "slope", "value": 2.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "intercept", "value": 0.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "r_squared", "value": 1.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "pred_at_15", "value": 30.0, "tolerance": 0.001, "abs_tolerance": 1e-4},
+        {"name": "mean_y", "value": 10.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "std_y", "value": 6.6332, "tolerance": 0.005, "abs_tolerance": 0.005}
+      ],
+      "expected_files": [
+        {"tool_name": "scatter_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["correlation_analysis"], ["linear_regression", "curve_fitting"], ["descriptive_statistics"], ["scatter_chart"]]
+    },
+    {
+      "id": "comp_20",
+      "category": "composite",
+      "difficulty": "hard",
+      "task": "Execute this five-step chain: (1) Compute the determinant D of A=[[2, 1], [1, 2]]. (2) Solve x^3 - D = 0 for the real root r in [1, 2] using the equation solver. (3) Numerically integrate f(x) = x^2 over [0, r]; since r = D^(1/3) and x^3/3 evaluated at r gives D/3, the result is exactly D/3. (4) Form the sequence s=[r, 2r, 3r, 4r, 5r] and compute descriptive statistics: mean_s and sample std_s. (5) Plot a bar chart of s vs index [1, 2, 3, 4, 5]. Report D, r, I, mean_s, and std_s.",
+      "expected_numeric": [
+        {"name": "D", "value": 3.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "r", "value": 1.44225, "tolerance": 0.001, "abs_tolerance": 5e-4},
+        {"name": "I", "value": 1.0, "tolerance": 0.001, "abs_tolerance": 1e-4},
+        {"name": "mean_s", "value": 4.32675, "tolerance": 0.005, "abs_tolerance": 0.005},
+        {"name": "std_s", "value": 2.28011, "tolerance": 0.01, "abs_tolerance": 0.01}
+      ],
+      "expected_files": [
+        {"tool_name": "bar_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["matrix_operation"], ["equation_solver"], ["numerical_integration"], ["descriptive_statistics"], ["bar_chart"]]
+    },
+    {
+      "id": "comp_21",
+      "category": "composite",
+      "difficulty": "hard",
+      "task": "Two research groups report measurements: Group_A=[15.2, 16.3, 14.8, 15.9, 16.1] and Group_B=[12.1, 13.5, 12.8, 13.2, 12.4]. (1) Compute descriptive statistics (mean, std) for each group separately. (2) Compute Pearson correlation between Group_A and Group_B. (3) Perform an independent two-sample t-test (A vs B) and report t_statistic. (4) Compute Cohen's d = (mean_A - mean_B) / pooled_std using sample variances. (5) Plot a bar chart with categories ['A', 'B'] and the two means. Report mean_A, mean_B, correlation, t_statistic, and cohens_d.",
+      "expected_numeric": [
+        {"name": "mean_A", "value": 15.66, "tolerance": 0.001, "abs_tolerance": 5e-4},
+        {"name": "mean_B", "value": 12.8, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "correlation", "value": 0.4766, "tolerance": 0.02, "abs_tolerance": 0.02},
+        {"name": "t_statistic", "value": 7.496, "tolerance": 0.02, "abs_tolerance": 0.02},
+        {"name": "cohens_d", "value": 4.741, "tolerance": 0.02, "abs_tolerance": 0.05}
+      ],
+      "expected_files": [
+        {"tool_name": "bar_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["descriptive_statistics"], ["correlation_analysis"], ["hypothesis_test"], ["bar_chart"]]
+    },
+    {
+      "id": "comp_22",
+      "category": "composite",
+      "difficulty": "hard",
+      "task": "Execute the following chain with strict data dependencies: (1) Compute det_A of A=[[5, 2], [2, 5]]; call it D. (2) Solve x^3 - D = 0 for the real root r in [2, 4]. (3) Numerically integrate f(x) = x over [0, r]; call it I. (4) Form s=[r, 2r, 3r, 4r] and compute descriptive statistics: mean_s and sample std_s. (5) Plot a line chart of s vs index [1, 2, 3, 4]. Report D, r, I, mean_s, and std_s.",
+      "expected_numeric": [
+        {"name": "D", "value": 21.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "r", "value": 2.75894, "tolerance": 0.001, "abs_tolerance": 5e-4},
+        {"name": "I", "value": 3.8057, "tolerance": 0.01, "abs_tolerance": 0.01},
+        {"name": "mean_s", "value": 6.8973, "tolerance": 0.005, "abs_tolerance": 0.01},
+        {"name": "std_s", "value": 3.5617, "tolerance": 0.01, "abs_tolerance": 0.02}
+      ],
+      "expected_files": [
+        {"tool_name": "line_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["matrix_operation"], ["equation_solver"], ["numerical_integration"], ["descriptive_statistics"], ["line_chart"]]
+    },
+    {
+      "id": "comp_23",
+      "category": "composite",
+      "difficulty": "vhard",
+      "task": "Let M=[[4, 2, 0], [2, 4, 0], [0, 0, 3]] (block-diagonal). Execute the following six-step chain: (1) Compute det_M. (2) Compute all three eigenvalues of M and report them in ascending order as e1, e2, e3. (3) Numerically integrate f(x) = x over [e1, e3]. (4) Solve x^2 - e3 = 0 for the positive root r in [1, 4]. (5) Fit a polynomial of degree 1 to the three points (e1, e1^2), (e2, e2^2), (e3, e3^2); report slope and intercept. (6) Plot a bar chart of [e1^2, e2^2, e3^2] with labels ['e1^2', 'e2^2', 'e3^2']. Report det_M, e1, e2, e3, I, r, slope, and intercept.",
+      "expected_numeric": [
+        {"name": "det_M", "value": 36.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "e1", "value": 2.0, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "e2", "value": 3.0, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "e3", "value": 6.0, "tolerance": 1e-9, "abs_tolerance": 1e-4},
+        {"name": "I", "value": 16.0, "tolerance": 0.001, "abs_tolerance": 1e-4},
+        {"name": "r", "value": 2.44949, "tolerance": 0.001, "abs_tolerance": 5e-4},
+        {"name": "slope", "value": 8.231, "tolerance": 0.01, "abs_tolerance": 0.01},
+        {"name": "intercept", "value": -13.848, "tolerance": 0.02, "abs_tolerance": 0.02}
+      ],
+      "expected_files": [
+        {"tool_name": "bar_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["matrix_operation"], ["numerical_integration"], ["equation_solver"], ["curve_fitting", "linear_regression"], ["bar_chart"]]
+    },
+    {
+      "id": "comp_24",
+      "category": "composite",
+      "difficulty": "vhard",
+      "task": "A clinical trial measures a biomarker in control and treatment arms. control=[40, 42, 44, 46, 48] and treatment=[50, 52, 54, 56, 58]. Execute the full analysis pipeline: (1) Compute descriptive statistics for each group (mean, std). (2) Perform an independent two-sample t-test (treatment vs control) and report t_statistic. (3) Compute Cohen's d using pooled sample std. (4) Compute Pearson correlation between control and treatment. (5) Fit a linear regression with control as x and treatment as y; report slope_reg and intercept_reg. (6) Plot a scatter chart of (control, treatment) with the regression line overlaid. Report mean_c, mean_t, t_statistic, cohens_d, correlation, slope_reg, and intercept_reg.",
+      "expected_numeric": [
+        {"name": "mean_c", "value": 44.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "mean_t", "value": 54.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "t_statistic", "value": 5.0, "tolerance": 0.005, "abs_tolerance": 0.005},
+        {"name": "cohens_d", "value": 3.1623, "tolerance": 0.01, "abs_tolerance": 0.01},
+        {"name": "correlation", "value": 1.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "slope_reg", "value": 1.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "intercept_reg", "value": 10.0, "tolerance": 0.001, "abs_tolerance": 1e-4}
+      ],
+      "expected_files": [
+        {"tool_name": "scatter_chart", "min_size_bytes": 1024}
+      ],
+      "required_tools": [["descriptive_statistics"], ["hypothesis_test"], ["correlation_analysis"], ["linear_regression", "curve_fitting"], ["scatter_chart"]]
+    },
+
+    {
+      "id": "err_06",
+      "category": "error_recovery",
+      "difficulty": "medium",
+      "task": "Given x=[1, 2, 3, 4, 5] and y=[0.5, 2.0, 4.5, 8.0, 12.5] (y = 0.5 * x^2). First fit a polynomial of degree 1 (linear). If its R squared is below 0.99, retry with a polynomial of degree 2. Report r_sq_linear and r_sq_final (the R squared of the model you settled on).",
+      "expected_numeric": [
+        {"name": "r_sq_linear", "value": 0.9626, "tolerance": 0.01, "abs_tolerance": 0.01},
+        {"name": "r_sq_final", "value": 1.0, "tolerance": 0.001, "abs_tolerance": 5e-4}
+      ],
+      "expected_files": [],
+      "required_tools": [["curve_fitting"]]
+    },
+    {
+      "id": "err_07",
+      "category": "error_recovery",
+      "difficulty": "hard",
+      "task": "You are given x=[1, 2, 3, 4, 5] (5 elements) and y=[2, 4, 6] (3 elements) for a linear regression. If the regression tool reports a length mismatch, truncate x to match the length of y (use x_clean=[1, 2, 3]) and retry. Then predict y at x=10 using the fitted model. Report slope_clean, intercept_clean, and pred_at_10.",
+      "expected_numeric": [
+        {"name": "slope_clean", "value": 2.0, "tolerance": 0.001, "abs_tolerance": 1e-4},
+        {"name": "intercept_clean", "value": 0.0, "tolerance": 0.01, "abs_tolerance": 0.01},
+        {"name": "pred_at_10", "value": 20.0, "tolerance": 0.001, "abs_tolerance": 1e-4}
+      ],
+      "expected_files": [],
+      "required_tools": [["linear_regression", "curve_fitting"]]
+    },
+    {
+      "id": "err_08",
+      "category": "error_recovery",
+      "difficulty": "hard",
+      "task": "Find the real root of f(x) = x^3 - x - 2 = 0. Start by trying the interval [0, 1]. If the solver fails because the function values at both endpoints have the same sign (f(0) = -2 and f(1) = -2 are both negative), widen the interval to [1, 2] and retry (f(1) = -2 < 0 and f(2) = 4 > 0, which brackets the root). Report the root.",
+      "expected_numeric": [
+        {"name": "root", "value": 1.5214, "tolerance": 0.001, "abs_tolerance": 5e-4}
+      ],
+      "expected_files": [],
+      "required_tools": [["equation_solver"]]
+    },
+    {
+      "id": "err_09",
+      "category": "error_recovery",
+      "difficulty": "vhard",
+      "task": "Execute the following multi-step analysis, recovering from any errors: (1) Attempt to compute the determinant of the non-square matrix [[1, 2, 3], [4, 5, 6]]. If the tool fails because the matrix is not square, instead compute the determinant of the 2x2 submatrix [[2, 1], [1, 3]]; call the result D. (2) You are given x=[1, 2, 3, 4] and y=[2, 4, 6] for a linear regression. Detect the length mismatch; truncate x to x_clean=[1, 2, 3] and fit the regression; report slope_clean and intercept_clean. (3) Numerically integrate f(x) = x^2 over [0, slope_clean]. (4) Report D, slope_clean, intercept_clean, and I.",
+      "expected_numeric": [
+        {"name": "D", "value": 5.0, "tolerance": 1e-9, "abs_tolerance": 1e-6},
+        {"name": "slope_clean", "value": 2.0, "tolerance": 0.001, "abs_tolerance": 1e-4},
+        {"name": "intercept_clean", "value": 0.0, "tolerance": 0.01, "abs_tolerance": 0.01},
+        {"name": "I", "value": 2.6667, "tolerance": 0.001, "abs_tolerance": 5e-4}
+      ],
+      "expected_files": [],
+      "required_tools": [["matrix_operation"], ["linear_regression", "curve_fitting"], ["numerical_integration"]]
     }
   ]
 }

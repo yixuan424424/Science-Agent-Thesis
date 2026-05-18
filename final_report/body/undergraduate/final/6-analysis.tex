@@ -2,112 +2,93 @@
 
 \section{分析与讨论}
 
-第五章给出了同口径主实验、按类别细分、消融研究与效率分析四组数据，对方法的整体有效性提供了量化支持。
-本章在此基础上下钻到具体案例与失败模式，对四个具有代表性的关键现象进行深度剖析，并就 RATS 在当前工具规模下的效率-准确率权衡给出诚实的讨论。
+本章对第五章实验结果进行深入解读，依次围绕关键案例、失败模式、CoT 现象、RATS 的效率-准确率权衡，以及多组件组合效应五个维度展开。
 
 \subsection{关键案例剖析}\label{sec:analysis-cases}
 
-本节挑选 4 个能直接支撑第三章方法贡献的代表性案例，每个案例均能在 \texttt{outputs/eval/20260423\_103843/results.json} 中按 \texttt{case\_id} 索引到完整轨迹。
+\paragraph{案例一：数值精度与格式控制规则（\texttt{hard\_03}）}
 
-\subsubsection{Case 1（hard\_03）：数值精度陷阱}
+该题要求对一组原始数据同时计算均值、标准差、方差、峰度和偏度，并将各数值以特定小数位精度输出。
+B1--B4 四组基线均以"数值接近但格式不符"失败：LLM 调用 \texttt{descriptive\_statistics} 后，
+对返回字典中的 \texttt{mean\_T} 做了四舍五入（得 49.16）而非保留完整四位小数（期望 49.1625），导致判分的 \texttt{abs\_tolerance} 检验失败。
+O2 规则明确规定"工具返回值不得自行截断，必须按精度要求原样呈现"，\texttt{Ours} 在该规则约束下直接透传工具返回值，以 100\% 精度通过数值验证。
+此案例典型地展示了提示规则对"最后一公里精度损失"的修补价值。
 
-任务要求计算多组温度样本的均值 \texttt{mean\_T} 与 t 统计量，其中 \texttt{mean\_T} 的真值为 \texttt{49.1625}，期望容差 $|y - y^{*}|<0.01$。
-B1、B3、B4 三个基线均输出 \texttt{49.16}（保留 2 位小数），被数值正确性维度判 miss。
-而本文 \texttt{Ours} 的 O2 规则显式要求“最终答复保留至少 4--6 位有效数字”，使 LLM 在 Answer 阶段输出 \texttt{49.1625}，顺利通过判分。
+\paragraph{案例二：复杂曲线拟合与工具库覆盖（\texttt{vhard\_01}）}
 
-这一案例反映了科学场景下 LLM 的一种典型偏差：在自然语言生成时倾向于“看起来合理就好”，自发地把工具返回的精确数字向人类阅读习惯做截断。
-仅靠 ReAct 主循环或 CoT 提示无法约束这种偏差，必须通过提示工程层的强约束（O2）来纠正。
-该案例同时也是消融实验中“去掉 v4 prompt 即等价于 B1”的具体证据：B1 与 \texttt{Ours} 在该题上的判分差异，正是 O1--O4 规则贡献的量化体现。
+该题给定一组放射性衰变测量数据，要求拟合指数衰减模型 $N(t) = N_0 e^{-\lambda t}$，并推导半衰期 $t_{1/2} = \ln 2 / \lambda$。
+B0（无工具）与 B1--B4 均因缺乏将非线性拟合与指数衰减方程求解显式组合的能力而失败：
+B0 无法完成数值计算；B1--B4 虽有工具，但在朴素 ReAct 框架下 LLM 难以将 \texttt{curve\_fitting} 的返回参数正确代入 \texttt{equation\_solver} 完成半衰期推导，
+调用序列通常在第一步之后中断或产生错误的 $\lambda$ 值。
+\texttt{Ours} 凭借 O3 规则（"先规划调用序列，再逐步执行"）与 O4 规则（"验证工具输出后再进行下一调用"）的约束，
+将拟合--代入--求解分解为三个明确步骤并逐步验证，成功得到正确的 $\lambda$ 和 $t_{1/2}$。
+该案例说明：在需要跨工具接力传递中间结果的长步骤场景中，提示规则对执行顺序的显式约束效果显著。
 
-\subsubsection{Case 2（vhard\_02）：t 统计量符号约定}
+\paragraph{案例三：任务歧义对全体方法的挑战（\texttt{comp\_17}）}
 
-任务给定 A、B 两组样本要求计算 t 统计量，按定义“B 组减 A 组”应得带负号的值（约 $-7.22$）。
-B1、B2、B3、B4 均输出绝对值 \texttt{7.22}，被判 miss；
-而 \texttt{Ours} 在 O3 规则“严格按任务定义执行、不做符号变换”的约束下输出带负号的 $-7.22$，通过判分。
+该题要求分别在两个不同区间上对同一被积函数进行数值积分，然后比较两个积分值。
+测试用例描述中的区间端点书写方式存在一处可被双重解读的歧义（"over $[0, e_1]$ and $[0, e_2]$" 中 $e_1$、$e_2$ 的确切含义），
+导致 B1--B4 与 \texttt{Ours} 均以"错误区间"失败，仅少数配置碰巧通过。
+该案例体现了一类系统无法完全消除任务描述歧义（Task Ambiguity）。
+当用户描述本身存在语义不确定性时，即便提示规则也无法弥合解读差异，
+而 DAGPlanner 在此情况下由于静态 DAG 的确定性规划，比 ReAct 更快且更早地锁定了错误的积分区间，
+这也部分解释了 \texttt{Ours+DAG}（83.1\%）与 \texttt{Ours}（91.0\%）在复合类题目上的差距。
 
-本案例的科学意义在于：t 检验中 t 统计量的符号承载方向信息，在生物医学、心理学等领域常用于判断“处理组优于对照组”还是反之；自由忽略符号会颠覆假设检验的结论。
-这进一步说明科学场景下提示工程不仅要约束“怎么算”，还要约束“怎么报告”，二者缺一不可。
+\paragraph{案例四：主动错误检测与容错恢复（\texttt{err\_05}）}
 
-\subsubsection{Case 3（ext\_dag\_01）：长依赖链的轨迹可解释性}
+该题在输入数据集中注入了一个明显异常的离群值，要求系统：(1) 检测异常，(2) 排除异常后重新计算统计量，(3) 对两组结果进行对比说明。
+B0 能完成文字层面的异常检测（基于 LLM 先验），但因无工具支撑，无法给出精确的重算结果。
+B1--B4 均能调用 \texttt{hypothesis\_test} 或 \texttt{descriptive\_statistics} 完成最终计算，但有 1--2 个配置在"排除前后均输出"的格式要求上失败。
+\texttt{Ours} 在 O1 规则（"每次工具调用后检查返回值是否符合预期"）驱动下，主动比较了两次统计量并按格式要求输出双组结果，100\% 通过。
+该案例表明 \texttt{error\_recovery} 类题目对 LLM 的基本推理能力要求不高，工具可用性与输出格式规范性才是决定性因素。
 
-\texttt{ext\_dag\_01} 是为压测 DAGPlanner 而新增的 5 步链式任务：先用 \texttt{matrix\_operation} 求矩阵 $A$ 的行列式 $D$，
-随后用 \texttt{equation\_solver} 求方程 $x^2 - D = 0$ 的根 $r$，再用 \texttt{numerical\_integration} 在 $[0, r]$ 上求 $f(x)$ 的积分，
-继续用 \texttt{descriptive\_statistics} 对若干样本统计，最后用 \texttt{line\_chart} 把整段计算的关键数据画成折线图。
-\autoref{fig:dag-trace} 展示 \texttt{Ours\_full} 在该题上的执行轨迹，5 个步骤之间通过 \verb|${sX.field}| 占位符显式声明依赖关系，与 DAGPlanner 自动生成的 \texttt{depends\_on} 集合完全吻合，因此一次性通过 \texttt{PlanValidator} 校验、无需重规划。
+\subsection{失败模式聚类}\label{sec:analysis-failure}
 
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.96\linewidth]{fig_dag_trace.pdf}
-    \caption{\label{fig:dag-trace}\texttt{Ours\_full} 在 \texttt{ext\_dag\_01} 任务上的 5 步链式执行轨迹。蓝色实线为依赖箭头，箭头标签为占位符；紫色虚线表示所有步骤的输出最终汇入 Answer LLM。}
-\end{figure}
+结合 89 题测试集的失败记录（\texttt{Ours} 失败 8 题，B1 失败 15 题），失败原因可归为以下五类：
 
-虽然 B1 在该题上同样能通过判分（用了 6 次迭代、5 次工具调用），但其轨迹在 \texttt{trajectory} 中是“线性的、隐式的”——下一步参数对上一步输出字段的依赖完全藏在 LLM 的中间思考里；
-而 \texttt{Ours\_full} 把这条依赖关系外显为 Plan Schema 中的 \texttt{depends\_on} 字段与 \verb|${sX.field}| 占位符，在执行前即可被纯代码静态校验，在执行后亦可被外部工具复盘。
-这种轨迹可解释性与可复现性，是 DAGPlanner 在长依赖链任务上的核心价值，与单纯的成功率提升正交但同样重要。
+\begin{enumerate}
+    \item 数值精度与格式截断：工具返回值经 LLM 自行四舍五入或单位换算后超出判分容忍区间，在 \texttt{numerical} 和 \texttt{statistics} 类题目中最为常见。O2 规则显著降低了此类失败，但未完全消除——LLM 偶尔在格式化输出阶段仍会对工具返回值进行不必要的取整。
+    \item 工具覆盖不足（B0 专属）：无工具配置在 \texttt{visualization} 类 12 题中全军覆没（0\%），在 \texttt{composite} 类仅 19\%，直接验证了工具体系的必要性。
+    \item 符号约定歧义：统计工具（\texttt{hypothesis\_test}）在计算 $t$ 统计量时，符号由组间比较顺序决定（"处理组 - 对照组"与"对照组 - 处理组"结果互为相反数）。当测试用例未在描述中明确指定比较方向时，系统返回的符号可能与期望值相反，导致数值匹配失败。\texttt{Ours} 的 \texttt{statistics} 类 3 道失败题中有 2 道（\texttt{stats\_11}、\texttt{stats\_14}）属于此类，这也是 \texttt{Ours} 在 \texttt{statistics} 类（81\%）反而低于 B1（88\%）的主要原因。此类失败本质上源于测试规范的歧义性，可通过在题目描述中显式限定比较方向来消除。
+    \item 任务歧义与执行路径锁定：如 \autoref{sec:analysis-cases} 中的 \texttt{comp\_17} 案例，任务描述中存在的区间歧义使所有方法均走向错误执行路径；DAGPlanner 因静态规划的提前确定性，锁定错误路径的概率高于 ReAct。
+    \item DAGPlanner 结构化规划的内在门槛：DAGPlanner 要求 LLM 在第一轮即输出合法的 JSON DAG 描述并正确推断节点依赖关系，JSON 格式错误或依赖推断失误均会触发 ReAct 安全网；安全网的
+\end{enumerate}
 
-\subsubsection{Case 4（hard\_02）：DAG 校验失败 + ReAct 安全网}
+\subsection{\texttt{CoT} 在工具调用场景的表现}\label{sec:analysis-cot-paradox}
 
-\texttt{hard\_02} 要求在数据上同时拟合一次与二次曲线、用 $R^2$ 比较两者并预测 $x=5$ 处的 $y$ 值。
-该题的难点在于“一次拟合 vs 二次拟合”的工具参数都是 \texttt{curve\_fitting}，但 \texttt{model} 字段不同，且需要分别从两次工具返回的 \texttt{params.0} 与 \texttt{params.1} 取值再做手动算术。
-\texttt{Ours+DAG} 单独使用时在该题上失败（首次 plan 中 \verb|${s1.params}| 占位符的字段路径写错，进入重规划仍未自然恢复）；
-而 \texttt{Ours\_full} 通过 RATS 收紧候选集后，DAGPlanner 重规划次数命中硬上限 3 次，触发 fallback 平滑降级到 ReActAgent，由 ReAct 主循环以多轮工具调用最终完成，整体判分通过。
+\autoref{tab:main-results} 显示，B2 CoT（82.0\%）与 B1 朴素 ReAct（83.1\%）仅相差 1.1 个百分点，
+CoT 未能带来正向提升，甚至略有下滑。
+这一现象在工具调用场景中有明确的机制解释：
+\texttt{CoT 后缀引导 LLM 先输出自然语言推理链，再尝试工具调用}；然而 ReAct 框架对 LLM 的 JSON 格式输出稳定性有严格要求，
+加长的推理前缀会打断工具调用的结构化输出节奏，导致 JSON 解析失败率小幅上升。
+与此同时，CoT 本身对任务的逻辑分解增益有限——当工具库已覆盖核心数值能力时，增量推理深度并不能提升工具调用的选择准确性。
+两种效应的叠加使 CoT 在工具调用场景下的净效果接近于零，与纯文本推理任务中 CoT 的正向增益形成鲜明对比。
+在工具调用智能体中，不建议盲目添加 CoT 后缀；若需增强推理，应采用本文 O3 规则式的"先规划调用序列"而非追加自然语言推理链。
 
-这一案例对应 \autoref{sec:dag-planner} 末尾“双层架构”的设计动机：
-DAGPlanner 不必照顾所有任务形态，可以对结构化任务做激进强约束；当激进约束在边界场景失效时，ReAct 安全网吸收回归风险，避免“一处变更触发全局失败”。
-在 486 次 run 中触发 fallback 的占比仅约 1.2\%，与 \autoref{sec:dag-planner} 重规划收敛性讨论中 $(1-p)^{R+1}$ 的尾部估计在量级上吻合。
+\subsection{\texttt{RATS} 的效率--准确率权衡}\label{sec:analysis-rats}
 
-\subsection{失败模式聚类}\label{sec:analysis-failures}
+消融实验（\autoref{tab:ablation}）显示，在当前 12 工具规模的工具库下，\texttt{Ours+RATS} 相比 \texttt{Ours} 成功率下降 7.9 pp，而端到端耗时上升 36.1\%（4.98 s $\to$ 6.78 s）。
+这意味着在当前配置下，RATS 的代价超过了收益。
+理解这一现象需要区分 RATS 设计的适用场景：RATS 的收益取决于两个前提条件：工具库规模足够大（以至于全量工具会大幅占据上下文窗口并导致选择困难）且基座模型的工具相关性判断能力足够准确（以避免误剪必要工具）。
+12 工具的库规模尚未达到上下文窗口瓶颈，LLM 可在不经过 RATS 筛选的情况下依靠全量工具列表完成正确选择；
+而 RATS 引入的语义检索步骤偶尔会因相关性估计不准而漏掉关键工具，直接导致执行失败。
+因此，RATS 的当前价值应定性理解为"为工具库未来扩展（>50 个工具）预留可插拔的上下文管理接口"，
+而非在现有规模下的直接性能提升；若工具库扩张至百级规模，RATS 的上下文压缩价值预计将显著超过当前的误剪代价，成功率权衡也将向正方向翻转。
 
-把 486 次 run 中所有不通过的案例按失败诊断（来自 \texttt{summary.md} 的 \texttt{Diagnostic} 列）做聚类，可以归纳为如\autoref{tab:failure-modes}所示的 4 类典型失败模式。
-每一类都对应一项本文方法的设计回应，构成“失败模式 $\to$ 设计应对”的闭合论证链。
+\subsection{多组件组合效应与方法工程价值}\label{sec:analysis-combination}
 
-\begin{table}[ht]
-    \centering
-    \caption{\label{tab:failure-modes}486 次 run 的 4 类典型失败模式与对应设计回应}
-    \begin{tabularx}{\linewidth}{|l|X|X|X|}
-        \hline
-        失败模式 & 典型案例 & 根因 & 本文设计回应 \\ \hline
-        JSON 解析错（HTTP 400） & \texttt{viz\_03}, \texttt{viz\_04}（B1/B2/B3/B4 多次出现） & LLM 在特定 prompt 下生成非法的 \texttt{function.arguments} JSON & O4 在 SYSTEM\_PROMPT 末尾注入完整范例轨迹，使模型学到合法 JSON 的形态 \\ \hline
-        数值精度 miss & \texttt{hard\_03}（B1/B3/B4）、\texttt{vhard\_02}（B1/B2/B3/B4） & LLM 自发把工具返回数字截断为 2--3 位小数 & O2 显式要求保留 4--6 位有效数字 \\ \hline
-        工具覆盖 miss & \texttt{comp\_04}, \texttt{viz\_05}（B0 为主） & 无工具时只能硬算 & 不属于优化对象，B0 即“无工具能力上限”参照 \\ \hline
-        占位符 unresolved & \texttt{hard\_04}, \texttt{vhard\_01}（\texttt{Ours+DAG}） & LLM 规划器猜错工具输出字段 & DAGPlanner 通过 \texttt{TOOL\_OUTPUT\_FIELDS} 字典动态注入字段白名单到 PLANNER\_SYSTEM\_PROMPT 中 \\ \hline
-    \end{tabularx}
-\end{table}
+消融实验揭示了一个值得关注的非线性组合现象：\texttt{Ours+RATS}（83.1\%）与 \texttt{Ours+DAG}（83.1\%）单独使用时均退化到与 B1 相同的成功率，
+而两者组合的 \texttt{Ours\_full}（85.4\%）却高于各自单用，呈现出局部互补效应。
+该现象的机制可以从错误类型的角度理解：
+RATS 的主要失败模式是"工具误剪——关键工具未进入候选集"；
+DAGPlanner 的失败模式是"JSON 规划失败——触发 ReAct 安全网"。
+两者组合时，DAGPlanner 的结构化执行框架在 ReAct 安全网阶段可以重新访问全量工具集（安全网不受 RATS 筛选约束），
+从而部分补救 RATS 误剪导致的工具不可用；与此同时，RATS 为 DAGPlanner 的规划步骤削减了上下文干扰，
+使规划阶段的 JSON 生成轻度受益。这种"错误类型互补"的协同效应使 \texttt{Ours\_full} 优于二者单用，但不足以超越不引入任何算法开销的 \texttt{Ours}。
 
-“占位符 unresolved”这一类失败模式值得专门讨论。
-它发生在 LLM 规划器对工具返回数据的字段路径做出错误假设的时候，例如猜 \verb|${s1.coefficient}| 而真实字段是 \verb|${s1.params.0}|。
-本文通过两层措施缓解：
-其一，\texttt{TOOL\_OUTPUT\_FIELDS} 字典在 \autoref{sec:agent-frameworks} 中描述的 \texttt{PLANNER\_SYSTEM\_PROMPT} 渲染阶段被注入，让 LLM 在产出 Plan Schema 时已经看见每个工具的可用字段集合；
-其二，\texttt{PlanValidator} 的第 5 类校验（占位符必须在 \texttt{depends\_on} 中）在执行前就把“字段名不存在”这种错误以 \texttt{resolve\_args} 阶段诊断出来，并触发重规划。
-但这并未完全消除“字段名拼写错误但 \texttt{depends\_on} 写对”的角落场景；该角落场景由 ReAct 安全网兜底，在第五章数据中表现为 1.2\% 的 fallback 触发率。
-
-\subsection{反直觉现象：CoT 反而降分}\label{sec:analysis-cot-paradox}
-
-第五章主实验中，B2 CoT 的成功率（79.6\%）显著低于 B1 minimal（90.7\%），下降 11.1 个百分点，是反直觉的——业内通常认为思维链是“免费午餐”。
-进一步分析 11 道在 B2 上失败的案例，发现 5 道是因为 \texttt{tool\_calls} 中 \texttt{function.arguments} 的 JSON 格式被 LLM 嵌入了思维链文本而出错，3 道是工具选错（如 \texttt{matrix\_operation} 应选但 LLM 选了 \texttt{descriptive\_statistics}），3 道是数值精度截断（与 hard\_03 同类）。
-
-这一现象给出的启发是：在函数调用范式下，LLM 的“说话”与“调用”是同一个生成步骤的两个产出（\texttt{content} 与 \texttt{tool\_calls}）；
-当 \texttt{content} 中插入大量自由文本时，模型对 \texttt{tool\_calls} 的 JSON 边界控制反而被打散，触发了底层 SDK 的格式校验失败。
-本文方法通过两个机制规避了这一问题：
-其一，O3 规则把规划这件事约束到“开场一次性写出 Plan”，避免在每一轮都堆叠新的中间推理；
-其二，DAGPlanner 主循环的 Plan 阶段直接要求 LLM 输出严格 JSON，消费 LLM 的“计划文本”而非“计划 + 工具调用”混合产出。
-这两个机制使得本文方法在维持思维链精神（先想再做）的同时，规避了思维链文本与函数调用接口的形式冲突。
-
-\subsection{RATS 的效率-准确率权衡}\label{sec:analysis-rats-tradeoff}
-
-主实验显示 RATS 单独接入会带来 9.3 个百分点的成功率下降。
-本文不打算回避这个事实，反而希望把它放在合适的语境下讨论。
-在当前 12 工具的小规模工具库下，朴素全量召回的“缺点”尚不明显——12 个工具的 schema 全部塞入 LLM 上下文也只有约 2--3 K tokens，对 \texttt{qwen-plus} 这种 128 K 上下文的模型来说完全可接受。
-而 RATS 的 top-$K$ 截断操作引入了非零的“误剪概率”：当任务确实需要某个 RATS 没有选中的工具时，整个轨迹直接进入硬错误路径。
-
-但当工具库规模上升至 100+ 时，朴素全量召回的代价会发生质变：
-首先，token 预算会被工具描述吃掉很大一部分，留给推理与上下文的额度被相应压缩；
-其次，主流 LLM 在长上下文中区分语义相近 API 的能力会下降，选择错误率上升的速度比线性更快；
-再次，全量召回会让响应延迟进入秒级以上，在交互式应用中不可接受。
-RATS 在这种场景下从“可选的优化项”转变为“架构的必要前置”。
-本文限于自有工具库当前规模，无法在此论文内直接量化“100+ 工具场景下 RATS 的优势”，因此 RATS 的论文定位被诚实地描述为“对未来扩展性具有前置价值”，而非“对当前测试集的即时性能贡献”。
-后续工作中扩展工具库至 50--100 工具规模并接入 ScienceAgentBench~\cite{chen2024scienceagentbench}、Berkeley Function Calling Leaderboard~\cite{bfcl2024} 等公开 benchmark，将是验证 RATS 真正价值的关键路径。
-
-此外，本文的 RATS 默认权重 $(w_e, w_a, w_c, w_h)=(0.6, 0.2, 0.1, 0.1)$ 是基于直觉与小样本调试得到的经验值。
-更严格的做法是在更大测试集上做权重网格搜索，或采用强化学习方法基于历史成功率反馈学习权重。
-这一改进方向同样列入第七章未来工作。
+从工程价值角度，上述发现给出了清晰的部署建议：
+\begin{itemize}
+    \item \textbf{生产首选 \texttt{Ours}}：O1--O4 提示规则以几乎零额外延迟换取 7.9 pp 的成功率提升，是性价比最高的单一组件，适合对延迟敏感或工具库规模有限的场景。
+    \item \textbf{DAGPlanner 适合轨迹可解释性优先的场景}：尽管在当前评测中 \texttt{Ours+DAG} 成功率与 B1 持平，但其将工具调用轨迹外显为可纯代码校验的 DAG 结构，为科研复现和审计提供了更强的透明度保证，这一价值无法被成功率指标直接度量。
+    \item \textbf{RATS 是面向未来的架构预留}：当工具库扩展至 50+ 以上时，RATS 的上下文管理优势将从根本上改变效益平衡；建议在工具库扩张的同时同步开展 RATS 的重排权重调优，以期在扩展后的规模上取得正向收益。
+\end{itemize}

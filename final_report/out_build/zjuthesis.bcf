@@ -3030,6 +3030,36 @@
   <!-- SECTION 0 (cont.) -->
   <bcf:section number="0">
   </bcf:section>
+  <!-- SECTION 2 -->
+  <bcf:bibdata section="2">
+    <bcf:datasource type="file" datatype="bibtex">body/ref.bib</bcf:datasource>
+  </bcf:bibdata>
+  <bcf:section number="2">
+  </bcf:section>
+  <!-- SECTION 0 (cont.) -->
+  <bcf:section number="0">
+  </bcf:section>
+  <!-- SECTION 3 -->
+  <bcf:bibdata section="3">
+    <bcf:datasource type="file" datatype="bibtex">body/ref.bib</bcf:datasource>
+  </bcf:bibdata>
+  <bcf:section number="3">
+    <bcf:citekey order="1" intorder="1">zjuthesisrules</bcf:citekey>
+  </bcf:section>
+  <!-- SECTION 0 (cont.) -->
+  <bcf:section number="0">
+  </bcf:section>
+  <!-- SECTION 4 -->
+  <bcf:bibdata section="4">
+    <bcf:datasource type="file" datatype="bibtex">body/ref.bib</bcf:datasource>
+  </bcf:bibdata>
+  <bcf:section number="4">
+    <bcf:citekey order="1" intorder="1">zjuthesisrules</bcf:citekey>
+    <bcf:citekey order="1" intorder="2">zjuthesis</bcf:citekey>
+  </bcf:section>
+  <!-- SECTION 0 (cont.) -->
+  <bcf:section number="0">
+  </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="none">
     <bcf:sort order="1">
@@ -3041,6 +3071,26 @@
   </bcf:sortingtemplate>
   <!-- DATALISTS -->
   <bcf:datalist section="1"
+                name="none/global//global/global/global"
+                type="entry"
+                sortingtemplatename="none"
+                sortingnamekeytemplatename="global"
+                labelprefix=""
+                uniquenametemplatename="global"
+                labelalphanametemplatename="global"
+                namehashtemplatename="global">
+  </bcf:datalist>
+  <bcf:datalist section="3"
+                name="none/global//global/global/global"
+                type="entry"
+                sortingtemplatename="none"
+                sortingnamekeytemplatename="global"
+                labelprefix=""
+                uniquenametemplatename="global"
+                labelalphanametemplatename="global"
+                namehashtemplatename="global">
+  </bcf:datalist>
+  <bcf:datalist section="4"
                 name="none/global//global/global/global"
                 type="entry"
                 sortingtemplatename="none"

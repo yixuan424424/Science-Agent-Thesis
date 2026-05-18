@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (MiKTeX 25.12) (preloaded format=xelatex 2026.5.9)  18 MAY 2026 18:55
+This is XeTeX, Version 3.141592653-2.6-0.999997 (MiKTeX 25.12) (preloaded format=xelatex 2026.5.9)  18 MAY 2026 14:25
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1482,7 +1482,7 @@ text;"
 Package translations Info: No language package found. I am going to use `englis
 h' as default language. on input line 171.
 
-(C:\Users\EDY\Desktop\Final_Project\final_report\out\zjuthesis.aux)
+No file zjuthesis.aux.
 \openout1 = `zjuthesis.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 171.
@@ -1505,7 +1505,6 @@ LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 171.
 LaTeX Font Info:    ... okay on input line 171.
 LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 171.
 LaTeX Font Info:    ... okay on input line 171.
-
 *geometry* driver: auto-detecting
 *geometry* detected driver: xetex
 *geometry* verbose mode - [ preamble ] result:
@@ -1541,6 +1540,9 @@ LaTeX Font Info:    ... okay on input line 171.
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 Package hyperref Info: Link coloring OFF on input line 171.
+
+Package hyperref Warning: Rerun to get /PageLabels entry.
+
 (C:\Users\EDY\AppData\Local\Programs\MiKTeX\tex/latex/pdflscape\pdflscape.sty
 Package: pdflscape 2022-10-27 v0.13 Display of landscape pages in PDF
 
@@ -1568,37 +1570,8 @@ Package biblatex Info: Automatic encoding selection.
 \openout3 = `zjuthesis.bcf'.
 
 Package biblatex Info: Trying to load bibliographic data...
-Package biblatex Info: ... file 'zjuthesis.bbl' found.
-(C:\Users\EDY\Desktop\Final_Project\final_report\out\zjuthesis.bbl
-
-Package fontspec Info: 
-(fontspec)             Could not resolve font "SimSun/I" (it probably doesn't
-(fontspec)             exist).
-
-
-Package fontspec Info: 
-(fontspec)             Could not resolve font "SimSun/BI" (it probably doesn't
-(fontspec)             exist).
-
-
-Package fontspec Info: 
-(fontspec)             Could not resolve font "SimSun/I" (it probably doesn't
-(fontspec)             exist).
-
-
-Package fontspec Info: 
-(fontspec)             Font family 'SimSun(1)' created for font 'SimSun' with
-(fontspec)             options [Script={CJK},AutoFakeBold={4}].
-(fontspec)              
-(fontspec)              This font family consists of the following NFSS
-(fontspec)             series/shapes:
-(fontspec)              
-(fontspec)             - 'normal' (m/n) with NFSS spec.:
-(fontspec)             <->"SimSun/OT:script=hani;language=dflt;"
-(fontspec)             - 'bold' (b/n) with NFSS spec.:
-(fontspec)             <->"SimSun/OT:script=hani;language=dflt;embolden=4;"
-
-)
+Package biblatex Info: ... file 'zjuthesis.bbl' not found.
+No file zjuthesis.bbl.
 Package biblatex Info: Reference section=0 on input line 171.
 Package biblatex Info: Reference segment=0 on input line 171.
 
@@ -1694,8 +1667,12 @@ Package fontspec Info:
 
 File: figure/logo/zju.pdf Graphic file (type pdf)
 <use figure/logo/zju.pdf>
-)
-[-1
+
+Overfull \hbox (48.69206pt too wide) in paragraph at lines 98--98
+ |   [] 
+ []
+
+) [-1
 
 ] [0
 
@@ -1706,7 +1683,36 @@ Overfull \hbox (0.29987pt too wide) in paragraph at lines 11--12
  含 为 获 得|   []或
  []
 
-) (body/undergraduate/final/acknowledgement.tex [1] [2
+) (body/undergraduate/final/acknowledgement.tex
+
+Package fontspec Info: 
+(fontspec)             Could not resolve font "SimSun/I" (it probably doesn't
+(fontspec)             exist).
+
+
+Package fontspec Info: 
+(fontspec)             Could not resolve font "SimSun/BI" (it probably doesn't
+(fontspec)             exist).
+
+
+Package fontspec Info: 
+(fontspec)             Could not resolve font "SimSun/I" (it probably doesn't
+(fontspec)             exist).
+
+
+Package fontspec Info: 
+(fontspec)             Font family 'SimSun(1)' created for font 'SimSun' with
+(fontspec)             options [Script={CJK},AutoFakeBold={4}].
+(fontspec)              
+(fontspec)              This font family consists of the following NFSS
+(fontspec)             series/shapes:
+(fontspec)              
+(fontspec)             - 'normal' (m/n) with NFSS spec.:
+(fontspec)             <->"SimSun/OT:script=hani;language=dflt;"
+(fontspec)             - 'bold' (b/n) with NFSS spec.:
+(fontspec)             <->"SimSun/OT:script=hani;language=dflt;embolden=4;"
+
+ [1] [2
 
 ])
 (body/undergraduate/final/abstract.tex [3] [4
@@ -1720,43 +1726,302 @@ Overfull \hbox (12.0504pt too wide) in paragraph at lines 36--38
  []
 
 )) (page/undergraduate/final/toc.tex [7] [8]
-(C:\Users\EDY\Desktop\Final_Project\final_report\out\zjuthesis.toc
-Underfull \vbox (badness 1360) has occurred while \output is active []
-
- [1
-
-])
+No file zjuthesis.toc.
 \tf@toc=\write4
 \openout4 = `zjuthesis.toc'.
 
+[1
 
-[2]) (page/undergraduate/final/cover-part.tex [1
+]) [2
 
 
+] (page/undergraduate/final/cover-part.tex [1
 
 
 ] [2])
 (body/undergraduate/final/content.tex
-(body/undergraduate/final/1-introduction.tex [1
+(body/undergraduate/final/1-introduction.tex
+
+LaTeX Warning: Citation 'brown2020gpt3' on page 1 undefined on input line 9.
 
 
-] [2] [3])
-(body/undergraduate/final/2-related-work.tex [4] [5
+LaTeX Warning: Citation 'openai2023gpt4' on page 1 undefined on input line 9.
 
-] [6])
-(body/undergraduate/final/3-algorithm.tex [7] [8
 
-] [9]
+LaTeX Warning: Citation 'yao2023react' on page 1 undefined on input line 11.
+
+
+LaTeX Warning: Citation 'qin2023toollearning' on page 1 undefined on input line
+ 11.
+
+
+LaTeX Warning: Citation 'openai2023gpt4' on page 1 undefined on input line 14.
+
+
+LaTeX Warning: Citation 'langchain2023' on page 1 undefined on input line 14.
+
+
+LaTeX Warning: Citation 'llamaindex2023' on page 1 undefined on input line 14.
+
+
+LaTeX Warning: Citation 'jumper2021alphafold' on page 1 undefined on input line
+ 19.
+
+
+LaTeX Warning: Citation 'butler2018ml4mat' on page 1 undefined on input line 19
+.
+
+
+LaTeX Warning: Citation 'harris2020numpy' on page 1 undefined on input line 21.
+
+
+
+LaTeX Warning: Citation 'mckinney2010pandas' on page 1 undefined on input line 
+21.
+
+
+LaTeX Warning: Citation 'qin2023toollearning' on page 1 undefined on input line
+ 30.
+
+
+LaTeX Warning: Citation 'yao2023react' on page 1 undefined on input line 31.
+
+
+LaTeX Warning: Citation 'wang2023plansolve' on page 1 undefined on input line 3
+4.
+
+[1
+
+
+] [2] [3]) (body/undergraduate/final/2-related-work.tex [4]
+
+LaTeX Warning: Citation 'yao2023react' on page 5 undefined on input line 11.
+
+
+LaTeX Warning: Citation 'yao2023react' on page 5 undefined on input line 11.
+
+
+LaTeX Warning: Citation 'openai2023functioncalling' on page 5 undefined on inpu
+t line 15.
+
+
+LaTeX Warning: Citation 'schick2023toolformer' on page 5 undefined on input lin
+e 19.
+
+
+LaTeX Warning: Citation 'schick2023toolformer' on page 5 undefined on input lin
+e 19.
+
+
+LaTeX Warning: Citation 'qin2023toollearning' on page 5 undefined on input line
+ 20.
+
+
+LaTeX Warning: Citation 'qin2023toollearning' on page 5 undefined on input line
+ 20.
+
+
+LaTeX Warning: Citation 'langchain2023' on page 5 undefined on input line 21.
+
+
+LaTeX Warning: Citation 'llamaindex2023' on page 5 undefined on input line 21.
+
+
+LaTeX Warning: Citation 'shen2023hugginggpt' on page 5 undefined on input line 
+22.
+
+
+LaTeX Warning: Citation 'shen2023hugginggpt' on page 5 undefined on input line 
+22.
+
+
+Overfull \hbox (8.17938pt too wide) in paragraph at lines 19--23
+\TU/FangSong(0)/m/n/12.045 自 监 督 方 式 让 模 型 在 预 训 练 语 料 中 学 会 主 动 插 入 \TU/TimesN
+ewRoman(0)/m/n/12.045 API \TU/FangSong(0)/m/n/12.045 调 用，| []$[]$
+ []
+
+
+Overfull \hbox (137.0353pt too wide) in paragraph at lines 19--23
+\TU/TimesNewRoman(0)/m/sc/12.045 dex$[]$ \TU/FangSong(0)/m/n/12.045 则 把 工 具 封 装
+、|  记 忆 管 理、|  链 式 调 度 等 组 件 抽 象 成 可 复 用 的 开 源 框 架。| []$[]$
+ []
+
+[5
+
+]
+
+LaTeX Warning: Citation 'wei2022cot' on page 6 undefined on input line 33.
+
+
+LaTeX Warning: Citation 'wei2022cot' on page 6 undefined on input line 33.
+
+
+LaTeX Warning: Citation 'wang2023selfconsistency' on page 6 undefined on input 
+line 34.
+
+
+LaTeX Warning: Citation 'wang2023selfconsistency' on page 6 undefined on input 
+line 34.
+
+
+Overfull \hbox (120.09634pt too wide) in paragraph at lines 32--36
+\TU/FangSong(0)/m/n/12.045 示，|  模 型 即 可 在 算 术、|  常 识 与 符 号 推 理 任 务 上 展 现 出 涌 现 
+的 多 步 推 理 能 力，| []$[]$
+ []
+
+
+LaTeX Warning: Citation 'wang2023plansolve' on page 6 undefined on input line 3
+7.
+
+
+LaTeX Warning: Citation 'wang2023plansolve' on page 6 undefined on input line 3
+7.
+
+
+LaTeX Warning: Citation 'yao2023tot' on page 6 undefined on input line 39.
+
+
+LaTeX Warning: Citation 'yao2023tot' on page 6 undefined on input line 39.
+
+
+LaTeX Warning: Citation 'shinn2023reflexion' on page 6 undefined on input line 
+40.
+
+
+LaTeX Warning: Citation 'shinn2023reflexion' on page 6 undefined on input line 
+40.
+
+
+Overfull \hbox (29.77586pt too wide) in paragraph at lines 37--42
+\TU/FangSong(0)/m/n/12.045 棵 搜 索 树 并 允 许 回 溯 与 剪 枝，|  更 适 合 解 空 间 不 唯 一 的 探 索 性
+ 任 务。| []$[]$
+ []
+
+
+LaTeX Warning: Citation 'patil2023gorilla' on page 6 undefined on input line 54
+.
+
+
+LaTeX Warning: Citation 'patil2023gorilla' on page 6 undefined on input line 54
+.
+
+
+LaTeX Warning: Citation 'qin2024toolllm' on page 6 undefined on input line 55.
+
+
+LaTeX Warning: Citation 'qin2024toolllm' on page 6 undefined on input line 55.
+
+
+LaTeX Warning: Citation 'liu2024retool' on page 6 undefined on input line 56.
+
+
+LaTeX Warning: Citation 'liu2024retool' on page 6 undefined on input line 56.
+
+
+LaTeX Warning: Citation 'bfcl2024' on page 6 undefined on input line 57.
+
+
+Overfull \hbox (64.86005pt too wide) in paragraph at lines 53--58
+[]\TU/FangSong(0)/m/n/12.045 随 着 工 具 库 规 模 的 扩 张， “先 检 索 再 调 用”|  的 工 具 选 择 思 路
+ 逐 渐 受 到 关 注。| []$[]$
+ []
+
+
+Underfull \vbox (badness 7133) has occurred while \output is active []
+
+ [6]
+
+LaTeX Warning: Citation 'lewis2020rag' on page 7 undefined on input line 69.
+
+
+LaTeX Warning: Citation 'lewis2020rag' on page 7 undefined on input line 69.
+
+
+LaTeX Warning: Citation 'llamaindex2023' on page 7 undefined on input line 71.
+
+
+LaTeX Warning: Citation 'karpukhin2020dpr' on page 7 undefined on input line 72
+.
+
+
+LaTeX Warning: Citation 'karpukhin2020dpr' on page 7 undefined on input line 72
+.
+
+) (body/undergraduate/final/3-algorithm.tex [7] [8]
+
+LaTeX Warning: Reference `sec:problem-formulation' on page 9 undefined on input
+ line 6.
+
+
+LaTeX Warning: Reference `sec:rats' on page 9 undefined on input line 7.
+
+
+LaTeX Warning: Reference `sec:dag-planner' on page 9 undefined on input line 7.
+
+
+
+LaTeX Warning: Reference `sec:ours-full' on page 9 undefined on input line 9.
+
+
+LaTeX Warning: Citation 'yao2023react' on page 9 undefined on input line 40.
+
+
+LaTeX Warning: Reference `eq:eval-criteria' on page 9 undefined on input line 4
+1.
+
+
+Overfull \hbox (9.63007pt too wide) in paragraph at lines 40--46
+[]\TU/FangSong(0)/m/n/12.045 朴 素 \TU/TimesNewRoman(0)/m/n/12.045 ReAct \TU/Fang
+Song(0)/m/n/12.045 主 循 环$[]$采 用 单 层 策 略 $\OML/ztmcm/m/it/12.045 ^^Y[]$\TU/FangS
+ong(0)/m/n/12.045 ，|  每 一 轮 都 把 全 部 工 具 描 述 $\OMS/ztmcm/m/n/12.045 f\OT1/ztmcm/
+m/n/12.045 (\OML/ztmcm/m/it/12.045 n[]; d[]; \OT1/ztmcm/m/n/12.045 ^^B[])\OMS/z
+tmcm/m/n/12.045 g[]$
+ []
+
+[9
+
+]
+
+LaTeX Warning: Citation 'lewis2020rag' on page 10 undefined on input line 66.
+
+
+LaTeX Warning: Citation 'karpukhin2020dpr' on page 10 undefined on input line 6
+6.
+
+
+LaTeX Warning: Reference `alg:rats' on page 10 undefined on input line 71.
+
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
 put line 78.
 
-
 LaTeX Warning: Float too large for page by 7.66495pt on input line 110.
 
-[10] [11]
+[10]
+
+LaTeX Warning: Reference `sec:exp-ablation' on page 11 undefined on input line 
+131.
+
+[11]
+
+LaTeX Warning: Citation 'wang2023plansolve' on page 12 undefined on input line 
+146.
+
+
+LaTeX Warning: Citation 'shinn2023reflexion' on page 12 undefined on input line
+ 146.
+
+
+LaTeX Warning: Reference `lst:plan-schema' on page 12 undefined on input line 1
+52.
+
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
 nput line 164.
- [12]
+[12]
+
+LaTeX Warning: Reference `alg:dag-planner' on page 13 undefined on input line 2
+00.
+
+
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [13]
@@ -1764,18 +2029,51 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 LaTeX Warning: Float too large for page by 221.18654pt on input line 247.
 
 
+LaTeX Warning: Reference `tab:validator-modes' on page 14 undefined on input li
+ne 251.
+
+
 LaTeX Warning: \verb may be unreliable inside tabularx on input line 265.
 
 
-Underfull \vbox (badness 6893) has occurred while \output is active []
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [14]
+
+LaTeX Warning: Reference `fig:arch' on page 15 undefined on input line 283.
+
 [15]
 File: figure/fig_arch.pdf Graphic file (type pdf)
 <use figure/fig_arch.pdf>
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10.53937> not available
 (Font)              Font shape `TU/lmtt/b/n' tried instead on input line 298.
+
+
+LaTeX Warning: Reference `eq:two-layer' on page 16 undefined on input line 301.
+
+
 ) (body/undergraduate/final/4-implementation.tex [16] [17] [18]
+
+LaTeX Warning: Reference `sec:tool-library' on page 19 undefined on input line 
+6.
+
+
+LaTeX Warning: Reference `sec:agent-frameworks' on page 19 undefined on input l
+ine 7.
+
+
+LaTeX Warning: Reference `sec:prompt-system' on page 19 undefined on input line
+ 8.
+
+
+LaTeX Warning: Reference `sec:eval-framework' on page 19 undefined on input lin
+e 9.
+
+
+LaTeX Warning: Reference `lst:base-tool' on page 19 undefined on input line 17.
+
+
+
 Overfull \hbox (52.24258pt too wide) in paragraph at lines 16--21
 []\TU/FangSong(0)/m/n/12.045 所 有 工 具 都 继 承 自 抽 象 基 类 \TU/lmtt/m/n/12.045 BaseTo
 ol\TU/FangSong(0)/m/n/12.045 ，|  实 现 规 范 化 的 元 信 息 属 性 \TU/lmtt/m/n/12.045 name
@@ -1789,8 +2087,32 @@ File: lstlang1.sty 2025/11/14 1.11b listings language file
 [19
 
 ]
-Underfull \hbox (badness 1005) in paragraph at lines 136--136
-[]|\TU/SimSun(1)/m/n/12.045 多 模 型 曲 线 拟 合  |（线
+
+LaTeX Warning: Reference `tab:tool-list' on page 20 undefined on input line 59.
+
+
+
+LaTeX Warning: Citation 'harris2020numpy' on page 20 undefined on input line 60
+.
+
+
+LaTeX Warning: Citation 'virtanen2020scipy' on page 20 undefined on input line 
+60.
+
+
+LaTeX Warning: Citation 'mckinney2010pandas' on page 20 undefined on input line
+ 61.
+
+
+LaTeX Warning: Citation 'hunter2007matplotlib' on page 20 undefined on input li
+ne 62.
+
+
+Overfull \hbox (7.09598pt too wide) in paragraph at lines 59--64
+\TU/FangSong(0)/m/n/12.045 具 的 关 键 输 出 字 段  |（如 线 性 回 归 的 \TU/lmtt/m/n/12.045 s
+lope\TU/FangSong(0)/m/n/12.045 、| \TU/lmtt/m/n/12.045 intercept\TU/FangSong(0)/
+m/n/12.045 、| \TU/lmtt/m/n/12.045 r_squared\TU/FangSong(0)/m/n/12.045 ）|  也 在 \
+TU/lmtt/m/n/12.045 TOOL_OUTPUT_FIELDS
  []
 
 
@@ -1804,10 +2126,44 @@ Underfull \hbox (badness 10000) in paragraph at lines 136--136
  []
 
 [20]
+
+LaTeX Warning: Reference `tab:agent-frameworks' on page 21 undefined on input l
+ine 149.
+
+[21]
+
+LaTeX Warning: Citation 'yao2023react' on page 22 undefined on input line 166.
+
+
+Underfull \hbox (badness 1460) in paragraph at lines 166--166
+[]|\TU/SimSun(1)/m/n/12.045 经 典 \TU/TimesNewRoman(0)/m/n/12.045 ReAct$[]$ \TU/S
+imSun(1)/m/n/12.045 主 循 环 \TU/TimesNewRoman(0)/m/n/12.045 + Function
+ []
+
+
+LaTeX Warning: Citation 'wei2022cot' on page 22 undefined on input line 166.
+
+
+LaTeX Warning: Citation 'wang2023plansolve' on page 22 undefined on input line 
+166.
+
+
+LaTeX Warning: Citation 'shinn2023reflexion' on page 22 undefined on input line
+ 166.
+
+
+LaTeX Warning: Reference `alg:dag-planner' on page 22 undefined on input line 1
+66.
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 166--166
 []|\TU/SimSun(1)/m/n/12.045 主 循 环 替 换 为 \TU/TimesNewRoman(0)/m/n/12.045 Plan-Va
 lidate-Execute-
  []
+
+[22]
+
+LaTeX Warning: Reference `tab:o1-o4' on page 23 undefined on input line 188.
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 200--200
@@ -1816,12 +2172,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 200--200
  []
 
 
-Underfull \hbox (badness 4713) in paragraph at lines 200--200
+Underfull \hbox (badness 3977) in paragraph at lines 200--200
 \TU/lmtt/m/n/12.045 descriptive_statistics \TU/SimSun(1)/m/n/12.045 计 算；|  线 性 
 代 数 运 算 必 须 通
  []
 
-[21]
+
 Overfull \hbox (65.3764pt too wide) in paragraph at lines 209--214
 []\TU/lmtt/m/n/12.045 src/prompts/planner_prompts.py \TU/FangSong(0)/m/n/12.045
  定 义 了 \TU/TimesNewRoman(0)/m/n/12.045 DAGPlanner \TU/FangSong(0)/m/n/12.045 专 
@@ -1835,79 +2191,177 @@ m/n/12.045 ${sX.field} []\TU/FangSong(0)/m/n/12.045 的 字 段 名 书 写 错 
 m/n/12.045 REPLAN_HINT_TEMPLATE
  []
 
+[23]
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+LaTeX Warning: Reference `eq:eval-criteria' on page 24 undefined on input line 
+228.
 
- [22])
-(body/undergraduate/final/5-experiments.tex
+) (body/undergraduate/final/5-experiments.tex
 Overfull \hbox (32.55923pt too wide) in paragraph at lines 236--1
 |\TU/FangSong(0)/m/n/12.045 （\TU/lmtt/m/n/12.045 --cases\TU/FangSong(0)/m/n/12.
 045 ）|  的 任 意 组 合 运 行。|  每 一 次 评 测 会 在 \TU/lmtt/m/n/12.045 outputs/eval/<timest
 amp>/ \TU/FangSong(0)/m/n/12.045 下 落 盘 \TU/lmtt/m/n/12.045 results.json
  []
 
-[23] [24] [25] [26
+[24] [25] [26
 
 ]
+
+LaTeX Warning: Reference `eq:eval-criteria' on page 27 undefined on input line 
+5.
+
+
 Overfull \hbox (18.79982pt too wide) in paragraph at lines 5--8
 \TU/lmtt/m/n/12.045 scripts/run_eval.py --configs b0 b1 b2 b3 b4 ours ours_rats
  ours_dag ours_full\TU/FangSong(0)/m/n/12.045 。| 
  []
+
+
+LaTeX Warning: Reference `tab:cases-dist' on page 27 undefined on input line 20
+.
 
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 27.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <5> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 27.
 
-Underfull \hbox (badness 1009) in paragraph at lines 61--61
-[]|\TU/TimesNewRoman(0)/m/n/12.045 Ours \TU/SimSun(1)/m/n/12.045 基 础 上 把 主 循 环 
-换 成 \TU/TimesNewRoman(0)/m/n/12.045 DAGPlanner |\TU/SimSun(1)/m/n/12.045 （无
+LaTeX Warning: Reference `tab:configs' on page 27 undefined on input line 42.
+
+
+LaTeX Warning: Citation 'wei2022cot' on page 27 undefined on input line 61.
+
+
+LaTeX Warning: Citation 'wang2023plansolve' on page 27 undefined on input line 
+61.
+
+
+Underfull \hbox (badness 1014) in paragraph at lines 61--61
+[]|\TU/SimSun(1)/m/n/12.045 两 阶 段：|  先 生 成 自 然 语 言 计 划 再 \TU/TimesNewRoman(0)/m
+/n/12.045 ReAct \TU/SimSun(1)/m/n/12.045 执
  []
 
+
+LaTeX Warning: Citation 'shinn2023reflexion' on page 27 undefined on input line
+ 61.
+
+
+LaTeX Warning: Reference `eq:eval-criteria' on page 27 undefined on input line 
+66.
+
 [27]
+
+LaTeX Warning: Reference `tab:main-results' on page 28 undefined on input line 
+72.
+
+
+LaTeX Warning: Reference `fig:main-bar' on page 28 undefined on input line 72.
+
 File: figure/fig_main_bar.pdf Graphic file (type pdf)
 <use figure/fig_main_bar.pdf>
- [28]
-Overfull \hbox (3.43027pt too wide) in paragraph at lines 129--129
+
+LaTeX Warning: Reference `sec:analysis-cot-paradox' on page 28 undefined on inp
+ut line 104.
+
+[28]
+
+LaTeX Warning: Reference `tab:by-category' on page 29 undefined on input line 1
+15.
+
+
+LaTeX Warning: Reference `fig:heatmap' on page 29 undefined on input line 115.
+
+
+Overfull \hbox (3.91916pt too wide) in paragraph at lines 129--129
  []|\TU/TimesNewRoman(0)/m/n/7.52812 Ours+RATS| 
  []
 
 
-Overfull \hbox (1.33136pt too wide) in paragraph at lines 129--129
+Overfull \hbox (1.82025pt too wide) in paragraph at lines 129--129
  []|\TU/TimesNewRoman(0)/m/n/7.52812 Ours+DAG| 
  []
 
 File: figure/fig_heatmap.pdf Graphic file (type pdf)
 <use figure/fig_heatmap.pdf>
+LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <12.045> not available
+(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 139.
 [29]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [30]
-Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [31]
+LaTeX Warning: Reference `tab:ablation' on page 31 undefined on input line 155.
+
+
+[31]
+
+LaTeX Warning: Reference `fig:scatter' on page 32 undefined on input line 182.
+
 [32]
 File: figure/fig_scatter.pdf Graphic file (type pdf)
 <use figure/fig_scatter.pdf>
-) (body/undergraduate/final/6-analysis.tex [33] [34]
-LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <12.045> not available
-(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 9.
- [35
 
-] [36]
+
+LaTeX Warning: Reference `tab:main-results' on page 33 undefined on input line 
+194.
+
+) (body/undergraduate/final/6-analysis.tex [33] [34
+
+] [35]
+Missing character: There is no ① in font Times New Roman/OT:script=latn;languag
+e=dflt;mapping=tex-text;!
+Missing character: There is no ② in font Times New Roman/OT:script=latn;languag
+e=dflt;mapping=tex-text;!
+Missing character: There is no ③ in font Times New Roman/OT:script=latn;languag
+e=dflt;mapping=tex-text;!
+[36]
+
+LaTeX Warning: Reference `sec:analysis-cases' on page 37 undefined on input lin
+e 53.
+
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <15.05624> not available
 (Font)              Font shape `TU/lmtt/b/n' tried instead on input line 57.
- [37])
-(body/undergraduate/final/7-conclusion.tex [38] [39
 
-]))
-(body/undergraduate/final/post.tex
+LaTeX Warning: Reference `tab:main-results' on page 37 undefined on input line 
+59.
+
+
+LaTeX Warning: Reference `tab:ablation' on page 37 undefined on input line 70.
+
+[37]) (body/undergraduate/final/7-conclusion.tex [38]
+
+LaTeX Warning: Citation 'chen2024scienceagentbench' on page 39 undefined on inp
+ut line 19.
+
+
+LaTeX Warning: Citation 'bfcl2024' on page 39 undefined on input line 19.
+
+[39
+
+]
+
+LaTeX Warning: Citation 'mialon2023gaia' on page 40 undefined on input line 46.
+
+
+)) (body/undergraduate/final/post.tex
 Underfull \vbox (badness 1102) has occurred while \output is active []
 
  [40]
-[41] [42] (body/undergraduate/final/3-appendix.tex [43] [44
+[41]
+
+LaTeX Warning: Empty bibliography on input line 4.
+
+(body/undergraduate/final/3-appendix.tex [42
 
 ]
+
+LaTeX Warning: Reference `tab:appendix-tool-schemas' on page 43 undefined on in
+put line 9.
+
+
+LaTeX Warning: Reference `tab:tool-list' on page 43 undefined on input line 10.
+
+
+
 Overfull \hbox (10.44147pt too wide) in alignment at lines 21--40
  [] [] [] [] 
  []
@@ -2070,20 +2524,187 @@ Overfull \hbox (10.44147pt too wide) in alignment at lines 63--257
  [] [] [] [] 
  []
 
-ignored error: Infinite glue shrinkage found in box being split [45
+ignored error: Infinite glue shrinkage found in box being split [43
 
-] [46]
+]
+
+LaTeX Warning: Reference `tab:o1-o4' on page 44 undefined on input line 265.
+
+[44]
 Overfull \hbox (23.7972pt too wide) in paragraph at lines 304--306
 \TU/FangSong(0)/m/n/12.045 范 例  |（异 常 切 换 \TU/TimesNewRoman(0)/m/n/12.045 + \TU
 /FangSong(0)/m/n/12.045 最 终 答 复 格 式） 。|  范 例 本 身 较 长，|  完 整 内 容 见 \TU/lmtt/m/n/
 12.045 src/prompts/system_prompts.py
  []
 
-) (body/undergraduate/final/4-cv.tex [47] [48])) [49
+
+LaTeX Warning: Reference `tab:appendix-ext-cases' on page 45 undefined on input
+ line 309.
+
+) (body/undergraduate/final/4-cv.tex [45] [46])) [47
+
+
+] [48
+
+]
+(page/undergraduate/final/post.tex (page/undergraduate/final/job.tex
+Underfull \hbox (badness 10000) in paragraph at lines 6--8
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 17--18
+
+ []
+
+) (page/undergraduate/final/eval.tex [49
+
+
+] [50
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 6--7
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 13--14
+
+ []
+
+))
+Package biblatex Info: Reference section=0 on input line 179.
+\blx@maxsegment@2=\count532
+\blx@sectionciteorder@2=\count533
+Package biblatex Info: Reference section=2 on input line 179.
+Package biblatex Info: Setting label 'refsection:2' on input line 179.
+ (page/undergraduate/proposal/cover-part.tex [51
+
+] [52
+
+] [53
+
+] [54])
+(page/undergraduate/proposal/cover.tex
+File: figure/logo/zjuchar.pdf Graphic file (type pdf)
+<use figure/logo/zjuchar.pdf>
+File: figure/logo/zju.pdf Graphic file (type pdf)
+<use figure/logo/zju.pdf>
+)
+(page/undergraduate/proposal/previous.tex [55
+
+] [56
+
+]
+(page/undergraduate/proposal/design/previous.tex)) [57] [58
+
+]
+(body/undergraduate/proposal/content.tex
+(body/undergraduate/proposal/proposal/proposal.tex
+Package biblatex Info: Reference section=0 on input line 2.
+\blx@maxsegment@3=\count534
+\blx@sectionciteorder@3=\count535
+Package biblatex Info: Reference section=3 on input line 2.
+Package biblatex Info: Setting label 'refsection:3' on input line 2.
+
+一、
+(body/undergraduate/proposal/proposal/background.tex
+
+LaTeX Warning: Citation 'zjuthesisrules' on page 1 undefined on input line 3.
+
+) (body/undergraduate/proposal/proposal/content.tex)
+(body/undergraduate/proposal/proposal/plan.tex) [1
+
 
 
 ]
-(C:\Users\EDY\Desktop\Final_Project\final_report\out\zjuthesis.aux)
+
+LaTeX Warning: Empty bibliography on input line 12.
+
+) (body/undergraduate/proposal/translation/translation.tex [2
+
+]
+Package biblatex Info: Reference section=0 on input line 3.
+\blx@maxsegment@4=\count536
+\blx@sectionciteorder@4=\count537
+Package biblatex Info: Reference section=4 on input line 3.
+Package biblatex Info: Setting label 'refsection:4' on input line 3.
+
+二、
+[3
+
+] [4
+
+]
+
+LaTeX Warning: Citation 'zjuthesisrules' on page 5 undefined on input line 12.
+
+
+LaTeX Warning: Citation 'zjuthesis' on page 5 undefined on input line 12.
+
+
+LaTeX Warning: Empty bibliography on input line 16.
+
+) (body/undergraduate/proposal/original/original.tex [5] [6
+
+]
+三、
+File: figure/rules2018.pdf Graphic file (type pdf)
+<use figure/rules2018.pdf>
+File: figure/rules2018.pdf Graphic file (type pdf)
+<use figure/rules2018.pdf, page 1>
+File: figure/rules2018.pdf Graphic file (type pdf)
+<use figure/rules2018.pdf, page 1>
+[7
+
+]
+File: figure/rules2018.pdf Graphic file (type pdf)
+<use figure/rules2018.pdf, page 1>
+File: figure/rules2018.pdf Graphic file (type pdf)
+<use figure/rules2018.pdf, page 1>
+File: figure/rules2018.pdf Graphic file (type pdf)
+<use figure/rules2018.pdf, page 1>
+ [8
+
+]
+File: figure/rules2018.pdf Graphic file (type pdf)
+<use figure/rules2018.pdf, page 2>
+File: figure/rules2018.pdf Graphic file (type pdf)
+<use figure/rules2018.pdf, page 2>
+File: figure/rules2018.pdf Graphic file (type pdf)
+<use figure/rules2018.pdf, page 2>
+ [9
+
+]
+File: figure/rules2018.pdf Graphic file (type pdf)
+<use figure/rules2018.pdf, page 3>
+File: figure/rules2018.pdf Graphic file (type pdf)
+<use figure/rules2018.pdf, page 3>
+File: figure/rules2018.pdf Graphic file (type pdf)
+<use figure/rules2018.pdf, page 3>
+ [10
+
+]) (body/undergraduate/proposal/midcheck/midcheck.tex
+四、
+)) [11
+
+
+] [12
+
+] (page/undergraduate/proposal/post.tex
+(page/undergraduate/proposal/design/post.tex
+(page/undergraduate/proposal/design/proposaleval.tex)
+(page/undergraduate/proposal/design/midcheckeval.tex [13
+
+
+
+
+] [14
+
+]))) [15
+
+]
+(C:\Users\EDY\Desktop\Final_Project\final_report\out_build\zjuthesis.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2022/08/05>
@@ -2092,18 +2713,29 @@ L3 programming layer <2022/08/05>
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
+Package biblatex Warning: Please (re)run Biber on the file:
+(biblatex)                zjuthesis
+(biblatex)                and rerun LaTeX afterwards.
+
 Package logreq Info: Writing requests to 'zjuthesis.run.xml'.
 \openout1 = `zjuthesis.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 35675 strings out of 402986
- 804133 string characters out of 5448918
- 1769555 words of memory out of 5000000
- 63839 multiletter control sequences out of 15000+600000
- 658547 words of font info for 198 fonts, out of 8000000 for 9000
+ 35833 strings out of 402986
+ 812481 string characters out of 5448918
+ 1765147 words of memory out of 5000000
+ 63945 multiletter control sequences out of 15000+600000
+ 658555 words of font info for 199 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 107i,14n,125p,1222b,5678s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 107i,19n,131p,1222b,2544s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on C:\Users\EDY\Desktop\Final_Project\final_report\out\zjuthesis
-.pdf (63 pages).
+Output written on C:\Users\EDY\Desktop\Final_Project\final_report\out_build\zju
+thesis.pdf (87 pages).

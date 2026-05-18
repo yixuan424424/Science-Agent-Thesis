@@ -1,6 +1,6 @@
 """生成迭代次数与端到端耗时的散点图 fig_scatter.pdf（论文 Figure 7）。
 
-数据来自 outputs/eval/20260423_103843/summary.md "Overall" 表格。
+数据来自 outputs/eval/20260518_120256/summary.md "Overall" 表格。
 横轴: 平均工具调用次数；纵轴: 平均端到端耗时（秒）；点的大小代表成功率。
 """
 
@@ -17,18 +17,18 @@ import matplotlib.pyplot as plt
 from _style import CONFIGS_ORDER, apply_style, out_path
 
 
-# Source: outputs/eval/20260423_103843/summary.md "Overall" 表
+# Source: outputs/eval/20260518_120256/summary.md "Overall" 表
 # (config, success_rate, avg_tool_calls, avg_duration_sec)
 DATA: dict[str, tuple[float, float, float]] = {
-    "B0":         (48.1, 0.00,  9.04),
-    "B1":         (90.7, 2.65,  5.35),
-    "B2":         (79.6, 2.20,  5.23),
-    "B3":         (92.6, 3.76,  8.07),
-    "B4":         (94.4, 2.67,  7.07),
-    "Ours":       (100.0, 2.46, 15.12),
-    "Ours+RATS":  (90.7, 2.46,  9.69),
-    "Ours+DAG":   (94.4, 4.96, 11.17),
-    "Ours_full":  (100.0, 4.89, 14.68),
+    "B0":         (44.9, 0.00, 10.08),
+    "B1":         (83.1, 2.85,  4.14),
+    "B2":         (82.0, 2.81,  4.09),
+    "B3":         (80.9, 3.89,  5.52),
+    "B4":         (83.1, 3.25,  5.79),
+    "Ours":       (91.0, 2.94,  4.98),
+    "Ours+RATS":  (83.1, 3.18,  6.78),
+    "Ours+DAG":   (83.1, 6.34, 13.17),
+    "Ours_full":  (85.4, 5.71, 13.29),
 }
 
 EMPHASIZE: set[str] = {"Ours", "Ours_full"}
@@ -59,8 +59,8 @@ def main() -> None:
 
     ax.set_xlabel("Average tool calls per task")
     ax.set_ylabel("Average end-to-end duration (s)")
-    ax.set_xlim(-0.4, 6.4)
-    ax.set_ylim(0, 18)
+    ax.set_xlim(-0.4, 7.5)
+    ax.set_ylim(0, 16)
     ax.grid(True, linestyle=":", linewidth=0.5, color="#bbb", alpha=0.7)
     ax.set_title("Tool-call usage vs duration (point size ~ success rate)")
 

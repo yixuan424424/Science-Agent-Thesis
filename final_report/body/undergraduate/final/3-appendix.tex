@@ -4,30 +4,261 @@
     \sectionnonum{附录}
 
     \appendixsubsecmajornumbering
-
     \subsection{12 工具的完整接口规范}
-
-    \autoref{tab:appendix-tool-schemas} 对第四章 \autoref{tab:tool-list} 的 12 个工具补充给出完整的输入参数与关键输出字段说明，便于读者按字段名复现 DAGPlanner 中的 \verb|${sX.field}| 占位符。
-
-    \begin{longtable}{|l|p{0.30\linewidth}|p{0.30\linewidth}|p{0.20\linewidth}|}
-        \hline
-        \textbf{工具名} & \textbf{关键输入参数} & \textbf{关键输出字段} & \textbf{用途} \\ \hline
-        \endhead
-
-        \texttt{matrix\_operation} & \texttt{operation} (枚举: add/sub/mul/inverse/det), \texttt{matrix\_a}, \texttt{matrix\_b} & \texttt{result, shape, determinant, real, imag} & 矩阵基本运算与行列式 \\ \hline
-        \texttt{numerical\_integration} & \texttt{expression}, \texttt{lower}, \texttt{upper}, \texttt{variable} & \texttt{integral, absolute\_error, expression, interval} & 一元函数自适应数值积分 \\ \hline
-        \texttt{curve\_fitting} & \texttt{model} (linear/poly2/exponential/power), \texttt{x}, \texttt{y} & \texttt{model, params, r\_squared, formula} & 多模型曲线拟合 \\ \hline
-        \texttt{equation\_solver} & \texttt{expression}, \texttt{lower}, \texttt{upper}, \texttt{variable} & \texttt{root, residual, expression, interval} & 区间内方程求根 \\ \hline
-        \texttt{descriptive\_statistics} & \texttt{values} (数组) & \texttt{count, mean, median, std, variance, min, max, range, q1, q3, iqr} & 描述性统计量 \\ \hline
-        \texttt{hypothesis\_test} & \texttt{test\_type} (one\_sample\_t / two\_sample\_t), \texttt{sample\_a}, \texttt{sample\_b}, \texttt{alpha} & \texttt{test\_type, t\_statistic, p\_value, alpha, reject\_null} & t 检验等假设检验 \\ \hline
-        \texttt{linear\_regression} & \texttt{x}, \texttt{y} & \texttt{slope, intercept, r\_squared, p\_value, std\_err, formula} & 一元线性回归 \\ \hline
-        \texttt{correlation\_analysis} & \texttt{x}, \texttt{y}, \texttt{method} (pearson/spearman) & \texttt{method, correlation, p\_value, strength, direction} & 相关性分析 \\ \hline
-        \texttt{line\_chart} & \texttt{x}, \texttt{y}, \texttt{title}, \texttt{xlabel}, \texttt{ylabel}, \texttt{output\_path} & \texttt{file\_path, width\_pixels, height\_pixels} & 折线图 \\ \hline
-        \texttt{scatter\_chart} & \texttt{x}, \texttt{y}, \texttt{title}, \texttt{xlabel}, \texttt{ylabel}, \texttt{output\_path} & \texttt{file\_path, width\_pixels, height\_pixels} & 散点图 \\ \hline
-        \texttt{bar\_chart} & \texttt{labels}, \texttt{values}, \texttt{title}, \texttt{xlabel}, \texttt{ylabel}, \texttt{output\_path} & \texttt{file\_path, width\_pixels, height\_pixels} & 条形图 \\ \hline
-        \texttt{heatmap} & \texttt{matrix}, \texttt{row\_labels}, \texttt{col\_labels}, \texttt{title}, \texttt{output\_path} & \texttt{file\_path, width\_pixels, height\_pixels} & 热力图 \\ \hline
-        \caption{\label{tab:appendix-tool-schemas}12 工具的完整接口规范（输入参数 + 输出字段）}\\
+    
+    \autoref{tab:appendix-tool-schemas}
+    对第四章 \autoref{tab:tool-list} 的 12 个工具补充给出完整的输入参数与关键输出字段说明，
+    便于读者按字段名复现 DAGPlanner 中的
+    \verb|${sX.field}| 占位符。
+    
+    \small
+    
+    \begin{longtable}{
+    p{0.18\linewidth}
+    p{0.30\linewidth}
+    p{0.30\linewidth}
+    p{0.14\linewidth}
+    }
+    
+    \caption{\label{tab:appendix-tool-schemas}
+    12 工具的完整接口规范（输入参数 + 输出字段）}
+    \\
+    
+    \toprule
+    
+    \textbf{工具名}
+    &
+    \textbf{关键输入参数}
+    &
+    \textbf{关键输出字段}
+    &
+    \textbf{用途}
+    
+    \\
+    
+    \midrule
+    \endfirsthead
+    
+    \toprule
+    
+    \textbf{工具名}
+    &
+    \textbf{关键输入参数}
+    &
+    \textbf{关键输出字段}
+    &
+    \textbf{用途}
+    
+    \\
+    
+    \midrule
+    \endhead
+    
+    \midrule
+    \multicolumn{4}{r}{续下页}
+    \\
+    \endfoot
+    
+    \bottomrule
+    \endlastfoot
+    
+    \texttt{matrix\_operation}
+    &
+    \texttt{operation}
+    (add/sub/mul/inverse/det),
+    \texttt{matrix\_a},
+    \texttt{matrix\_b}
+    &
+    \texttt{result},
+    \texttt{shape},
+    \texttt{determinant},
+    \texttt{real},
+    \texttt{imag}
+    &
+    矩阵基本运算与行列式
+    \\
+    
+    \texttt{numerical}
+    &
+    \texttt{expression},
+    \texttt{lower},
+    \texttt{upper},
+    \texttt{variable}
+    &
+    \texttt{integral},
+    \texttt{absolute\_error},
+    \texttt{expression},
+    \texttt{interval}
+    &
+    一元函数自适应数值积分
+    \\
+    
+    \texttt{curve\_fitting}
+    &
+    \texttt{model}
+    (linear/poly2/exponential/power),
+    \texttt{x},
+    \texttt{y}
+    &
+    \texttt{model},
+    \texttt{params},
+    \texttt{r\_squared},
+    \texttt{formula}
+    &
+    多模型曲线拟合
+    \\
+    
+    \texttt{equation\_solver}
+    &
+    \texttt{expression},
+    \texttt{lower},
+    \texttt{upper},
+    \texttt{variable}
+    &
+    \texttt{root},
+    \texttt{residual},
+    \texttt{expression},
+    \texttt{interval}
+    &
+    区间内方程求根
+    \\
+    
+    \texttt{statistics}
+    &
+    \texttt{values} (数组)
+    &
+    \texttt{count},
+    \texttt{mean},
+    \texttt{median},
+    \texttt{std},
+    \texttt{variance},
+    \texttt{min},
+    \texttt{max},
+    \texttt{range},
+    \texttt{q1},
+    \texttt{q3},
+    \texttt{iqr}
+    &
+    描述性统计量
+    \\
+    
+    \texttt{hypothesis\_test}
+    &
+    \texttt{test\_type}
+    (one\_sample\_t /
+    two\_sample\_t),
+    \texttt{sample\_a},
+    \texttt{sample\_b},
+    \texttt{alpha}
+    &
+    \texttt{test\_type},
+    \texttt{t\_statistic},
+    \texttt{p\_value},
+    \texttt{alpha},
+    \texttt{reject\_null}
+    &
+    t 检验等假设检验
+    \\
+    
+    \texttt{linear\_regression}
+    &
+    \texttt{x},
+    \texttt{y}
+    &
+    \texttt{slope},
+    \texttt{intercept},
+    \texttt{r\_squared},
+    \texttt{p\_value},
+    \texttt{std\_err},
+    \texttt{formula}
+    &
+    一元线性回归
+    \\
+    
+    \texttt{correlation}
+    &
+    \texttt{x},
+    \texttt{y},
+    \texttt{method}
+    (pearson/spearman)
+    &
+    \texttt{method},
+    \texttt{correlation},
+    \texttt{p\_value},
+    \texttt{strength},
+    \texttt{direction}
+    &
+    相关性分析
+    \\
+    
+    \texttt{line\_chart}
+    &
+    \texttt{x},
+    \texttt{y},
+    \texttt{title},
+    \texttt{xlabel},
+    \texttt{ylabel},
+    \texttt{output\_path}
+    &
+    \texttt{file\_path},
+    \texttt{width\_pixels},
+    \texttt{height\_pixels}
+    &
+    折线图
+    \\
+    
+    \texttt{scatter\_chart}
+    &
+    \texttt{x},
+    \texttt{y},
+    \texttt{title},
+    \texttt{xlabel},
+    \texttt{ylabel},
+    \texttt{output\_path}
+    &
+    \texttt{file\_path},
+    \texttt{width\_pixels},
+    \texttt{height\_pixels}
+    &
+    散点图
+    \\
+    
+    \texttt{bar\_chart}
+    &
+    \texttt{labels},
+    \texttt{values},
+    \texttt{title},
+    \texttt{xlabel},
+    \texttt{ylabel},
+    \texttt{output\_path}
+    &
+    \texttt{file\_path},
+    \texttt{width\_pixels},
+    \texttt{height\_pixels}
+    &
+    条形图
+    \\
+    
+    \texttt{heatmap}
+    &
+    \texttt{matrix},
+    \texttt{row\_labels},
+    \texttt{col\_labels},
+    \texttt{title},
+    \texttt{output\_path}
+    &
+    \texttt{file\_path},
+    \texttt{width\_pixels},
+    \texttt{height\_pixels}
+    &
+    热力图
+    \\
+    
     \end{longtable}
+    
+    \normalsize
+    ```
+    
 
     \subsection{O1--O4 提示工程规则全文}
 
@@ -80,17 +311,17 @@
     \begin{table}[ht]
         \centering
         \caption{\label{tab:appendix-ext-cases}8 道 \texttt{ext\_*} 压力测试用例的设计目标}
-        \begin{tabularx}{\linewidth}{|c|l|X|c|}
-            \hline
-            编号 & 用例 ID & 设计目标 & 主要类别 \\ \hline
-            1 & \texttt{ext\_rs\_01} & 在 \texttt{descriptive\_statistics} 与 \texttt{hypothesis\_test} 之间区分（统计描述 vs 假设检验） & statistics \\ \hline
-            2 & \texttt{ext\_rs\_02} & 在 \texttt{linear\_regression} 与 \texttt{correlation\_analysis} 之间区分（拟合 vs 相关） & statistics \\ \hline
-            3 & \texttt{ext\_rs\_03} & 在 \texttt{equation\_solver} 与 \texttt{numerical\_integration} 之间区分 & numerical \\ \hline
-            4 & \texttt{ext\_rs\_04} & 在 \texttt{heatmap} 与 \texttt{bar\_chart} 之间区分（多维 vs 一维可视化） & visualization \\ \hline
-            5 & \texttt{ext\_dag\_01} & 5 步链式：行列式 $\to$ 求根 $\to$ 积分 $\to$ 统计 $\to$ 折线图 & composite \\ \hline
-            6 & \texttt{ext\_dag\_02} & 4 步链式：统计 $\to$ 相关 $\to$ 回归 $\to$ 散点图 & composite \\ \hline
-            7 & \texttt{ext\_dag\_03} & 3 步链式 + 中间结果分支：拟合 + 残差统计 + 残差直方图 & composite \\ \hline
-            8 & \texttt{ext\_dag\_04} & 4 步链式：矩阵特征值 $\to$ 排序 $\to$ 选取 $\to$ 条形图 & composite \\ \hline
+        \begin{tabularx}{\linewidth}{clXc}
+            \toprule
+            编号 & 用例 ID & 设计目标 & 主要类别 \\ \midrule
+            1 & \texttt{ext\_rs\_01} & 在 \texttt{descriptive\_statistics} 与 \texttt{hypothesis\_test} 之间区分（统计描述 vs 假设检验） & statistics \\
+            2 & \texttt{ext\_rs\_02} & 在 \texttt{linear\_regression} 与 \texttt{correlation\_analysis} 之间区分（拟合 vs 相关） & statistics \\
+            3 & \texttt{ext\_rs\_03} & 在 \texttt{equation\_solver} 与 \texttt{numerical\_integration} 之间区分 & numerical \\
+            4 & \texttt{ext\_rs\_04} & 在 \texttt{heatmap} 与 \texttt{bar\_chart} 之间区分（多维 vs 一维可视化） & visualization \\
+            5 & \texttt{ext\_dag\_01} & 5 步链式：行列式 $\to$ 求根 $\to$ 积分 $\to$ 统计 $\to$ 折线图 & composite \\
+            6 & \texttt{ext\_dag\_02} & 4 步链式：统计 $\to$ 相关 $\to$ 回归 $\to$ 散点图 & composite \\
+            7 & \texttt{ext\_dag\_03} & 3 步链式 + 中间结果分支：拟合 + 残差统计 + 残差直方图 & composite \\
+            8 & \texttt{ext\_dag\_04} & 4 步链式：矩阵特征值 $\to$ 排序 $\to$ 选取 $\to$ 条形图 & composite \\ \bottomrule
         \end{tabularx}
     \end{table}
 

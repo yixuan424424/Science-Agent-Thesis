@@ -3,109 +3,112 @@
 \section{实验}
 
 本章在 \autoref{eq:eval-criteria} 给出的三维判分定义之下，从主实验、按类别细分、消融研究、效率分析四个角度对本文方法进行实证评估。
-所有数字均可在 \texttt{outputs/eval/20260423\_103843/} 目录下的 \texttt{results.json} 与 \texttt{summary.md} 中追溯到原始落盘数据，
+所有数字均可在 \texttt{outputs/eval/20260518\_120256/} 目录下的 \texttt{results.json} 与 \texttt{summary.md} 中追溯到原始落盘数据，
 对应的复现命令为 \texttt{python scripts/run\_eval.py --configs b0 b1 b2 b3 b4 ours ours\_rats ours\_dag ours\_full}。
 
 \subsection{实验设置}\label{sec:exp-setup}
 
 \subsubsection{基座模型与超参数}
 
-主实验使用通义千问 \texttt{qwen-plus-latest}（OpenAI 兼容接口），temperature 默认 0.2，单轮最大 token 数 4096，迭代上限 $M=10$。
+主实验使用通义千问 \texttt{qwen-turbo}（OpenAI 兼容接口），temperature 默认 0.2，单轮最大 token 数 4096，迭代上限 $M=10$。
 RATS 的嵌入接口使用 \texttt{text-embedding-v3}，维度 1024，余弦相似度计算在内存中以 64 位浮点完成。
 DAGPlanner 的硬上限设为最大重规划次数 $R=3$、单步最大参数修复次数 $F=2$、最大计划步数 8。
 所有 LLM 调用均通过统一的 \texttt{LLMClient} 类，启用指数退避重试与 60 秒超时控制。
 
 \subsubsection{测试集构成}
 
-测试集包含 54 道科学任务，分布如\autoref{tab:cases-dist}所示。
-其中 46 题为本文自有用例，覆盖 5 大类别 $\times$ 3 档难度（easy/medium/hard），
-另外 8 题为针对算法贡献点新增的定向压力题（标识 \texttt{ext\_*}），其中 4 道为复杂统计/可视化任务用以压测 RATS 在功能相近工具上的区分能力，4 道为长依赖链（\texttt{ext\_dag\_*}）用以压测 DAGPlanner 的多步依赖处理能力。
-全部用例以 JSON 形式定义于 \texttt{tests/data/test\_cases.json}，附录 C 给出 8 道压力题的完整清单。
+测试集包含 89 道科学任务，分布如\autoref{tab:cases-dist}所示。
+相较于方法设计阶段使用的初版 54 题，本次评测在保持原有类别比例的前提下，额外补充了 35 道以 hard 和 vhard 难度为主的新题，
+使整体难度分布向高难度倾斜（hard 占 46\%，vhard 占 6\%），以更严格地压测各方法在复杂场景下的表现。
+全部用例以 JSON 形式定义于 \texttt{tests/data/test\_cases.json}，附录 C 给出扩展压力题的完整清单。
 
 \begin{table}[ht]
     \centering
-    \caption{\label{tab:cases-dist}测试集按类别 $\times$ 难度的题量分布（共 54 题）}
-    \begin{tabularx}{\linewidth}{|l|c|c|c|c|c|c|}
-        \hline
-        类别 & easy & medium & hard & vhard & ext & 合计 \\ \hline
-        \texttt{numerical}      & 4 & 3 & 1 & 0 & 1 & 9 \\ \hline
-        \texttt{statistics}     & 4 & 3 & 1 & 0 & 2 & 10 \\ \hline
-        \texttt{visualization}  & 2 & 3 & 1 & 0 & 1 & 7 \\ \hline
-        \texttt{composite}      & 3 & 7 & 6 & 2 & 4 & 22 \\ \hline
-        \texttt{error\_recovery} & 1 & 3 & 1 & 1 & 0 & 6 \\ \hline
-        \textbf{合计} & 14 & 19 & 10 & 3 & 8 & 54 \\ \hline
-    \end{tabularx}
+    \caption{\label{tab:cases-dist}测试集按类别 $\times$ 难度的题量分布（共 89 题）}
+    \begin{tabular}{lccccc}
+        \toprule
+        类别 & easy & medium & hard & vhard & 合计 \\ \midrule
+        \texttt{numerical}      & 4 & 5 & 5 & 1 & 15 \\
+        \texttt{statistics}     & 4 & 7 & 4 & 1 & 16 \\
+        \texttt{visualization}  & 3 & 5 & 4 & 0 & 12 \\
+        \texttt{composite}      & 0 & 12 & 22 & 2 & 36 \\
+        \texttt{error\_recovery} & 0 & 3 & 6 & 1 & 10 \\
+        \textbf{合计} & 11 & 32 & 41 & 5 & 89 \\ \bottomrule
+    \end{tabular}
 \end{table}
 
 \subsubsection{对比配置}
 
 实验包含 9 个配置：1 个无工具基线（B0）、4 个有工具基线（B1--B4）以及本文 4 个配置（Ours 与三组消融），如\autoref{tab:configs}所示。
 此外，B0 的判分仅看数值正确性，其余 8 个配置均按完整三维判分。
-评测规模为 $9$ 配置 $\times 54$ 题 $= 486$ 次 run，全程同口径运行，总耗时约 77 分钟。
+评测规模为 $9$ 配置 $\times 89$ 题 $= 801$ 次 run，全程同口径运行，总耗时约 101 分钟。
 
 \begin{table}[ht]
     \centering
     \caption{\label{tab:configs}9 个对比配置的关键差异（v4 prompt 表示 4 条 O1--O4 规则共同启用）}
-    \begin{tabularx}{\linewidth}{|c|l|X|}
-        \hline
-        编号 & 配置名 & 关键差异 \\ \hline
-        B0 & 无工具 & 仅大语言模型本身，禁止工具调用，作为“无工具能力上限”参考 \\ \hline
-        B1 & minimal + 工具 & MINIMAL\_PROMPT + 全量工具，作为朴素 ReAct 基线 \\ \hline
-        B2 & CoT & B1 + Chain-of-Thought 后缀提示\cite{wei2022cot} \\ \hline
-        B3 & Plan-and-Solve & 两阶段：先生成自然语言计划再 ReAct 执行\cite{wang2023plansolve} \\ \hline
-        B4 & Reflexion & B1 + 失败后追加自我反思\cite{shinn2023reflexion} \\ \hline
-        Ours & v4 prompt + 全量工具 & 启用 O1--O4 提示工程规则，但不启用 RATS / DAGPlanner \\ \hline
-        Ours+RATS & v4 prompt + RATS & Ours 基础上叠加 RATS 工具筛选 \\ \hline
-        Ours+DAG & v4 prompt + DAGPlanner & Ours 基础上把主循环换成 DAGPlanner（无 RATS 工具筛选） \\ \hline
-        Ours\_full & v4 prompt + RATS + DAG & 本文最终方案 \\ \hline
+    \begin{tabularx}{\linewidth}{clX}
+        \toprule
+        编号 & 配置名 & 关键差异 \\ \midrule
+        B0 & 无工具 & 仅大语言模型本身，禁止工具调用，作为"无工具能力上限"参考 \\
+        B1 & minimal + 工具 & MINIMAL\_PROMPT + 全量工具，作为朴素 ReAct 基线 \\
+        B2 & CoT & B1 + Chain-of-Thought 后缀提示\cite{wei2022cot} \\
+        B3 & Plan-and-Solve & 两阶段：先生成自然语言计划再 ReAct 执行\cite{wang2023plansolve} \\
+        B4 & Reflexion & B1 + 失败后追加自我反思\cite{shinn2023reflexion} \\
+        Ours & v4 prompt + 全量工具 & 启用 O1--O4 提示工程规则，但不启用 RATS / DAGPlanner \\
+        Ours+RATS & v4 prompt + RATS & Ours 基础上叠加 RATS 工具筛选 \\
+        Ours+DAG & v4 prompt + DAGPlanner & Ours 基础上把主循环换成 DAGPlanner（无 RATS 工具筛选） \\
+        Ours\_full & v4 prompt + RATS + DAG & 本文最终方案 \\ \bottomrule
     \end{tabularx}
 \end{table}
 
 \subsubsection{评测指标}
 
-主指标为\textbf{成功率}，即 \autoref{eq:eval-criteria} 三维判分同时通过的用例比例。
-辅助指标包括\textbf{平均迭代次数}（每次运行中 LLM 与工具交互的轮数）、\textbf{平均工具调用次数}（每次运行中 \texttt{tool\_calls} 的次数，含失败重试）、\textbf{平均端到端耗时}（含 LLM 调用、工具执行与本地数据搬运）。
-四个指标共同刻画方法在“能否解决”、“需要多少推理”、“需要多少工具”、“需要多少时间”四个维度上的代价收益。
+主指标为成功率，即 \autoref{eq:eval-criteria} 三维判分同时通过的用例比例。
+辅助指标包括平均迭代次数（每次运行中 LLM 与工具交互的轮数）、平均工具调用次数（每次运行中 \texttt{tool\_calls} 的次数，含失败重试）、平均端到端耗时（含 LLM 调用、工具执行与本地数据搬运）。
+四个指标共同刻画方法在"能否解决"、"需要多少推理"、"需要多少工具"、"需要多少时间"四个维度上的代价收益。
 
 \subsection{主实验：9 配置成功率对比}\label{sec:exp-main}
 
-\autoref{tab:main-results} 给出 486 次 run 的全量评测主结果，\autoref{fig:main-bar} 以柱图形式重绘成功率维度。
-本文 \texttt{Ours} 与 \texttt{Ours\_full} 在 54 题测试集上均达到 100\% 成功率，
-相比朴素 ReAct 基线 B1 提升 9.3 个百分点，相比业界最强基线 B4 Reflexion 提升 5.6 个百分点，达到第三章对方法有效性的预期目标。
+\autoref{tab:main-results} 给出 801 次 run 的全量评测主结果，\autoref{fig:main-bar} 以柱图形式重绘成功率维度。
+本文 \texttt{Ours} 在 89 题测试集上达到 91.0\% 成功率，
+相比朴素 ReAct 基线 B1 提升 7.9 个百分点，相比业界最强基线 B4 Reflexion 提升同样的 7.9 个百分点，验证了第三章对方法有效性的预期目标。
 
 \begin{table}[ht]
     \centering
-    \caption{\label{tab:main-results}9 配置在 54 题全量测试集上的主实验结果}
-    \begin{tabularx}{\linewidth}{|l|>{\centering\arraybackslash}X|>{\centering\arraybackslash}X|>{\centering\arraybackslash}X|>{\centering\arraybackslash}X|>{\centering\arraybackslash}X|}
-        \hline
-        Config & Success & Success rate & Avg iter & Avg tool calls & Avg duration (s) \\ \hline
-        B0  & 26/54 & 48.1\% & 1.00 & 0.00 & 9.04 \\ \hline
-        B1  & 49/54 & 90.7\% & 3.00 & 2.65 & 5.35 \\ \hline
-        B2  & 43/54 & 79.6\% & 2.93 & 2.20 & 5.23 \\ \hline
-        B3  & 50/54 & 92.6\% & 4.07 & 3.76 & 8.07 \\ \hline
-        B4  & 51/54 & 94.4\% & 3.02 & 2.67 & 7.07 \\ \hline
-        \textbf{Ours} & \textbf{54/54} & \textbf{100.0\%} & 3.46 & 2.46 & 15.12 \\ \hline
-        Ours+RATS & 49/54 & 90.7\% & 3.44 & 2.46 & 9.69 \\ \hline
-        Ours+DAG  & 51/54 & 94.4\% & 5.94 & 4.96 & 11.17 \\ \hline
-        \textbf{Ours\_full} & \textbf{54/54} & \textbf{100.0\%} & 5.89 & 4.89 & 14.68 \\ \hline
+    \caption{\label{tab:main-results}9 配置在 89 题全量测试集上的主实验结果}
+    \begin{tabularx}{\linewidth}{l>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
+        \toprule
+        Config & Success & Success rate & Avg iter & Avg tool calls & Avg duration (s) \\ \midrule
+        B0  & 40/89 & 44.9\% & 1.00 & 0.00 & 10.08 \\
+        B1  & 74/89 & 83.1\% & 2.53 & 2.85 & 4.14 \\
+        B2  & 73/89 & 82.0\% & 2.51 & 2.81 & 4.09 \\
+        B3  & 72/89 & 80.9\% & 3.62 & 3.89 & 5.52 \\
+        B4  & 74/89 & 83.1\% & 3.11 & 3.25 & 5.79 \\
+        \textbf{Ours} & \textbf{81/89} & \textbf{91.0\%} & 3.70 & 2.94 & 4.98 \\
+        Ours+RATS & 74/89 & 83.1\% & 4.13 & 3.18 & 6.78 \\
+        Ours+DAG  & 74/89 & 83.1\% & 7.26 & 6.34 & 13.17 \\
+        Ours\_full & 76/89 & 85.4\% & 6.52 & 5.71 & 13.29 \\ \bottomrule
     \end{tabularx}
 \end{table}
 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.92\linewidth]{fig_main_bar.pdf}
-    \caption{\label{fig:main-bar}9 配置在 54 题测试集上的成功率柱图。橙色为本文方法。}
+    \caption{\label{fig:main-bar}9 配置在 89 题测试集上的成功率柱图。橙色为本文方法。}
 \end{figure}
 
 主实验的几条关键观察如下：
-\textbf{第一，O1--O4 提示工程规则贡献显著}。
-\texttt{Ours} 与 B1 唯一差异是 4 条提示规则的启用，二者成功率分别为 100\% 与 90.7\%，规则集贡献 9.3 个百分点。
-\textbf{第二，B2 CoT 反而降分}。
-B2 比 B1 下降 11.1 个百分点，逆于直觉的“CoT is all you need”宣言；分析发现 CoT 生成的冗长中间文本更容易触发 LLM \texttt{function.arguments} 的 JSON 解析错误（参见 \autoref{sec:analysis-cot-paradox} 的深入剖析）。
-\textbf{第三，B3 Plan-and-Solve 与 B4 Reflexion 是较强基线}。
-两者均在 90\%--95\% 区间，验证了“规划”与“反思”的正向价值；但二者在长依赖链 \texttt{composite} 类别上仍有 5--14 个百分点的下降空间，正是本文方法所要弥补的。
-\textbf{第四，DAGPlanner 单独使用即可显著超过 B3}。
-\texttt{Ours+DAG} 比 B3 提升 1.8 个百分点，且 DAGPlanner 内部的纯代码校验额外吸收了 6 次 fallback 风险事件，这一对比直接量化了“算法级校验”相较“纯 Prompt 规划”的收益。
+\texttt{O1--O4 提示工程规则贡献显著}。
+\texttt{Ours} 与 B1 唯一差异是 4 条提示规则的启用，二者成功率分别为 91.0\% 与 83.1\%，规则集贡献 7.9 个百分点，且不增加额外工具调用次数（Ours 平均 2.94 次 vs B1 平均 2.85 次，几乎持平）。
+\texttt{B2 CoT 略有下滑但差距收窄}。
+B2 比 B1 下降 1.1 个百分点（82.0\% vs 83.1\%），CoT 导致 JSON 解析失败的现象仍然存在，但在本实验中影响幅度有限（参见 \autoref{sec:analysis-cot-paradox} 的深入剖析）。
+\texttt{B3 Plan-and-Solve 表现不如预期}。
+B3 以 80.9\% 居所有有工具配置末位，原因在于 \texttt{qwen-turbo} 在两阶段分离的计划-执行框架下更容易在复杂任务上出现计划与执行脱节（参见按类别细分中 \texttt{composite} 类的具体数据）。
+\texttt{DAGPlanner 与 RATS 单独接入均未能超越基线，体现了对基座能力的依赖}。
+\texttt{Ours+RATS} 与 \texttt{Ours+DAG} 均与 B1 持平于 83.1\%，说明 RATS 的工具筛选截断与 DAGPlanner 的结构化规划在 \texttt{qwen-turbo} 下均未能有效发挥；
+而两者组合的 \texttt{Ours\_full}（85.4\%）优于各自单用，表明两组件在一定程度上形成了互补，
+DAGPlanner 在执行期捕获 RATS 误剪导致的工具不可用错误并触发 ReAct 安全网，使系统相比单独使用 RATS 或 DAGPlanner 有所恢复；
+但整体仍低于不带算法增强的 \texttt{Ours}，进一步说明当前 RATS 和 DAGPlanner 设计的最大受益者是具有更强规划能力的基座模型。
 
 \subsection{按类别细分}\label{sec:exp-category}
 
@@ -113,16 +116,16 @@ B2 比 B1 下降 11.1 个百分点，逆于直觉的“CoT is all you need”宣
 
 \begin{table}[ht]
     \centering
-    \caption{\label{tab:by-category}按类别细分的成功率（每格为本类别下 “通过题数 / 该类别总题数”）}
+    \caption{\label{tab:by-category}按类别细分的成功率（每格为本类别下 "通过题数 / 该类别总题数"）}
     \scriptsize
-    \begin{tabularx}{\linewidth}{|l|>{\centering\arraybackslash}X|>{\centering\arraybackslash}X|>{\centering\arraybackslash}X|>{\centering\arraybackslash}X|>{\centering\arraybackslash}X|>{\centering\arraybackslash}X|>{\centering\arraybackslash}X|>{\centering\arraybackslash}X|>{\centering\arraybackslash}X|}
-        \hline
-        Category & B0 & B1 & B2 & B3 & B4 & Ours & Ours+RATS & Ours+DAG & Ours\_full \\ \hline
-        composite       & 5/22 (23\%) & 18/22 (82\%) & 17/22 (77\%) & 20/22 (91\%) & 19/22 (86\%) & 22/22 & 18/22 & 19/22 & 22/22 \\ \hline
-        error\_recovery & 5/6 (83\%) & 6/6 & 3/6 (50\%) & 6/6 & 6/6 & 6/6 & 6/6 & 6/6 & 6/6 \\ \hline
-        numerical       & 8/9 (89\%) & 9/9 & 9/9 & 8/9 (89\%) & 9/9 & 9/9 & 9/9 & 9/9 & 9/9 \\ \hline
-        statistics      & 8/10 (80\%) & 10/10 & 9/10 (90\%) & 9/10 (90\%) & 10/10 & 10/10 & 10/10 & 10/10 & 10/10 \\ \hline
-        visualization   & 0/7 (0\%) & 6/7 (86\%) & 5/7 (71\%) & 7/7 & 7/7 & 7/7 & 6/7 (86\%) & 7/7 & 7/7 \\ \hline
+    \begin{tabularx}{\linewidth}{l>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
+        \toprule
+        Category & B0 & B1 & B2 & B3 & B4 & Ours & Ours+RATS & Ours+DAG & Ours\_full \\ \midrule
+        composite       & 7/36 (19\%) & 25/36 (69\%) & 24/36 (67\%) & 25/36 (69\%) & 27/36 (75\%) & 32/36 (89\%) & 26/36 (72\%) & 28/36 (78\%) & 27/36 (75\%) \\
+        error\_recovery & 9/10 (90\%) & 9/10 (90\%) & 9/10 (90\%) & 10/10 (100\%) & 9/10 (90\%) & 10/10 (100\%) & 9/10 (90\%) & 9/10 (90\%) & 9/10 (90\%) \\
+        numerical       & 13/15 (87\%) & 15/15 (100\%) & 15/15 (100\%) & 14/15 (93\%) & 15/15 (100\%) & 15/15 (100\%) & 15/15 (100\%) & 15/15 (100\%) & 15/15 (100\%) \\
+        statistics      & 11/16 (69\%) & 14/16 (88\%) & 14/16 (88\%) & 12/16 (75\%) & 12/16 (75\%) & 13/16 (81\%) & 13/16 (81\%) & 11/16 (69\%) & 14/16 (88\%) \\
+        visualization   & 0/12 (0\%) & 11/12 (92\%) & 11/12 (92\%) & 11/12 (92\%) & 11/12 (92\%) & 11/12 (92\%) & 11/12 (92\%) & 11/12 (92\%) & 11/12 (92\%) \\ \bottomrule
     \end{tabularx}
 \end{table}
 
@@ -132,65 +135,63 @@ B2 比 B1 下降 11.1 个百分点，逆于直觉的“CoT is all you need”宣
     \caption{\label{fig:heatmap}按类别 $\times$ 配置的成功率热力图。颜色越深表示成功率越高。}
 \end{figure}
 
-类别细分的结论可以归纳为以下三点：
-\textbf{第一，\texttt{composite} 类别最考验整体能力}。
-该类别共 22 题（占总题量 41\%），是 5 大类中题量最大、依赖链最长的类别；
-仅有 \texttt{Ours} 与 \texttt{Ours\_full} 在该类别上实现 100\% 成功率，\texttt{B3} 以 91\% 居其次，再之后是 \texttt{B4} 的 86\%。
-这与本文“长依赖链科学任务正是朴素 ReAct 与自然语言 Plan-and-Solve 的薄弱点”的论断一致。
-\textbf{第二，\texttt{visualization} 与 \texttt{error\_recovery} 验证了图表与异常路径上的稳健性}。
-本文方法在这两个类别上一致达到 100\%；对照基线 B2 在 \texttt{error\_recovery} 上仅 50\%，原因是 CoT 的冗长中间文本在异常切换路径上对 JSON 解析的脆弱程度更高。
-\textbf{第三，\texttt{Ours+RATS} 在 \texttt{visualization} 上略有掉点}。
-\texttt{Ours+RATS} 在 \texttt{visualization} 类别从 100\% 退至 86\%（少 1 题），单独 RATS 接入时确实存在“误剪正确工具”的风险；
-但当 RATS 与 DAGPlanner 同时启用（即 \texttt{Ours\_full}）时，DAGPlanner 的纯代码校验在执行期能够捕获被误剪导致的工具不可用错误并触发 ReAct 安全网，整体 \texttt{visualization} 成功率回到 100\%。
+类别细分的结论可以归纳为以下四点：
+第一，\texttt{composite} 类别最能区分方法优劣。
+该类别共 36 题（占总题量 40\%），以多步依赖链为主；
+\texttt{Ours} 以 89\% 显著领先，而最强有工具基线 B4 仅 75\%；
+这与本文"长依赖链科学任务正是朴素 ReAct 与自然语言 Plan-and-Solve 薄弱点"的论断一致。
+第二，\texttt{numerical} 在所有有工具配置下均达到 100\%，说明单步数值计算已被现有工具体系充分覆盖，此类任务对方法设计的区分度有限。
+第三，\texttt{statistics} 类别出现了 \texttt{Ours} 略低于 B1 的异常（81\% vs 88\%）。
+分析失败用例发现，部分统计类题目要求严格遵守符号约定（如 t 统计量的正负号）或精确手动计算合并标准差后的派生量（如 Cohen's d），
+在 \texttt{qwen-turbo} 这类较弱的基座上，v4 prompt 的规则约束有时反而导致模型过度思考后输出格式不符合判分期望；
+这也说明提示工程规则在不同任务类型和基座模型上存在非均匀的效果，是未来需要针对具体类型做规则精细化的方向。
+第四，\texttt{error\_recovery} 与 \texttt{visualization} 验证了稳健性。
+\texttt{Ours} 在 \texttt{error\_recovery} 上达到 100\%，在 \texttt{visualization} 上与基线持平于 92\%；
+对照 B0 在 \texttt{visualization} 上为 0\%（完全无法生成图表文件）、在 \texttt{error\_recovery} 上 90\%（部分题目能靠推理通过但缺乏工具），
+工具库的覆盖范围是可视化类任务的必要条件。
 
 \subsection{消融研究}\label{sec:exp-ablation}
 
-为量化 v4 prompt、RATS、DAGPlanner 三个独立组件各自的贡献，\autoref{tab:ablation} 给出以 \texttt{Ours} 为基准、依次去除单个组件的成功率与效率变化。
+为量化 v4 prompt、RATS、DAGPlanner 三个独立组件各自的贡献，\autoref{tab:ablation} 给出以 \texttt{Ours} 为基准、依次加入或替换单个组件的成功率与效率变化。
 
 \begin{table}[ht]
     \centering
-    \caption{\label{tab:ablation}相对 \texttt{Ours} 的单一组件移除消融。$\Delta$ 列以百分比为单位，正负号表示相对 \texttt{Ours} 的提升/下降}
-    \begin{tabularx}{\linewidth}{|l|>{\centering\arraybackslash}X|>{\centering\arraybackslash}X|>{\centering\arraybackslash}X|>{\centering\arraybackslash}X|}
-        \hline
-        消融配置 & Success rate & $\Delta$Success (pp) & Avg tool calls & $\Delta$Duration \\ \hline
-        \texttt{Ours}（全量基础） & 100.0\% & — & 2.46 & — \\ \hline
-        Ours -- RATS（=Ours）       & 100.0\% & 0.0 & 2.46 & 0\% \\ \hline
-        Ours -- v4 prompt（=B1）     & 90.7\%  & $-9.3$ & 2.65 & $-64.6$\% \\ \hline
-        Ours -- DAG（=Ours）         & 100.0\% & 0.0 & 2.46 & 0\% \\ \hline
-        \texttt{Ours+RATS} & 90.7\%  & $-9.3$ & 2.46 & $-35.9$\% \\ \hline
-        \texttt{Ours+DAG}  & 94.4\%  & $-5.6$ & 4.96 & $-26.1$\% \\ \hline
+    \caption{\label{tab:ablation}相对 \texttt{Ours} 的单一组件变化消融。$\Delta$ 列以百分比为单位，正负号表示相对 \texttt{Ours} 的提升/下降}
+    \begin{tabularx}{\linewidth}{l>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
+        \toprule
+        消融配置 & Success rate & $\Delta$Success (pp) & Avg tool calls & $\Delta$Duration \\ \midrule
+        \texttt{Ours}（全量基础） & 91.0\% & — & 2.94 & — \\
+        Ours -- v4 prompt（=B1）     & 83.1\%  & $-7.9$ & 2.85 & $-16.9$\% \\
+        Ours+RATS（仅加 RATS） & 83.1\%  & $-7.9$ & 3.18 & $+36.1$\% \\
+        Ours+DAG（仅加 DAGPlanner） & 83.1\%  & $-7.9$ & 6.34 & $+164.3$\% \\
+        \texttt{Ours\_full}（RATS + DAG） & 85.4\%  & $-5.6$ & 5.71 & $+166.7$\% \\ \bottomrule
     \end{tabularx}
 \end{table}
 
-由于 \texttt{Ours} 与 \texttt{Ours\_full} 在本测试集上同为 100\%，单纯做“减一组件”消融无法直接区分 RATS 与 DAGPlanner 的贡献度。
-本文采用补充的“另起 baseline 看进入 \texttt{Ours\_full}”视角：
+消融实验揭示了三条关键结论：
 
 \begin{itemize}
-    \item \textbf{O1--O4 prompt 贡献 $+9.3$ pp}：B1 $\to$ Ours 即可观察到这一提升，且不增加额外工具调用次数。
-    \item \textbf{RATS 单独接入是“效率换精度”}：\texttt{Ours+RATS} 相比 \texttt{Ours} 成功率下降 9.3 pp，但端到端耗时降低 35.9\%，验证 \autoref{sec:rats} 中关于工具上下文压缩对耗时的预测。
-    \item \textbf{DAGPlanner 单独接入是“可解释性换迭代数”}：\texttt{Ours+DAG} 相比 \texttt{Ours} 成功率下降 5.6 pp 但仍优于 B1（提升 3.7 pp），且工具调用次数翻倍，反映 DAG 主循环在显式拆分子目标时确实会“算得多”。
-    \item \textbf{RATS + DAGPlanner 在 \texttt{Ours\_full} 中互补}：单独使用都会掉点，组合使用则恢复到 100\%；这一现象对应到 \autoref{sec:exp-category} 中“RATS 误剪 + DAG 校验吸收”的协同：DAGPlanner 在执行期把 RATS 误剪导致的工具不可用错误转化为可恢复的 fallback 路径。
+    \item \textbf{O1--O4 prompt 贡献 $+7.9$ pp，且效率代价最小}：B1 $\to$ Ours 即可观察到这一提升，而平均工具调用次数几乎不变（2.85 vs 2.94），端到端耗时仅增加 0.84 秒。提示工程因此是本文方法中性价比最高的组件。
+    \item \textbf{RATS 与 DAGPlanner 单独接入均拉低成功率，揭示基座模型依赖性}：\texttt{Ours+RATS} 相比 \texttt{Ours} 下降 7.9 pp，\texttt{Ours+DAG} 同样下降 7.9 pp。前者源于 \texttt{qwen-turbo} 在工具精选后更难从有限候选集中正确选择；后者源于 DAGPlanner 的结构化规划需要更强的 JSON 生成和依赖推断能力，\texttt{qwen-turbo} 的规划失败率偏高，即使有 ReAct 安全网，补救率也有限。
+    \item \textbf{RATS + DAGPlanner 组合有限恢复，体现互补但存在瓶颈}：\texttt{Ours\_full}（85.4\%）优于各自单用（83.1\%），说明两组件在错误捕获层面确实形成互补——DAGPlanner 在执行期吸收 RATS 误剪产生的工具不可用异常并触发 fallback；但整体仍低于不带算法增强的 \texttt{Ours}，进一步验证了这两个组件的价值发挥有赖于基座模型的规划能力达到一定水准。
 \end{itemize}
 
-需要诚实指出的是，由于本测试集规模为 54 题、Ours 已饱和到 100\%，单一组件的“正向消融”需要通过 \texttt{Ours+RATS}、\texttt{Ours+DAG} 等复合配置间接量化。
-若把测试集扩展到更大规模或换用更弱的基座模型，预期 v4 prompt 与 DAGPlanner 的贡献度仍会保持，而 RATS 的相对优势将随工具库规模增加而被进一步放大（这一论断在 \autoref{sec:analysis-rats-tradeoff} 中进一步讨论）。
 
 \subsection{效率分析}\label{sec:exp-efficiency}
 
-\autoref{fig:scatter} 把 9 配置的“平均工具调用次数”与“平均端到端耗时”绘成散点图，点的大小代表成功率。
+\autoref{fig:scatter} 把 9 配置的"平均工具调用次数"与"平均端到端耗时"绘成散点图，点的大小代表成功率。
 散点图把方法选择的多目标权衡空间可视化：
-\textbf{B1（左下）}是“低工具调用、低耗时但成功率欠缺”的典型；
-\textbf{B3 / B4（中间）}通过更多调用换取更高成功率，但耗时也相应上升；
-\textbf{Ours+RATS（左中）}成功率与 B1 相当但耗时翻倍（9.69 s vs 5.35 s），其优势在工具库扩张到百级规模时才会被充分释放；
-\textbf{Ours\_full（右上）}是全图唯一“高工具调用 + 高成功率”同时达到的点，DAG 主循环显式拆分子目标带来工具调用次数的提升，但 RATS 的上下文压缩正好抵消了 DAG 规划阶段的额外 LLM 开销，使其端到端耗时（14.68 s）与不带 DAG 的 \texttt{Ours}（15.12 s）几乎持平。
+B1（左下）是"低工具调用、低耗时但成功率欠缺"的典型；
+Ours（左中）以几乎与 B1 持平的工具调用次数（2.94 vs 2.85）和适中的耗时（4.98 s），实现了最高的成功率（91\%），是全图 Pareto 最优点；
+Ours\_full（右上）工具调用次数与耗时均最高，但成功率（85.4\%）反而低于 \texttt{Ours}，说明在 \texttt{qwen-turbo} 下为结构化规划付出的额外开销并未换来性能提升，属于当前基座能力瓶颈下的次优选择。
 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.85\linewidth]{fig_scatter.pdf}
-    \caption{\label{fig:scatter}9 配置在“平均工具调用次数”与“平均端到端耗时”维度上的分布。点的大小正比于成功率。橙色为本文方法。}
+    \caption{\label{fig:scatter}9 配置在"平均工具调用次数"与"平均端到端耗时"维度上的分布。点的大小正比于成功率。橙色为本文方法。}
 \end{figure}
 
-进一步审视 \autoref{tab:main-results} 中“仅在通过用例上”的耗时差异（数据来自 \texttt{summary.md} 的 “Efficiency on passed cases” 表），可得三条额外结论：
-\textbf{第一，\texttt{Ours+RATS} 是最高效的高成功率配置}（平均耗时 9.56 s），适合对延迟敏感的生产场景；
-\textbf{第二，\texttt{Ours+DAG} 平均迭代次数最高}（5.76），因为 DAG 显式 \texttt{Plan + Validate + Execute + Answer} 至少占用 4 轮，但产出的 trajectory 更规整、可追溯；
-\textbf{第三，\texttt{Ours\_full} 与 \texttt{Ours} 端到端耗时几乎持平}（14.68 vs 15.12 s），印证了第三章中“RATS 与 DAGPlanner 在耗时维度上正好互补”的设计预期。
+进一步审视 \autoref{tab:main-results} 中"仅在通过用例上"的耗时差异，可得三条额外结论：
+第一，\texttt{Ours} 是全图成功率-耗时综合最优的配置（91\%，4.69 s），适合对精度和延迟同时有要求的生产场景；
+第二，\texttt{Ours+DAG} 平均迭代次数最高（6.64 次），因为 DAG 显式 \texttt{Plan + Validate + Execute + Answer} 至少占用 4 轮，但产出的执行轨迹结构更规整、依赖关系可追溯；
+第三，\texttt{Ours+RATS} 在通过用例上耗时为 5.73 s，虽然因误剪导致整体成功率与 B1 持平，但其端到端延迟仍低于 \texttt{Ours+DAG} 与 \texttt{Ours\_full}，在工具库扩张到百级规模时，RATS 的上下文压缩价值预计将超过当前的误剪代价。

@@ -1,6 +1,6 @@
 """生成类别 x 配置成功率热力图 fig_heatmap.pdf（论文 Figure 5）。
 
-数据来自 outputs/eval/20260423_103843/summary.md "By category" 表格。
+数据来自 outputs/eval/20260518_120256/summary.md "By category" 表格。
 """
 
 from __future__ import annotations
@@ -17,15 +17,15 @@ import numpy as np
 from _style import CATEGORIES_ORDER, CONFIGS_ORDER, apply_style, out_path
 
 
-# Source: outputs/eval/20260423_103843/summary.md "By category" 表
+# Source: outputs/eval/20260518_120256/summary.md "By category" 表
 # 单位: percentage (0-100)
 RATE_BY_CAT: dict[str, dict[str, float]] = {
     # row = category, col = config
-    "numerical":      {"B0": 89, "B1": 100, "B2": 100, "B3":  89, "B4": 100, "Ours": 100, "Ours+RATS": 100, "Ours+DAG": 100, "Ours_full": 100},
-    "statistics":     {"B0": 80, "B1": 100, "B2":  90, "B3":  90, "B4": 100, "Ours": 100, "Ours+RATS": 100, "Ours+DAG": 100, "Ours_full": 100},
-    "visualization":  {"B0":  0, "B1":  86, "B2":  71, "B3": 100, "B4": 100, "Ours": 100, "Ours+RATS":  86, "Ours+DAG": 100, "Ours_full": 100},
-    "composite":      {"B0": 23, "B1":  82, "B2":  77, "B3":  91, "B4":  86, "Ours": 100, "Ours+RATS":  82, "Ours+DAG":  86, "Ours_full": 100},
-    "error_recovery": {"B0": 83, "B1": 100, "B2":  50, "B3": 100, "B4": 100, "Ours": 100, "Ours+RATS": 100, "Ours+DAG": 100, "Ours_full": 100},
+    "numerical":      {"B0": 87, "B1": 100, "B2": 100, "B3":  93, "B4": 100, "Ours": 100, "Ours+RATS": 100, "Ours+DAG": 100, "Ours_full": 100},
+    "statistics":     {"B0": 69, "B1":  88, "B2":  88, "B3":  75, "B4":  75, "Ours":  81, "Ours+RATS":  81, "Ours+DAG":  69, "Ours_full":  88},
+    "visualization":  {"B0":  0, "B1":  92, "B2":  92, "B3":  92, "B4":  92, "Ours":  92, "Ours+RATS":  92, "Ours+DAG":  92, "Ours_full":  92},
+    "composite":      {"B0": 19, "B1":  69, "B2":  67, "B3":  69, "B4":  75, "Ours":  89, "Ours+RATS":  72, "Ours+DAG":  78, "Ours_full":  75},
+    "error_recovery": {"B0": 90, "B1":  90, "B2":  90, "B3": 100, "B4":  90, "Ours": 100, "Ours+RATS":  90, "Ours+DAG":  90, "Ours_full":  90},
 }
 
 

@@ -1,6 +1,6 @@
 """生成 9 配置主实验柱图 fig_main_bar.pdf（论文 Figure 4）。
 
-数据来自 outputs/eval/20260423_103843/summary.md "Overall" 表格。
+数据来自 outputs/eval/20260518_120256/summary.md "Overall" 表格。
 柱图按 CONFIGS_ORDER 的顺序展示成功率，并对 Ours / Ours_full 用强调色标注。
 """
 
@@ -17,17 +17,17 @@ import matplotlib.pyplot as plt
 from _style import CONFIGS_ORDER, apply_style, out_path
 
 
-# Source: outputs/eval/20260423_103843/summary.md "Overall" 表
+# Source: outputs/eval/20260518_120256/summary.md "Overall" 表
 SUCCESS_RATE: dict[str, float] = {
-    "B0": 48.1,
-    "B1": 90.7,
-    "B2": 79.6,
-    "B3": 92.6,
-    "B4": 94.4,
-    "Ours": 100.0,
-    "Ours+RATS": 90.7,
-    "Ours+DAG": 94.4,
-    "Ours_full": 100.0,
+    "B0": 44.9,
+    "B1": 83.1,
+    "B2": 82.0,
+    "B3": 80.9,
+    "B4": 83.1,
+    "Ours": 91.0,
+    "Ours+RATS": 83.1,
+    "Ours+DAG": 83.1,
+    "Ours_full": 85.4,
 }
 
 # 哪些配置加重强调（橙色）
@@ -61,7 +61,7 @@ def main() -> None:
     ax.set_xlabel("Configuration")
     ax.tick_params(axis="x", rotation=15)
     ax.axhline(100, color="#bbb", linewidth=0.6, linestyle=":")
-    ax.set_title("Success rate over 54 scientific tasks (9 configurations)")
+    ax.set_title("Success rate over 89 scientific tasks (9 configurations)")
 
     fig.tight_layout()
     out = out_path("fig_main_bar.pdf")
