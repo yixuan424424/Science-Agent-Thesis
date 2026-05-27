@@ -1,10 +1,97 @@
 \cleardoublepage
-\chapter{中期检查}
+\chapter{中期报告}
 
 \section{项目概况}
 
+\subsection{研究背景}
+
+近年来，以 GPT 系列、通义千问、文心一言为代表的大语言模型在自然语言理解、逻辑推理、任务规划等方面取得跨越式进展，为人工智能从"感知智能"迈向"决策智能"奠定了基础。在此背景之上，智能体技术成为大模型落地应用的关键方向：通过为大模型赋予工具调用、自主规划、多轮迭代能力，智能体能够突破大模型自身的知识边界，对接外部系统与专业工具，从而完成复杂的现实世界任务。与此同时，AI for Science 被广泛视为加速科学发现、提升科研效率的重要技术手段，科学研究场景下普遍存在大量重复性、流程化的工作，包括数值计算、统计分析、实验数据可视化等，迫切需要智能化、自动化的辅助工具支持。
+
+然而，当前主流的智能体框架与工具调用技术在通用场景中已被广泛验证，却在科学研究这一垂直场景下存在明显的适配性缺陷：其一，缺乏面向科学领域的统一工具抽象规范，不同科研库接口差异极大，集成成本高；其二，对专业科研任务的理解与拆解能力不足，难以将模糊的科研问题拆解为严谨、可执行的工具调用序列；其三，工具调用的容错性与结果可靠性不足，存在参数幻觉、调用逻辑错误、数值精度随意截断等问题，无法满足科研工作的严谨性要求。
+
+\subsection{研究目标}
+
+本研究旨在系统性地研究面向科学场景的大语言模型智能体工具调用优化问题。结合指导教师与盲审专家"应强化核心算法创新、补充关键技术模块算法细节"的指导意见，本课题在开题阶段的工程集成方案基础上，进一步将研究目标聚焦为：提出两个可独立消融、形式化可分析的算法模块，作为本论文的核心贡献点：
+
+\begin{enumerate}
+    \item \textbf{RATS}（Retrieval-Augmented Tool Selection，检索增强工具选择算法）：针对工具库规模增长后 context 膨胀、LLM 选错率上升的问题，设计基于 embedding 语义检索加规则重排的轻量工具选择算法；
+    \item \textbf{DAGPlanner}（结构化 DAG 任务拆解算法）：针对长依赖链科学任务拆解薄弱的问题，设计一种基于有向无环图（DAG）schema 的结构化规划器，通过纯代码校验与错误驱动的重规划实现收敛。
+\end{enumerate}
+
+在此之上，完成一套支撑性的科学计算工具库、科学场景专用 Prompt 工程规则集、以及用于对比验证的评估框架与基准测试集。
+
+\subsection{研究意义}
+
+本研究在算法层面填补了"面向科学场景的轻量工具检索"与"结构化任务拆解"两项空白，弥补了通用智能体框架在科学场景下的适配性缺陷，为科研领域智能体系统的设计提供可参考的实现范式；在应用层面，系统的模块化与可扩展设计使其能够快速迁移至生物信息、材料科学、环境科学等细分科研领域，具备较强的落地潜力。
+
 \section{工作进展情况}
+
+\subsection{基础工程}
+
+\textbf{环境层面：}基于 Python 3.14.4 搭建开发环境，采用 venv 虚拟环境管理依赖；底层 LLM 选用通义千问 \texttt{qwen-plus-latest} 与 \texttt{qwen-turbo-latest}，涉及 embedding 时使用 \texttt{text-embedding-v3}；数值计算基于 NumPy 2.4、SciPy 1.17，绘图基于 Matplotlib 3.10。
+
+\textbf{工具库层面：}已完成 12 个工具的封装，统一继承 \texttt{BaseTool} 抽象基类，统一返回 \texttt{ToolResult(success, data, error, message)} 数据结构；为支持 LLM 传入字符串数学表达式的场景（如数值积分、方程求解），还实现了基于 AST 白名单的安全表达式求值模块。
+
+\textbf{测试层面：}已编写 45 个工具级单元测试（数值 18 + 统计 17 + 可视化 10），全部通过。
+
+\textbf{Agent 层面：}手写实现了 \texttt{ReActAgent} 主循环，采用 OpenAI Function Calling 协议加显式中文 Thought 的组合模式，并对 LLM 客户端做了超时控制与指数退避重试。
+
+\subsection{Prompt 工程优化}
+
+针对科学场景下的典型失败模式，经过多轮实验与 case 级轨迹分析，提炼出 4 条 Prompt 规则：
+
+\begin{itemize}
+    \item \textbf{O1 结果合理性检查：}拟合 $R^2$ 超出 $[0,1]$、参数量级失配、返回值含 NaN/Inf 视为异常，必须切换方法；
+    \item \textbf{O2 数值计算规范：}3 个以上样本的统计量必须通过工具计算，禁止心算；
+    \item \textbf{O3 开场规划模板：}3 步以上任务第一轮必须写 \texttt{Plan:} 并逐步执行；
+    \item \textbf{O4 Few-shot 示例注入：}在 \texttt{SYSTEM\_PROMPT} 末尾追加典型轨迹示例。
+\end{itemize}
+
+在原 46 题测试集上，Prompt 优化前后基线（v3 $\to$ v4）的对比实验显示：Ours 配置成功率从 93.5\% 提升至 97.8\%，同时工具调用次数相对 B1 基线减少约 8.8\%，证明该组规则对科学场景具有针对性收益。
+
+\subsection{算法深化}
+
+\textbf{RATS 算法模块：}实现于 \texttt{src/tool\_selector/}，包含三个核心组件 —— Embedder（封装阿里云 OpenAIEmbedder，另提供 HashEmbedder 作为离线 fallback）、EmbeddingCache（按 \texttt{tool\_name::desc\_hash::model\_id} 组织持久化缓存）、\texttt{RATS.retrieve()}（执行离线预计算、在线 top-K 检索与规则重排三阶段）。重排综合考虑 embedding 相似度（权重 0.6）、参数重叠度（0.2）、历史成功率（0.2）三项特征，并设置 $K_{\min}=3$ 作为保底机制。该模块通过 9 个单元测试全部绿灯。
+
+\textbf{DAGPlanner 算法模块：}实现于 \texttt{src/agent/dag\_planner.py} 与 \texttt{src/agent/dag\_agent.py}。核心设计包括：一套可纯代码校验的 Plan Schema，每个步骤含 \texttt{id}、\texttt{goal}、\texttt{tool}、\texttt{args\_template}（支持 \texttt{\$\{sX.field\}} 占位符）、\texttt{depends\_on} 字段；一个 PlanValidator 覆盖 5 类失败模式——JSON Schema 不符、工具名不在候选集、依赖图有环、依赖变量未声明、占位符不在 \texttt{depends\_on} 中；一个四阶段主循环 Plan $\to$ Validate $\to$ Execute $\to$ Answer，其中 Validate 阶段完全不调用 LLM，仅在失败时带诊断信息触发重规划（最多 3 次），3 次仍失败则降级到 ReActAgent 作为 safety net。该模块通过 5 类失败模式单测全部绿灯。
+
+\textbf{新基线与测试集扩展：}实现 \texttt{src/agent/new\_baselines.py}，其中包含 CoT（追加"think step by step"指示）、Plan-and-Solve（两阶段 LLM 调用，先自然语言 plan 再 ReAct 执行）、Reflexion（失败后生成反思追加到下一轮 system message）三个业界常用基线。测试集由 46 题扩展至 54 题，新增 8 道定向 hard 题，其中 4 道压 RATS 的工具区分力、4 道压 DAGPlanner 的多步依赖。
+
+\subsection{测试结果}
+
+对 9 配置 $\times$ 54 题共 486 次 run 的全量评测（总耗时约 77 分钟）结果如表~\ref{tab:midcheck-results} 所示。
+
+\begin{table}[htbp]
+    \centering
+    \caption{各配置全量评测结果（54 题）}
+    \label{tab:midcheck-results}
+    \begin{tabular}{lcccc}
+        \toprule
+        配置 & 成功率 & 平均迭代 & 平均工具调用 & 平均耗时（秒） \\
+        \midrule
+        B0（无工具）         & 48.1\%  & 1.00 & 0.00 & 9.04  \\
+        B1（minimal + 工具） & 90.7\%  & 3.00 & 2.65 & 5.35  \\
+        B2（CoT）            & 79.6\%  & 2.93 & 2.20 & 5.23  \\
+        B3（Plan-and-Solve） & 92.6\%  & 4.07 & 3.76 & 8.07  \\
+        B4（Reflexion）      & 94.4\%  & 3.02 & 2.67 & 7.07  \\
+        Ours（v4 prompt）    & 100.0\% & 3.46 & 2.46 & 15.12 \\
+        Ours + RATS          & 90.7\%  & 3.44 & 2.46 & 9.69  \\
+        Ours + DAG           & 94.4\%  & 5.94 & 4.96 & 11.17 \\
+        Ours\_full           & 100.0\% & 5.89 & 4.89 & 14.68 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+主力方案 Ours 与 Ours\_full 在本测试集上均达到 100\% 成功率，相比朴素 ReAct 基线 B1 提升 10.3 个百分点，相比业界最强基线 Reflexion 提升 5.6 个百分点，达到预期目标。值得注意的是，B2 CoT 相比 B1 反而下降 11.1 个百分点，分析发现其冗长的中间推理文本更容易触发 LLM function.arguments 的 JSON 解析错误。RATS 单独接入时的效果是典型的效率换精度，在当前 12 工具规模下平均耗时降低约 36\%，成功率相应损失 9.3 个百分点，该权衡在工具库扩展到百级规模时将反转为 RATS 的优势。
 
 \section{问题与建议}
 
+自建科学任务集虽已较开题阶段的设想明显扩充，但相对公开大规模 agent 基准仍属中小规模，外部可推广性需要更谨慎地表述。此前曾评估将 ScienceAgentBench、BFCL、GAIA 等公开数据纳入对比，因接口对齐与任务定义差异带来的工程成本较高而暂缓，当前以定向压力题补强弱项属于务实折中，但也会在论文中作为方法适用边界加以说明，并在条件允许时探索引入体量可控的公开子集以增强对照说服力。
+
+主力实验依托同一供应商的 LLM 与 embedding，虽然便于统一鉴权与复现实验，但也意味着跨厂商、跨版本、跨模态的泛化结论仍不充分。RATS 与 DAGPlanner 在更强或更弱的基座模型上是否保持同样的相对优势，需要额外实验才能支撑，而这受到 API 成本与工程时间的现实约束。与此同时，科学工具库目前覆盖数值、统计与可视化三类高频能力，RATS 在"百级工具库"场景下的收益论证仍主要依赖外推，尚缺乏同口径的大规模工具库压力测试。
+
+以上问题并不否定当前工程与实验产出的可复现性，但要求论文在贡献陈述上更加克制，在局限性与未来工作中写得更具体，也更能回应开题阶段导师与专家关于"技术深度与评估充分性"的关切。
+
 \section{其他}
+
+针对开题报告考核中，导师与盲审专家提出的"技术深度不足"等问题，着重加强了算法深化，主要体现在引入 RATS 与 DAGPlanner 算法模块，以提升最终效果。

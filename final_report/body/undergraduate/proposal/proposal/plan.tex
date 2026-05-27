@@ -2,4 +2,94 @@
 
 \subsection{进度安排}
 
+本研究整体周期为 16 周。具体进度安排如表~\ref{tab:proposal-schedule} 所示。
+
+\begin{table}[htbp]
+    \centering
+    \caption{研究进度安排表}
+    \label{tab:proposal-schedule}
+    \begin{tabular}{clll}
+        \toprule
+        阶段 & 时间周期 & 工作内容 & 预期结果 \\
+        \midrule
+        1 & 第 1--2 周
+          & \begin{minipage}[t]{0.32\textwidth}
+              完成文献调研与选题论证，确定技术路线与研究边界，
+              完成开题报告的撰写、修改与提交
+            \end{minipage}
+          & \begin{minipage}[t]{0.22\textwidth}
+              开题报告终稿、文献调研清单
+            \end{minipage} \\[2ex]
+        2 & 第 3--4 周
+          & \begin{minipage}[t]{0.32\textwidth}
+              完成科学工具抽象基类设计，完成核心科研工具的封装与单元测试，
+              完成工具库整体联调
+            \end{minipage}
+          & \begin{minipage}[t]{0.22\textwidth}
+              科学工具库代码、单元测试报告
+            \end{minipage} \\[2ex]
+        3 & 第 5--6 周
+          & \begin{minipage}[t]{0.32\textwidth}
+              完成科学任务拆解 Prompt 模板设计，实现任务拆解模块的开发，
+              完成模块调试与准确率优化
+            \end{minipage}
+          & \begin{minipage}[t]{0.22\textwidth}
+              Prompt 模板集、任务拆解模块代码、模块测试报告
+            \end{minipage} \\[2ex]
+        4 & 第 7--8 周
+          & \begin{minipage}[t]{0.32\textwidth}
+              完成动态工具选择、数据流管理、异常重试、结果校验模块的
+              开发与测试，完成各核心优化模块的联调
+            \end{minipage}
+          & \begin{minipage}[t]{0.22\textwidth}
+              核心优化模块代码、模块功能测试报告
+            \end{minipage} \\[2ex]
+        5 & 第 9--10 周
+          & \begin{minipage}[t]{0.32\textwidth}
+              完成全系统的集成与联调，构建科学任务测试数据集，
+              进行对比实验，整理实验数据与分析结果
+            \end{minipage}
+          & \begin{minipage}[t]{0.22\textwidth}
+              系统原型、测试数据集、对比实验报告
+            \end{minipage} \\[2ex]
+        6 & 第 11--12 周
+          & \begin{minipage}[t]{0.32\textwidth}
+              完成科研场景下的验证测试，优化系统可用性，
+              按照学校论文规范，撰写毕业论文初稿
+            \end{minipage}
+          & \begin{minipage}[t]{0.22\textwidth}
+              优化后的系统原型、毕业论文初稿
+            \end{minipage} \\[2ex]
+        7 & 第 13--14 周
+          & \begin{minipage}[t]{0.32\textwidth}
+              根据导师意见修改毕业论文，同步优化系统与实验内容，
+              并继续修改撰写毕业论文
+            \end{minipage}
+          & \begin{minipage}[t]{0.22\textwidth}
+              论文修改稿、完善后的系统与实验材料、查重报告
+            \end{minipage} \\[2ex]
+        8 & 第 15--16 周
+          & \begin{minipage}[t]{0.32\textwidth}
+              完成毕业论文终稿定稿，整理所有毕设材料，
+              制作答辩 PPT，准备答辩
+            \end{minipage}
+          & \begin{minipage}[t]{0.22\textwidth}
+              论文终稿、完整毕设材料、答辩 PPT
+            \end{minipage} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
 \subsection{预期目标}
+
+完成一套面向科学场景的标准化工具抽象框架，封装不少于 12 个高频科研工具，覆盖数值计算、统计分析、数据可视化三大类别，形成可扩展的科学工具库，并确保所有工具均通过单元测试，可稳定执行。
+
+设计完成适配科学任务的 Prompt 模板集\cite{wang2023plansolve}，实现复杂科研任务的层级化拆解，任务拆解逻辑准确率不低于 85\%，能够匹配对应的工具调用步骤。
+
+完成工具调用优化与容错校验机制的开发，对比原生 GPT-4 直接调用模式\cite{openai2023gpt4}，系统的工具调用整体成功率提升至 90\% 以上，任务平均执行步数减少 20\% 以上，具备完善的异常处理与结果校验能力。
+
+完成面向科学场景的智能体工具调用优化系统原型开发，实现科研需求输入到结果输出的全流程自动化运行，在 3--5 个真实基础科研场景中完成可用性验证。
+
+形成完整的毕设材料，包括系统源代码、使用说明文档、开发文档、测试数据集、实验报告等，具备可复现性。
+
+完成毕业论文，内容完整、逻辑严谨、数据详实。

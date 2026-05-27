@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (MiKTeX 25.12) (preloaded format=xelatex 2026.5.9)  18 MAY 2026 18:55
+This is XeTeX, Version 3.141592653-2.6-0.999997 (MiKTeX 25.12) (preloaded format=xelatex 2026.5.9)  27 MAY 2026 19:04
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1701,9 +1701,20 @@ File: figure/logo/zju.pdf Graphic file (type pdf)
 
 ] (page/undergraduate/final/previous.tex
 (page/undergraduate/final/promise.tex
-Overfull \hbox (0.29987pt too wide) in paragraph at lines 11--12
-\TU/FangSong(0)/m/n/14.05249 文 中 不 包 含 其 他 人 已 经 发 表 或 撰 写 过 的 研 究 成 果，|  也 不 包
- 含 为 获 得|   []或
+Overfull \hbox (2.38579pt too wide) in paragraph at lines 26--27
+[]\TU/FangSong(0)/m/n/14.05249 本 人 完 全 了 解|   []有 权 保 留 并 向 国 家 有 关 部 门 或 机 构 送
+ 交 本 论 文  |（设
+ []
+
+
+Overfull \hbox (3.70322pt too wide) in paragraph at lines 26--27
+\TU/FangSong(0)/m/n/14.05249 计）|  的 复 印 件 和 电 子 版，|  允 许 本 论 文  |（设 计）|  被 查 阅 
+和 借 阅。|  本 人 授 权|   []可
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 28--29
+
  []
 
 ) (body/undergraduate/final/acknowledgement.tex [1] [2
@@ -2082,8 +2093,32 @@ Overfull \hbox (23.7972pt too wide) in paragraph at lines 304--306
 ) (body/undergraduate/final/4-cv.tex [47] [48])) [49
 
 
+] [50
+
 ]
-(C:\Users\EDY\Desktop\Final_Project\final_report\out\zjuthesis.aux)
+(page/undergraduate/final/post.tex (page/undergraduate/final/job.tex
+Underfull \hbox (badness 10000) in paragraph at lines 37--38
+
+ []
+
+) (page/undergraduate/final/eval.tex [51
+
+
+] [52
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 6--7
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 13--14
+
+ []
+
+)) [53
+
+] (C:\Users\EDY\Desktop\Final_Project\final_report\out\zjuthesis.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2022/08/05>
@@ -2097,13 +2132,13 @@ Package logreq Info: Writing requests to 'zjuthesis.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 35675 strings out of 402986
- 804133 string characters out of 5448918
- 1769555 words of memory out of 5000000
- 63839 multiletter control sequences out of 15000+600000
+ 35727 strings out of 402986
+ 806793 string characters out of 5448918
+ 1769571 words of memory out of 5000000
+ 63883 multiletter control sequences out of 15000+600000
  658547 words of font info for 198 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 107i,14n,125p,1222b,5678s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 107i,17n,125p,1222b,5678s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 Output written on C:\Users\EDY\Desktop\Final_Project\final_report\out\zjuthesis
-.pdf (63 pages).
+.pdf (67 pages).

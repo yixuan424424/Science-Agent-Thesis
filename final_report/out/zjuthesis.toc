@@ -89,3 +89,5 @@
 \contentsline {subsubsection}{\numberline {B.4}O4: Few-shot 示例注入}{47}{subsubsection.1.0.9.2.4}%
 \contentsline {subsection}{\numberline {C}ext 压力测试用例清单}{47}{subsection.1.0.9.3}%
 \contentsline {section}{作者简历}{49}{section*.28}%
+\contentsline {section}{本科生毕业论文（设计）任务书}{51}{section*.29}%
+\contentsline {section}{本科生毕业论文（设计）考核}{53}{section*.30}%
