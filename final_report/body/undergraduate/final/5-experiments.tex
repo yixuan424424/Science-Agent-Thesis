@@ -1,10 +1,10 @@
-\cleardoublepage
+\clearpage
 
 \section{实验}
 
 本章在 \autoref{eq:eval-criteria} 给出的三维判分定义之下，从主实验、按类别细分、消融研究、效率分析四个角度对本文方法进行实证评估。
-所有数字均可在 \texttt{outputs/eval/20260518\_120256/} 目录下的 \texttt{results.json} 与 \texttt{summary.md} 中追溯到原始落盘数据，
-对应的复现命令为 \texttt{python scripts/run\_eval.py --configs b0 b1 b2 b3 b4 ours ours\_rats ours\_dag ours\_full}。
+所有数字均可在 \texttt{outputs/\allowbreak eval/\allowbreak 20260518\_120256/} 目录下的 \texttt{results.json} 与 \texttt{summary.md} 中追溯到原始落盘数据，
+对应的复现命令为 \texttt{python scripts/\allowbreak run\_eval.py --configs b0 b1 b2 b3 b4 ours ours\_rats ours\_dag ours\_full}。
 
 \subsection{实验设置}\label{sec:exp-setup}
 
@@ -22,7 +22,7 @@ DAGPlanner 的硬上限设为最大重规划次数 $R=3$、单步最大参数修
 使整体难度分布向高难度倾斜（hard 占 46\%，vhard 占 6\%），以更严格地压测各方法在复杂场景下的表现。
 全部用例以 JSON 形式定义于 \texttt{tests/data/test\_cases.json}，附录 C 给出扩展压力题的完整清单。
 
-\begin{table}[ht]
+\begin{table}[htbp]
     \centering
     \caption{\label{tab:cases-dist}测试集按类别 $\times$ 难度的题量分布（共 89 题）}
     \begin{tabular}{lccccc}
@@ -43,7 +43,7 @@ DAGPlanner 的硬上限设为最大重规划次数 $R=3$、单步最大参数修
 此外，B0 的判分仅看数值正确性，其余 8 个配置均按完整三维判分。
 评测规模为 $9$ 配置 $\times 89$ 题 $= 801$ 次 run，全程同口径运行，总耗时约 101 分钟。
 
-\begin{table}[ht]
+\begin{table}[htbp]
     \centering
     \caption{\label{tab:configs}9 个对比配置的关键差异（v4 prompt 表示 4 条 O1--O4 规则共同启用）}
     \begin{tabularx}{\linewidth}{clX}
@@ -73,7 +73,7 @@ DAGPlanner 的硬上限设为最大重规划次数 $R=3$、单步最大参数修
 本文 \texttt{Ours} 在 89 题测试集上达到 91.0\% 成功率，
 相比朴素 ReAct 基线 B1 提升 7.9 个百分点，相比业界最强基线 B4 Reflexion 提升同样的 7.9 个百分点，验证了第三章对方法有效性的预期目标。
 
-\begin{table}[ht]
+\begin{table}[htbp]
     \centering
     \caption{\label{tab:main-results}9 配置在 89 题全量测试集上的主实验结果}
     \begin{tabularx}{\linewidth}{l>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
@@ -114,7 +114,7 @@ DAGPlanner 在执行期捕获 RATS 误剪导致的工具不可用错误并触发
 
 \autoref{tab:by-category} 给出按 5 大类别细分的成功率，\autoref{fig:heatmap} 以热力图形式可视化同一组数据。
 
-\begin{table}[ht]
+\begin{table}[htbp]
     \centering
     \caption{\label{tab:by-category}按类别细分的成功率（每格为本类别下 "通过题数 / 该类别总题数"）}
     \scriptsize
@@ -154,7 +154,7 @@ DAGPlanner 在执行期捕获 RATS 误剪导致的工具不可用错误并触发
 
 为量化 v4 prompt、RATS、DAGPlanner 三个独立组件各自的贡献，\autoref{tab:ablation} 给出以 \texttt{Ours} 为基准、依次加入或替换单个组件的成功率与效率变化。
 
-\begin{table}[ht]
+\begin{table}[htbp]
     \centering
     \caption{\label{tab:ablation}相对 \texttt{Ours} 的单一组件变化消融。$\Delta$ 列以百分比为单位，正负号表示相对 \texttt{Ours} 的提升/下降}
     \begin{tabularx}{\linewidth}{l>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}

@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (MiKTeX 25.12) (preloaded format=xelatex 2026.5.9)  27 MAY 2026 19:04
+This is XeTeX, Version 3.141592653-2.6-0.999997 (MiKTeX 25.12) (preloaded format=xelatex 2026.5.9)  28 MAY 2026 09:43
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -26,7 +26,7 @@ Package: ltxcmds 2023-12-04 v1.26 LaTeX kernel commands for general use (HO)
 Package: kvsetkeys 2022-10-05 v1.19 Key value parser (HO)
 ))
 Degree: {undergraduate}
-MajorFormat: {general}
+MajorFormat: {cs}
 Type: {design}
 Period: {final}
 BlindReview: {false}
@@ -1381,7 +1381,8 @@ LaTeX Info: Redefining \hbar on input line 50.
 )
 (config/path.tex) (config/commands.tex) (config/format/format.tex
 (config/format/general/reference.tex) (config/format/general/caption.tex)
-(config/format/general/geometry.tex) (config/format/general/layout.tex
+(config/format/general/geometry.tex) (config/format/major/cs/geometry.tex)
+(config/format/general/layout.tex
 \cftbeforealgotocloftskip=\skip154
 \cftalgotocloftindent=\skip155
 \cftalgotocloftnumwidth=\skip156
@@ -1389,8 +1390,9 @@ LaTeX Info: Redefining \hbar on input line 50.
 \cftafterloatitleskip=\skip158
 \c@blankpages=\count525
 \c@actualpage=\count526
-)
-(config/format/general/tables.tex) (config/format/general/heading.tex)
+) (config/format/major/cs/layout.tex)
+(config/format/general/tables.tex) (config/format/major/cs/tables.tex)
+(config/format/general/heading.tex) (config/format/major/cs/heading.tex)
 (config/format/general/fonts.tex
 
 Package xeCJK Warning: Redefining CJKfamily `zhfs' (FangSong).
@@ -1475,8 +1477,16 @@ ext;"
 (fontspec)             Roman/BI/OT:script=latn;language=dflt;+smcp;mapping=tex-
 text;"
 
-) (config/format/general/numbering.tex) (config/format/general/debugging.tex)
-(config/format/general/language.tex) (config/format/general/title.tex)))
+) (config/format/major/cs/fonts.tex) (config/format/general/numbering.tex)
+(config/format/major/cs/numbering.tex) (config/format/general/debugging.tex)
+(config/format/general/language.tex) (config/format/major/cs/code.tex
+(C:\Users\EDY\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
+File: lstlang1.sty 2025/11/14 1.11b listings language file
+)
+(C:\Users\EDY\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstmisc.sty
+File: lstmisc.sty 2025/11/14 1.11b (Carsten Heinz)
+))
+(config/format/general/title.tex)))
 \@quotelevel=\count527
 \@quotereset=\count528
 Package translations Info: No language package found. I am going to use `englis
@@ -1514,15 +1524,15 @@ LaTeX Font Info:    ... okay on input line 171.
 * layout: <same size as paper>
 * layoutoffset:(h,v)=(0.0pt,0.0pt)
 * modes: includehead includefoot twoside 
-* h-part:(L,W,R)=(71.13188pt, 469.47049pt, 56.9055pt)
-* v-part:(T,H,B)=(71.13188pt, 717.00946pt, 56.9055pt)
+* h-part:(L,W,R)=(90.47955pt, 416.54877pt, 90.47955pt)
+* v-part:(T,H,B)=(72.2698pt, 700.50723pt, 72.2698pt)
 * \paperwidth=597.50787pt
 * \paperheight=845.04684pt
-* \textwidth=469.47049pt
-* \textheight=663.62837pt
-* \oddsidemargin=-1.1381pt
-* \evensidemargin=-15.36449pt
-* \topmargin=-1.1381pt
+* \textwidth=416.54877pt
+* \textheight=647.12614pt
+* \oddsidemargin=18.20956pt
+* \evensidemargin=18.20956pt
+* \topmargin=-0.00018pt
 * \headheight=12.0pt
 * \headsep=11.38109pt
 * \topskip=12.0pt
@@ -1701,20 +1711,13 @@ File: figure/logo/zju.pdf Graphic file (type pdf)
 
 ] (page/undergraduate/final/previous.tex
 (page/undergraduate/final/promise.tex
-Overfull \hbox (2.38579pt too wide) in paragraph at lines 26--27
-[]\TU/FangSong(0)/m/n/14.05249 本 人 完 全 了 解|   []有 权 保 留 并 向 国 家 有 关 部 门 或 机 构 送
- 交 本 论 文  |（设
- []
-
-
-Overfull \hbox (3.70322pt too wide) in paragraph at lines 26--27
-\TU/FangSong(0)/m/n/14.05249 计）|  的 复 印 件 和 电 子 版，|  允 许 本 论 文  |（设 计）|  被 查 阅 
-和 借 阅。|  本 人 授 权|   []可
- []
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 28--29
 
+ []
+
+
+Overfull \hbox (9.69267pt too wide) in paragraph at lines 30--33
+\TU/FangSong(0)/m/n/14.05249 毕 业 论 文  |（设 计）|  作 者 签 名：| [] 导 师 签 名：| [] 
  []
 
 ) (body/undergraduate/final/acknowledgement.tex [1] [2
@@ -1725,60 +1728,103 @@ Underfull \hbox (badness 10000) in paragraph at lines 28--29
 ] [5] [6
 
 ]
-Overfull \hbox (12.0504pt too wide) in paragraph at lines 36--38
-\TU/TimesNewRoman(0)/m/n/12.045 egories (numerical, statistical, visualization,
- composite, error-recovery) and designs a 9-configuration
+Overfull \hbox (4.21855pt too wide) in paragraph at lines 36--38
+\TU/TimesNewRoman(0)/m/n/12.045 designs a 9-configuration comparison-and-ablati
+on framework that includes three widely
  []
 
-)) (page/undergraduate/final/toc.tex [7] [8]
-(C:\Users\EDY\Desktop\Final_Project\final_report\out\zjuthesis.toc
-Underfull \vbox (badness 1360) has occurred while \output is active []
-
- [1
+[7])) (page/undergraduate/final/toc.tex [8]
+(C:\Users\EDY\Desktop\Final_Project\final_report\out\zjuthesis.toc [1
 
 ])
 \tf@toc=\write4
 \openout4 = `zjuthesis.toc'.
 
 
-[2]) (page/undergraduate/final/cover-part.tex [1
+[2]) (body/undergraduate/final/content.tex
+(body/undergraduate/final/1-introduction.tex
+Underfull \vbox (badness 2073) has occurred while \output is active []
+
+ [1
 
 
 
 
-] [2])
-(body/undergraduate/final/content.tex
-(body/undergraduate/final/1-introduction.tex [1
+]
+[2] [3]) (body/undergraduate/final/2-related-work.tex [4] [5
+
+] [6] [7])
+(body/undergraduate/final/3-algorithm.tex [8]
+Overfull \hbox (19.18811pt too wide) in paragraph at lines 15--19
+[]\TU/FangSong(0)/m/n/12.045 设 智 能 体 可 访 问 的 工 具 库 为 $\OMS/ztmcm/m/n/12.045 P \
+OT1/ztmcm/m/n/12.045 = \OMS/ztmcm/m/n/12.045 f\OML/ztmcm/m/it/12.045 t[]; t[]; 
+[] ; t[]\OMS/ztmcm/m/n/12.045 g$\TU/FangSong(0)/m/n/12.045 ，|  每 个 工 具 $\OML/zt
+mcm/m/it/12.045 t[]$ \TU/FangSong(0)/m/n/12.045 由 四 元 组 $\OT1/ztmcm/m/n/12.045 
+(\OML/ztmcm/m/it/12.045 n[]; d[]; \OT1/ztmcm/m/n/12.045 ^^B[]\OML/ztmcm/m/it/12
+.045 ; f[]\OT1/ztmcm/m/n/12.045 )$
+ []
 
 
-] [2] [3])
-(body/undergraduate/final/2-related-work.tex [4] [5
+Overfull \hbox (26.70804pt too wide) in paragraph at lines 40--46
+[]\TU/FangSong(0)/m/n/12.045 朴 素 \TU/TimesNewRoman(0)/m/n/12.045 ReAct \TU/Fang
+Song(0)/m/n/12.045 主 循 环$[]$采 用 单 层 策 略 $\OML/ztmcm/m/it/12.045 ^^Y[]$\TU/FangS
+ong(0)/m/n/12.045 ，|  每 一 轮 都 把 全 部 工 具 描 述 $\OMS/ztmcm/m/n/12.045 f\OT1/ztmcm/
+m/n/12.045 (\OML/ztmcm/m/it/12.045 n[]; d[]; \OT1/ztmcm/m/n/12.045 ^^B[])\OMS/z
+tmcm/m/n/12.045 g[]$
+ []
 
-] [6])
-(body/undergraduate/final/3-algorithm.tex [7] [8
+[9
 
-] [9]
+] [10]
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
 put line 78.
 
 
-LaTeX Warning: Float too large for page by 7.66495pt on input line 110.
+LaTeX Warning: Float too large for page by 47.6549pt on input line 110.
 
-[10] [11]
-Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
-nput line 164.
- [12]
+
+Overfull \hbox (33.9298pt too wide) in paragraph at lines 112--116
+[]\TU/FangSong(0)/m/n/12.045 工 具 检 索 文 本 的 构 造 细 节 值 得 说 明。|  对 每 个 工 具，|  本 文 
+按 \TU/lmtt/m/n/12.045 name\TU/FangSong(0)/m/n/12.045 、| \TU/lmtt/m/n/12.045 nam
+e.replace("_",
+ []
+
+
+Overfull \hbox (9.59953pt too wide) in paragraph at lines 128--132
+\TU/FangSong(0)/m/n/12.045 号；|  参 数 重 叠 度 对 功 能 高 度 相 近 的 工 具  |（如 \TU/lmtt/m/n
+/12.045 curve_fitting \TU/FangSong(0)/m/n/12.045 与 \TU/lmtt/m/n/12.045 linear_r
+egression\TU/FangSong(0)/m/n/12.045 ）|
+ []
+
+[11]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [13]
+ [12]
+Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
+nput line 164.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 164.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <5> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 164.
 
-LaTeX Warning: Float too large for page by 221.18654pt on input line 247.
+Underfull \vbox (badness 3690) has occurred while \output is active []
+
+ [13]
+Overfull \hbox (31.34734pt too wide) in paragraph at lines 193--197
+[]\TU/FangSong(0)/m/n/12.045 占 位 符 语 法 支 持 [][]\TU/lmtt/m/n/12.045 ${sX}[] |\TU
+/FangSong(0)/m/n/12.045 （引 用 步 骤 $\OML/ztmcm/m/it/12.045 sX$ \TU/FangSong(0)/m/
+n/12.045 的 完 整 \TU/lmtt/m/n/12.045 data \TU/FangSong(0)/m/n/12.045 对 象）|  与 [][
+]\TU/lmtt/m/n/12.045 ${sX.field.subfield}[]
+ []
+
+
+LaTeX Warning: Float too large for page by 261.1765pt on input line 247.
 
 
 LaTeX Warning: \verb may be unreliable inside tabularx on input line 265.
 
 
-Underfull \vbox (badness 6893) has occurred while \output is active []
+Underfull \vbox (badness 3657) has occurred while \output is active []
 
  [14]
 [15]
@@ -1786,38 +1832,122 @@ File: figure/fig_arch.pdf Graphic file (type pdf)
 <use figure/fig_arch.pdf>
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10.53937> not available
 (Font)              Font shape `TU/lmtt/b/n' tried instead on input line 298.
-) (body/undergraduate/final/4-implementation.tex [16] [17] [18]
-Overfull \hbox (52.24258pt too wide) in paragraph at lines 16--21
-[]\TU/FangSong(0)/m/n/12.045 所 有 工 具 都 继 承 自 抽 象 基 类 \TU/lmtt/m/n/12.045 BaseTo
-ol\TU/FangSong(0)/m/n/12.045 ，|  实 现 规 范 化 的 元 信 息 属 性 \TU/lmtt/m/n/12.045 name
-\TU/TimesNewRoman(0)/m/n/12.045 /\TU/lmtt/m/n/12.045 description\TU/TimesNewRom
-an(0)/m/n/12.045 /\TU/lmtt/m/n/12.045 parameters
+) (body/undergraduate/final/4-implementation.tex [16] [17] [18] [19]
+Overfull \hbox (1.39302pt too wide) in paragraph at lines 16--21
+\TU/lmtt/m/n/12.045 error, message)\TU/FangSong(0)/m/n/12.045 。| \TU/lmtt/m/n/1
+2.045 to_openai_schema() \TU/FangSong(0)/m/n/12.045 方 法 负 责 将 \TU/TimesNewRoman
+(0)/m/n/12.045 Python \TU/FangSong(0)/m/n/12.045 端 的 \TU/lmtt/m/n/12.045 ToolPa
+rameter
  []
 
-(C:\Users\EDY\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
-File: lstlang1.sty 2025/11/14 1.11b listings language file
-)
-[19
+[20
 
 ]
-Underfull \hbox (badness 1005) in paragraph at lines 136--136
-[]|\TU/SimSun(1)/m/n/12.045 多 模 型 曲 线 拟 合  |（线
+Underfull \hbox (badness 10000) in paragraph at lines 136--136
+[]|\TU/TimesNewRoman(0)/m/n/10.53937 result, determinant,
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 136--136
-[]|\TU/TimesNewRoman(0)/m/n/10.53937 t_statistic, p_value, re-
+[]|\TU/TimesNewRoman(0)/m/n/10.53937 integral, abso-
+ []
+
+
+Underfull \hbox (badness 8189) in paragraph at lines 136--136
+|\TU/SimSun(1)/m/n/12.045 （线 性\TU/TimesNewRoman(0)/m/n/12.045 /\TU/SimSun(1)/m/
+n/12.045 多 项 式\TU/TimesNewRoman(0)/m/n/12.045 /\TU/SimSun(1)/m/n/12.045 指
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 136--136
+[]|\TU/TimesNewRoman(0)/m/n/10.53937 params, r_squared,
+ []
+
+
+Underfull \hbox (badness 5637) in paragraph at lines 136--136
+[]|\TU/TimesNewRoman(0)/m/n/10.53937 mean, median, std,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 136--136
+[]|\TU/TimesNewRoman(0)/m/n/10.53937 t_statistic, p_value,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 136--136
+[]|\TU/TimesNewRoman(0)/m/n/10.53937 slope, intercept,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 136--136
+[]|\TU/TimesNewRoman(0)/m/n/12.045 Pearson/Spearman
+ []
+
+
+Underfull \hbox (badness 2856) in paragraph at lines 136--136
 []|\TU/TimesNewRoman(0)/m/n/10.53937 correlation, p_value,
  []
 
-[20]
+
+Underfull \hbox (badness 10000) in paragraph at lines 136--136
+[]|\TU/TimesNewRoman(0)/m/n/10.53937 file_path,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 136--136
+[]|\TU/TimesNewRoman(0)/m/n/10.53937 file_path,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 136--136
+[]|\TU/TimesNewRoman(0)/m/n/10.53937 file_path,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 136--136
+[]|\TU/TimesNewRoman(0)/m/n/10.53937 file_path,
+ []
+
+
+Overfull \hbox (26.92645pt too wide) in paragraph at lines 141--144
+\TU/TimesNewRoman(0)/m/n/12.045 LLM \TU/FangSong(0)/m/n/12.045 输 出 表 达 式 的 轻 量 
+规 范 化，|  使 \TU/TimesNewRoman(0)/m/n/12.045 DAGPlanner \TU/FangSong(0)/m/n/12.04
+5 中 形 如 [][]\TU/lmtt/m/n/12.045 "x**2 - ${s1.determinant}"
+ []
+
+[21] [22]
 Underfull \hbox (badness 10000) in paragraph at lines 166--166
 []|\TU/SimSun(1)/m/n/12.045 主 循 环 替 换 为 \TU/TimesNewRoman(0)/m/n/12.045 Plan-Va
-lidate-Execute-
+lidate-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 166--166
+\TU/TimesNewRoman(0)/m/n/12.045 Execute-Answer \TU/SimSun(1)/m/n/12.045 四 阶 段  
+|（[]算
+ []
+
+
+Overfull \hbox (5.4735pt too wide) in paragraph at lines 171--176
+\TU/FangSong(0)/m/n/12.045 的 最 终 结 果，|  含 \TU/lmtt/m/n/12.045 final_answer\TU/F
+angSong(0)/m/n/12.045 、| \TU/lmtt/m/n/12.045 trajectory\TU/FangSong(0)/m/n/12.0
+45 、| \TU/lmtt/m/n/12.045 iterations_used\TU/FangSong(0)/m/n/12.045 、| \TU/lmtt
+/m/n/12.045 stopped_reason\TU/FangSong(0)/m/n/12.045 ） ，|
+ []
+
+
+Overfull \hbox (16.63647pt too wide) in paragraph at lines 171--176
+\TU/FangSong(0)/m/n/12.045 以 及 \TU/TimesNewRoman(0)/m/n/12.045 OpenAI \TU/FangS
+ong(0)/m/n/12.045 兼 容 消 息 格 式 的 轻 量 序 列 化。|  所 有 \TU/TimesNewRoman(0)/m/n/12.04
+5 Agent \TU/FangSong(0)/m/n/12.045 都 向 上 统 一 返 回 \TU/lmtt/m/n/12.045 AgentResul
+t\TU/FangSong(0)/m/n/12.045 ，|
+ []
+
+[23]
+Overfull \hbox (21.39868pt too wide) in paragraph at lines 188--189
+[]\TU/FangSong(0)/m/n/12.045 针 对 \TU/TimesNewRoman(0)/m/n/12.045 ReAct \TU/Fang
+Song(0)/m/n/12.045 在 科 学 场 景 下 的 典 型 失 败 模 式，|  本 文 在 \TU/lmtt/m/n/12.045 promp
+ts/system_prompts.py
  []
 
 
@@ -1827,119 +1957,111 @@ Underfull \hbox (badness 10000) in paragraph at lines 200--200
  []
 
 
-Underfull \hbox (badness 4713) in paragraph at lines 200--200
+Underfull \hbox (badness 10000) in paragraph at lines 200--200
 \TU/lmtt/m/n/12.045 descriptive_statistics \TU/SimSun(1)/m/n/12.045 计 算；|  线 性 
-代 数 运 算 必 须 通
- []
-
-[21]
-Overfull \hbox (65.3764pt too wide) in paragraph at lines 209--214
-[]\TU/lmtt/m/n/12.045 src/prompts/planner_prompts.py \TU/FangSong(0)/m/n/12.045
- 定 义 了 \TU/TimesNewRoman(0)/m/n/12.045 DAGPlanner \TU/FangSong(0)/m/n/12.045 专 
-用 的 三 段 提 示：| \TU/lmtt/m/n/12.045 PLANNER_SYSTEM_PROMPT
+代 数 运
  []
 
 
-Overfull \hbox (50.22269pt too wide) in paragraph at lines 209--214
-\TU/FangSong(0)/m/n/12.045 工 具 的 输 出 字 段 白 名 单，|  从 根 源 减 少 占 位 符 [][]\TU/lmtt/
-m/n/12.045 ${sX.field} []\TU/FangSong(0)/m/n/12.045 的 字 段 名 书 写 错 误；| \TU/lmtt/
-m/n/12.045 REPLAN_HINT_TEMPLATE
+Underfull \vbox (badness 1616) has occurred while \output is active []
+
+ [24]
+[25] [26]) (body/undergraduate/final/5-experiments.tex [27]
+Overfull \hbox (24.728pt too wide) in paragraph at lines 13--17
+\TU/FangSong(0)/m/n/12.045 单 轮 最 大 \TU/TimesNewRoman(0)/m/n/12.045 token \TU/Fa
+ngSong(0)/m/n/12.045 数 \TU/TimesNewRoman(0)/m/n/12.045 4096\TU/FangSong(0)/m/n/
+12.045 ，|  迭 代 上 限 $\OML/ztmcm/m/it/12.045 M \OT1/ztmcm/m/n/12.045 = 10$\TU/Fan
+gSong(0)/m/n/12.045 。| \TU/TimesNewRoman(0)/m/n/12.045 RATS \TU/FangSong(0)/m/n
+/12.045 的 嵌 入 接 口 使 用 \TU/lmtt/m/n/12.045 text-embedding-v3\TU/FangSong(0)/m/n/
+12.045 ，|
  []
 
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [22])
-(body/undergraduate/final/5-experiments.tex
-Overfull \hbox (32.55923pt too wide) in paragraph at lines 236--1
-|\TU/FangSong(0)/m/n/12.045 （\TU/lmtt/m/n/12.045 --cases\TU/FangSong(0)/m/n/12.
-045 ）|  的 任 意 组 合 运 行。|  每 一 次 评 测 会 在 \TU/lmtt/m/n/12.045 outputs/eval/<timest
-amp>/ \TU/FangSong(0)/m/n/12.045 下 落 盘 \TU/lmtt/m/n/12.045 results.json
- []
-
-[23] [24] [25] [26
+[28
 
 ]
-Overfull \hbox (18.79982pt too wide) in paragraph at lines 5--8
-\TU/lmtt/m/n/12.045 scripts/run_eval.py --configs b0 b1 b2 b3 b4 ours ours_rats
- ours_dag ours_full\TU/FangSong(0)/m/n/12.045 。| 
- []
-
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 27.
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <5> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 27.
-
-Underfull \hbox (badness 1009) in paragraph at lines 61--61
-[]|\TU/TimesNewRoman(0)/m/n/12.045 Ours \TU/SimSun(1)/m/n/12.045 基 础 上 把 主 循 环 
-换 成 \TU/TimesNewRoman(0)/m/n/12.045 DAGPlanner |\TU/SimSun(1)/m/n/12.045 （无
- []
-
-[27]
 File: figure/fig_main_bar.pdf Graphic file (type pdf)
 <use figure/fig_main_bar.pdf>
- [28]
-Overfull \hbox (3.43027pt too wide) in paragraph at lines 129--129
+ [29] [30]
+Overfull \hbox (9.31047pt too wide) in paragraph at lines 129--129
  []|\TU/TimesNewRoman(0)/m/n/7.52812 Ours+RATS| 
  []
 
 
-Overfull \hbox (1.33136pt too wide) in paragraph at lines 129--129
+Overfull \hbox (7.21156pt too wide) in paragraph at lines 129--129
  []|\TU/TimesNewRoman(0)/m/n/7.52812 Ours+DAG| 
  []
 
-File: figure/fig_heatmap.pdf Graphic file (type pdf)
-<use figure/fig_heatmap.pdf>
-[29]
-Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [30]
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Overfull \hbox (0.8744pt too wide) in paragraph at lines 129--129
+ []|\TU/TimesNewRoman(0)/m/n/7.52812 Ours_full| 
+ []
+
+
+Underfull \vbox (badness 2005) has occurred while \output is active []
 
  [31]
+File: figure/fig_heatmap.pdf Graphic file (type pdf)
+<use figure/fig_heatmap.pdf>
+
 [32]
+Overfull \hbox (1.94208pt too wide) in paragraph at lines 168--168
+ []|$\OT1/ztmcm/m/n/12.045 ^^A$\TU/TimesNewRoman(0)/m/n/12.045 Duration| 
+ []
+
+[33]
+Overfull \hbox (25.22853pt too wide) in paragraph at lines 175--176
+[]\TU/TimesNewRoman(0)/b/n/12.045 RATS \TU/FangSong(0)/b/n/12.045 与 \TU/TimesNe
+wRoman(0)/b/n/12.045 DAGPlanner \TU/FangSong(0)/b/n/12.045 单 独 接 入 均 拉 低 成 功 率，
+|  揭 示 基 座 模 型 依 赖 性\TU/FangSong(0)/m/n/12.045 ：| \TU/lmtt/m/n/12.045 Ours+RATS
+
+ []
+
+[34]
 File: figure/fig_scatter.pdf Graphic file (type pdf)
 <use figure/fig_scatter.pdf>
-) (body/undergraduate/final/6-analysis.tex [33] [34]
+) (body/undergraduate/final/6-analysis.tex [35]
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <12.045> not available
 (Font)              Font shape `TU/lmtt/b/n' tried instead on input line 9.
- [35
+ [36
 
-] [36]
+] [37]
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <15.05624> not available
 (Font)              Font shape `TU/lmtt/b/n' tried instead on input line 57.
- [37])
-(body/undergraduate/final/7-conclusion.tex [38] [39
 
-]))
-(body/undergraduate/final/post.tex
-Underfull \vbox (badness 1102) has occurred while \output is active []
+Underfull \vbox (badness 1442) has occurred while \output is active []
 
- [40]
-[41] [42] (body/undergraduate/final/3-appendix.tex [43] [44
+ [38]
+Underfull \vbox (badness 1033) has occurred while \output is active []
 
-]
-Overfull \hbox (10.44147pt too wide) in alignment at lines 21--40
+ [39])
+(body/undergraduate/final/7-conclusion.tex [40] [41
+
+] [42]))
+(body/undergraduate/final/post.tex [43] [44
+
+] [45]
+(body/undergraduate/final/3-appendix.tex [46]
+Overfull \hbox (14.67531pt too wide) in alignment at lines 21--40
  [] [] [] [] 
  []
 
 
-Overfull \hbox (10.44147pt too wide) in alignment at lines 40--55
+Overfull \hbox (14.67531pt too wide) in alignment at lines 40--55
  [] [] [] [] 
  []
 
 
-Overfull \hbox (10.44147pt too wide) in alignment at lines 55--60
+Overfull \hbox (14.67531pt too wide) in alignment at lines 55--60
  [] [] [] [] 
  []
 
 
-Overfull \hbox (10.44147pt too wide) in alignment at lines 60--63
+Overfull \hbox (14.67531pt too wide) in alignment at lines 60--63
  [] [] [] [] 
  []
 
 
-Overfull \hbox (4.02945pt too wide) in paragraph at lines 65--66
+Overfull \hbox (13.55496pt too wide) in paragraph at lines 65--66
 []|\TU/lmtt/m/n/10.53937 matrix_operation| 
  []
 
@@ -1954,16 +2076,34 @@ Underfull \hbox (badness 10000) in paragraph at lines 67--71
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 83--87
-[]|\TU/lmtt/m/n/10.53937 expression\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt
-/m/n/10.53937 lower\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n/10.53937 up
-per\TU/TimesNewRoman(0)/m/n/10.53937 ,
+Underfull \hbox (badness 10000) in paragraph at lines 72--77
+[]|\TU/lmtt/m/n/10.53937 result\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n
+/10.53937 shape\TU/TimesNewRoman(0)/m/n/10.53937 ,
+ []
+
+
+Underfull \hbox (badness 3386) in paragraph at lines 78--80
+[]|\TU/FangSong(0)/m/n/10.53937 矩 阵 基 本 运
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 88--92
-[]|\TU/lmtt/m/n/10.53937 integral\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m
-/n/10.53937 absolute_error\TU/TimesNewRoman(0)/m/n/10.53937 ,
+[]|\TU/lmtt/m/n/10.53937 integral\TU/TimesNewRoman(0)/m/n/10.53937 ,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 88--92
+\TU/lmtt/m/n/10.53937 absolute_error\TU/TimesNewRoman(0)/m/n/10.53937 ,
+ []
+
+
+Underfull \hbox (badness 3386) in paragraph at lines 93--95
+[]|\TU/FangSong(0)/m/n/10.53937 一 元 函 数 自
+ []
+
+
+Underfull \hbox (badness 3386) in paragraph at lines 93--95
+\TU/FangSong(0)/m/n/10.53937 适 应 数 值 积
  []
 
 
@@ -1972,31 +2112,39 @@ Underfull \hbox (badness 10000) in paragraph at lines 98--102
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 103--107
-[]|\TU/lmtt/m/n/10.53937 model\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n/
-10.53937 params\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n/10.53937 r_squa
-red\TU/TimesNewRoman(0)/m/n/10.53937 ,
+Overfull \hbox (2.3402pt too wide) in paragraph at lines 98--102
+\TU/TimesNewRoman(0)/m/n/10.53937 ear/poly2/exponential/power),
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 113--117
-[]|\TU/lmtt/m/n/10.53937 expression\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt
-/m/n/10.53937 lower\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n/10.53937 up
-per\TU/TimesNewRoman(0)/m/n/10.53937 ,
+Underfull \hbox (badness 3386) in paragraph at lines 108--110
+[]|\TU/FangSong(0)/m/n/10.53937 多 模 型 曲 线
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 130--141
-[]|\TU/lmtt/m/n/10.53937 count\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n/
-10.53937 mean\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n/10.53937 median\T
-U/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n/10.53937 std\TU/TimesNewRoman(0)
-/m/n/10.53937 ,
+Overfull \hbox (8.0218pt too wide) in paragraph at lines 111--112
+[]|\TU/lmtt/m/n/10.53937 equation_solver| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 147--153
-[]|\TU/lmtt/m/n/10.53937 test_type \TU/TimesNewRoman(0)/m/n/10.53937 (one_sampl
-e_t /
+Underfull \hbox (badness 10000) in paragraph at lines 118--122
+[]|\TU/lmtt/m/n/10.53937 root\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n/1
+0.53937 residual\TU/TimesNewRoman(0)/m/n/10.53937 ,
+ []
+
+
+Underfull \hbox (badness 3386) in paragraph at lines 123--125
+[]|\TU/FangSong(0)/m/n/10.53937 区 间 内 方 程
+ []
+
+
+Underfull \hbox (badness 3386) in paragraph at lines 142--144
+[]|\TU/FangSong(0)/m/n/10.53937 描 述 性 统 计
+ []
+
+
+Overfull \hbox (8.0218pt too wide) in paragraph at lines 145--146
+[]|\TU/lmtt/m/n/10.53937 hypothesis_test| 
  []
 
 
@@ -2006,19 +2154,44 @@ Underfull \hbox (badness 10000) in paragraph at lines 147--153
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 154--159
+Underfull \hbox (badness 5847) in paragraph at lines 154--159
 []|\TU/lmtt/m/n/10.53937 test_type\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/
 m/n/10.53937 t_statistic\TU/TimesNewRoman(0)/m/n/10.53937 ,
  []
 
 
-Underfull \hbox (badness 1762) in paragraph at lines 160--162
-[]|\TU/TimesNewRoman(0)/m/n/10.53937 t \TU/FangSong(0)/m/n/10.53937 检 验 等 假 设
+Underfull \hbox (badness 10000) in paragraph at lines 154--159
+\TU/lmtt/m/n/10.53937 p_value\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n/1
+0.53937 alpha\TU/TimesNewRoman(0)/m/n/10.53937 ,
  []
 
 
-Overfull \hbox (9.56262pt too wide) in paragraph at lines 163--164
+Overfull \hbox (19.08813pt too wide) in paragraph at lines 163--164
 []|\TU/lmtt/m/n/10.53937 linear_regression| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 168--174
+[]|\TU/lmtt/m/n/10.53937 slope\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n/
+10.53937 intercept\TU/TimesNewRoman(0)/m/n/10.53937 ,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 168--174
+\TU/lmtt/m/n/10.53937 r_squared\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n
+/10.53937 p_value\TU/TimesNewRoman(0)/m/n/10.53937 ,
+ []
+
+
+Underfull \hbox (badness 3386) in paragraph at lines 175--177
+[]|\TU/FangSong(0)/m/n/10.53937 一 元 线 性 回
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 180--184
+[]|\TU/lmtt/m/n/10.53937 x\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n/10.5
+3937 y\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n/10.53937 method \TU/Time
+sNewRoman(0)/m/n/10.53937 (pear-
  []
 
 
@@ -2034,28 +2207,32 @@ Underfull \hbox (badness 10000) in paragraph at lines 185--190
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 203--206
-[]|\TU/lmtt/m/n/10.53937 file_path\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/
-m/n/10.53937 width_pixels\TU/TimesNewRoman(0)/m/n/10.53937 ,
+Underfull \hbox (badness 10000) in paragraph at lines 196--202
+[]|\TU/lmtt/m/n/10.53937 x\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n/10.5
+3937 y\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n/10.53937 title\TU/TimesN
+ewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n/10.53937 xlabel\TU/TimesNewRoman(0)/m/n/
+10.53937 ,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 219--222
-[]|\TU/lmtt/m/n/10.53937 file_path\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/
-m/n/10.53937 width_pixels\TU/TimesNewRoman(0)/m/n/10.53937 ,
+Underfull \hbox (badness 10000) in paragraph at lines 212--218
+[]|\TU/lmtt/m/n/10.53937 x\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n/10.5
+3937 y\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n/10.53937 title\TU/TimesN
+ewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n/10.53937 xlabel\TU/TimesNewRoman(0)/m/n/
+10.53937 ,
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 228--234
 []|\TU/lmtt/m/n/10.53937 labels\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n
-/10.53937 values\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n/10.53937 title
-\TU/TimesNewRoman(0)/m/n/10.53937 ,
+/10.53937 values\TU/TimesNewRoman(0)/m/n/10.53937 ,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 235--238
-[]|\TU/lmtt/m/n/10.53937 file_path\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/
-m/n/10.53937 width_pixels\TU/TimesNewRoman(0)/m/n/10.53937 ,
+Underfull \hbox (badness 10000) in paragraph at lines 228--234
+\TU/lmtt/m/n/10.53937 title\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n/10.
+53937 xlabel\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/m/n/10.53937 ylabel\TU
+/TimesNewRoman(0)/m/n/10.53937 ,
  []
 
 
@@ -2071,29 +2248,45 @@ n/10.53937 title\TU/TimesNewRoman(0)/m/n/10.53937 ,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 250--253
-[]|\TU/lmtt/m/n/10.53937 file_path\TU/TimesNewRoman(0)/m/n/10.53937 , \TU/lmtt/
-m/n/10.53937 width_pixels\TU/TimesNewRoman(0)/m/n/10.53937 ,
- []
-
-
-Overfull \hbox (10.44147pt too wide) in alignment at lines 63--257
+Overfull \hbox (14.67531pt too wide) in alignment at lines 63--257
  [] [] [] [] 
  []
 
-ignored error: Infinite glue shrinkage found in box being split [45
+ignored error: Infinite glue shrinkage found in box being split [47
 
-] [46]
-Overfull \hbox (23.7972pt too wide) in paragraph at lines 304--306
-\TU/FangSong(0)/m/n/12.045 范 例  |（异 常 切 换 \TU/TimesNewRoman(0)/m/n/12.045 + \TU
-/FangSong(0)/m/n/12.045 最 终 答 复 格 式） 。|  范 例 本 身 较 长，|  完 整 内 容 见 \TU/lmtt/m/n/
-12.045 src/prompts/system_prompts.py
+
+] [48]
+Underfull \hbox (badness 10000) in paragraph at lines 325--325
+[]|\TU/SimSun(1)/m/n/12.045 在 \TU/lmtt/m/n/12.045 descriptive_statistics \TU/Si
+mSun(1)/m/n/12.045 与
  []
 
-) (body/undergraduate/final/4-cv.tex [47] [48])) [49
+
+Underfull \hbox (badness 10000) in paragraph at lines 325--325
+\TU/lmtt/m/n/12.045 hypothesis_test \TU/SimSun(1)/m/n/12.045 之 间 区 分  |（统 计 描
+ []
 
 
-] [50
+Underfull \hbox (badness 10000) in paragraph at lines 325--325
+[]|\TU/SimSun(1)/m/n/12.045 在 \TU/lmtt/m/n/12.045 linear_regression \TU/SimSun(
+1)/m/n/12.045 与
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 325--325
+\TU/lmtt/m/n/12.045 correlation_analysis \TU/SimSun(1)/m/n/12.045 之 间 区 分  |（拟
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 325--325
+[]|\TU/SimSun(1)/m/n/12.045 在 \TU/lmtt/m/n/12.045 equation_solver \TU/SimSun(1)
+/m/n/12.045 与
+ []
+
+) (body/undergraduate/final/4-cv.tex [49] [50])) [51
+
+
+] [52
 
 ]
 (page/undergraduate/final/post.tex (page/undergraduate/final/job.tex
@@ -2101,24 +2294,20 @@ Underfull \hbox (badness 10000) in paragraph at lines 37--38
 
  []
 
-) (page/undergraduate/final/eval.tex [51
+) (page/undergraduate/final/eval.tex [53
 
 
-] [52
+] [54
+
+]) [55
+
+] [56
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 6--7
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 13--14
-
- []
-
-)) [53
-
-] (C:\Users\EDY\Desktop\Final_Project\final_report\out\zjuthesis.aux)
+File: figure/mentor_opinion.png Graphic file (type bmp)
+<figure/mentor_opinion.png>
+) [57]
+(C:\Users\EDY\Desktop\Final_Project\final_report\out\zjuthesis.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2022/08/05>
@@ -2132,13 +2321,13 @@ Package logreq Info: Writing requests to 'zjuthesis.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 35727 strings out of 402986
- 806793 string characters out of 5448918
- 1769571 words of memory out of 5000000
- 63883 multiletter control sequences out of 15000+600000
- 658547 words of font info for 198 fonts, out of 8000000 for 9000
+ 35780 strings out of 402986
+ 808023 string characters out of 5448918
+ 1824551 words of memory out of 5000000
+ 63926 multiletter control sequences out of 15000+600000
+ 658499 words of font info for 192 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 107i,17n,125p,1222b,5678s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 107i,17n,125p,1222b,5663s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 Output written on C:\Users\EDY\Desktop\Final_Project\final_report\out\zjuthesis
-.pdf (67 pages).
+.pdf (69 pages).

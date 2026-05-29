@@ -1,4 +1,4 @@
-\cleardoublepage
+\clearpage
 
 \section{算法设计}
 
@@ -251,7 +251,7 @@ Execute 阶段按拓扑序逐步调用工具，并允许对单步参数做有限
 \texttt{PlanValidator} 在不调用 LLM 的前提下覆盖五类失败模式（\autoref{tab:validator-modes}），所有错误一次性收集后整体回灌给 LLM，避免逐错误轮询造成额外的 API 开销。
 其中“占位符引用必须包含在 depends\_on”这条强约束是 DAG 结构能够被纯代码校验的关键：它把“依赖关系是否一致”这一原本必须由 LLM 自我审视的问题，下沉为对 \texttt{depends\_on} 与 \verb|${...}| 占位符两个集合是否相等的判定。
 
-\begin{table}[ht]
+\begin{table}[htbp]
     \centering
     \caption{\label{tab:validator-modes}DAGPlanner 的五种纯代码校验失败模式}
     \begin{tabularx}{\linewidth}{clX}
